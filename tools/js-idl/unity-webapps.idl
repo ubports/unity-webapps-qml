@@ -1,0 +1,90 @@
+dictionary UnityIndicatorProperties {
+   Integer count;
+   Date time;
+   String iconURI;
+   Callback onIndicatorActivated;
+};
+interface UnityMessagingIndicatorInterface {
+   method showIndicator (String name, optional UnityIndicatorProperties indicatorProperties);
+   method clearIndicator (String name);
+   method clearIndicators ();
+
+   method addAction (String name, Callback onActionInvoked);
+   method removeAction (String name);
+   method removeActions (String name);
+
+   method onPresenceChanged (Callback onPresenceChanged);
+   readonly attribute String presence;
+};      
+
+interface UnityLauncherInterface {
+   method setCount (Integer count);
+   method clearCount ();
+	
+   method setProgress (Number progress);
+   method clearProgress ();
+
+   method setUrgent (Boolean urgnet);
+
+   method addAction (String name, Callback onActionInvoked);
+   method removeAction (String name);
+   method removeActions ();
+};
+
+interface UnityNotificationInterface {
+   method showNotification (String summary, String body, optional String iconUrl);
+};
+
+enum UnityPlaybackState {
+   "Playing",
+   "Paused"
+};
+dictionary UnityTrackMetadata {
+   String title;
+
+   String? album;
+   String? artist;
+
+   String? artLocation;
+};
+interface UnityMediaPlayerInterface {
+   method setTrack (UnityTrackMetadata trackMetadata);
+
+   method onPrevious (Callback onPreviousCallback);
+   method onNext (Callback onNextCallback);
+   method onPlayPause (Callback onPlayPauseCallback);
+
+   method onPrevious (Callback onPreviousCallback);
+   method onNext (Callback onNextCallback);
+   method onPlayPause (Callback onPlayPauseCallback);
+
+   method getPlaybackstate (Callback response);
+   method setPlaybackstate (UnityPlaybackState state);
+
+   method setCanGoNext (boolean cangonext);
+   method setCanGoPrev (boolean cangoprev);
+   method setCanPlay (boolean canplay);
+   method setCanPause (boolean canpause);
+};
+
+dictionary UnityInitParameters {
+   String name;
+   String iconUrl;
+   Callback onInit;
+
+   String? homepage;
+   String? domain;
+};
+interface Unity {
+   method init (UnityInitParameters initializationParameters);
+
+   method addAction (String actionName, Callback onActionInvoked);
+   method removeAction (String actionName);
+   method removeActions ();
+	
+   attribute UnityNotificationInterface Notification;
+   attribute UnityMessagingIndicatorInterface MessagingIndicator;
+   attribute UnityMediaPlayerInterface MediaPlayer;
+   attribute UnityLauncherInterface Launcher;
+};
+

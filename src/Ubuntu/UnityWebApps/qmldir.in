@@ -1,0 +1,5 @@
+module $${API_URI}
+plugin $${TARGET}
+$${TARGET}Js 0.1 $${TARGET}.js
+$${TARGET}Utils 0.1 $${TARGET}Utils.js
+$${TARGET} 0.1 $${TARGET}.qml

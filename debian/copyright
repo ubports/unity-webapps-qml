@@ -1,0 +1,10 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: unity-webapps-qml
+Upstream-Contact: WebApps Team <webapps-team@canonical.com>
+Source: https://launchpad.net/unity-webapps-qml
+
+Files: *
+Copyright: 2013 Canonical Ltd.
+License: GPL-3
+ On Debian systems, the complete text of the GNU General
+ Public License version 3 can be found in `/usr/share/common-licenses/GPL-3'.
