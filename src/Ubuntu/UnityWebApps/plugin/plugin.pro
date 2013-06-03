@@ -24,13 +24,11 @@ QT += core qml
 
 SOURCES += \
     qml-plugin.cpp \
-    callback.cpp \
     UnityWebappsApi.cpp \
     UnityWebappsApiNotifications.cpp
 
 HEADERS += \
     qml-plugin.h \
-    callback.h \
     UnityWebappsApi.h \
     UnityWebappsApiNotifications.h
 
