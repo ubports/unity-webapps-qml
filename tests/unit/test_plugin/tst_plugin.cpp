@@ -7,7 +7,7 @@
 #include <QSignalSpy>
 #include <QJsonDocument>
 
-#include "plugin/UnityWebappsApi.h"
+#include "plugin/unity-webapps-api.h"
 
 
 PluginTest::PluginTest()
@@ -48,5 +48,3 @@ void PluginTest::testInit()
 //    binding->init(QJsonDocument::fromJson(initargs.toUtf8()).toVariant());
 //    QCOMPARE(initCompleted.count(), 1);
 }
-
-QTEST_MAIN(PluginTest);

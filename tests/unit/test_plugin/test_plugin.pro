@@ -11,19 +11,36 @@ QT += \
     qml \
     testlib
 
-LIBS += $$system(ls ../../src/Ubuntu/UnityWebApps/*.so)
+PLUGIN_SRC_DIR = \
+    $$TOP_SRC_DIR/src/Ubuntu/UnityWebApps/plugin
 
 SOURCES += \
-    tst_plugin.cpp
+    tst_plugin.cpp \
+    tst_manifestParser.cpp \
+    tst_webappsAppModel.cpp \
+    $${PLUGIN_SRC_DIR}/unity-webapps-app-model.cpp \
+    $${PLUGIN_SRC_DIR}/unity-webapps-app-manifest-parser.cpp \
+    main.cpp
 
 HEADERS += \
-    tst_plugin.h
+    tst_plugin.h \
+    tst_manifestParser.h \
+    tst_webappsAppModel.h \
+    $${PLUGIN_SRC_DIR}/unity-webapps-app-model.h \
+    $${PLUGIN_SRC_DIR}/unity-webapps-app-manifest-parser.h
 
 INCLUDEPATH += \
     $$TOP_SRC_DIR/src/Ubuntu/UnityWebApps
 
+OTHER_FILES += \
+    $$system(ls ./data/*/*) \
+    $$system(ls ./data/*/*/*) \
+    $$system(ls *.sh)
+
 # manually add the 'check' target
-check.commands = "set -e;"
 check.depends = $${TARGET}
+check.commands = "set -e; ./runtests.sh $${TARGET}"
+
 QMAKE_EXTRA_TARGETS += check
+
 

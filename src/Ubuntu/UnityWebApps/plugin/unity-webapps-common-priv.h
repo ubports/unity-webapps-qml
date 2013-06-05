@@ -16,24 +16,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TST_PLUGIN_H
-#define TST_PLUGIN_H
 
-#include <QTest>
+#ifndef __UNITY_WEBAPPS_TOOLS_PRIV_H__
+#define __UNITY_WEBAPPS_TOOLS_PRIV_H__
 
-class PluginTest: public QObject
+// T must be copy-constructible & have a default constructor
+template <typename T>
+class Fallible
 {
-    Q_OBJECT
+public:
+    struct InvalidValueException {};
 
 public:
-    PluginTest();
+    Fallible()
+        : _valid(false)
+    {}
+    Fallible(const T& value, bool valid = true)
+        : _valid(valid), _value(value)
+    {}
+    bool isvalid() const { return _valid; }
+    T value() const
+    {
+        if (!_valid)
+            throw InvalidValueException();
+        return _value;
+    }
 
-private Q_SLOTS:
-    void initTestCase();
-
-    // tests
-    void testLoadPlugin();
-    void testInit();
+private:
+    bool _valid;
+    T _value;
 };
 
-#endif // TST_PLUGIN_H
+#endif // __UNITY_WEBAPPS_TOOLS_PRIV_H__

@@ -16,24 +16,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TST_PLUGIN_H
-#define TST_PLUGIN_H
+#ifndef __TST_WEBAPPS_APP_MODEL_H__
+#define __TST_WEBAPPS_APP_MODEL_H__
 
+#include <QObject>
+#include <QFileInfoList>
 #include <QTest>
 
-class PluginTest: public QObject
+
+class WebappsAppModelTest: public QObject
 {
     Q_OBJECT
 
 public:
-    PluginTest();
+    WebappsAppModelTest();
 
 private Q_SLOTS:
     void initTestCase();
 
     // tests
-    void testLoadPlugin();
-    void testInit();
+    void testEmptyWebappsModel();
+    void testWebappsModel();
+    void testWebappsContentWithRequiresModel();
+
+
+private:
+
 };
 
-#endif // TST_PLUGIN_H
+#endif // __TST_WEBAPPS_APP_MODEL_H__

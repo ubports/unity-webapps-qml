@@ -12,24 +12,47 @@ Item {
     id: webapp
 
     /*!
-      \preliminary
+      \qmlproperty string UnityWebApps::name
       Holds the name of the application that is run as a WebApp.
 
       The name should not change once it has been set. (?)
       */
     property string name: ""
 
+
     /*!
-      \preliminary
+      \qmlproperty string UnityWebApps::bindee
       Holds a reference to the object that webapps are to be injected in.
 
-      The component directly binds and expects an experimental.messageReceived signal
-      to bind to.
+      The UnityWebApps QML component expects any bindee to duck-type with
+        the following IDL signature:
+
+        method getUnityWebappsProxies()
+
+        that should return a BindeeExports:
+
+        interface BindeeExports {
+            method injectUserScript(string userScriptUrl);
+            method sendToPage(string message);
+            method loadingStartedConnect(Callback onLoadingStarted);
+            method messageReceivedConnect(Callback onMessageReceived);
+        }
+
       */
     property var bindee
 
+
+    /*!
+      \qmlproperty string UnityWebApps::_opt_backendProxies
+
+      Used only for testing.
+      Allows optional (not the default ones) backends to be used.
+
+     */
     property var _opt_backendProxies: null
 
+
+    // PRIVATE FUNCTION: __bind
     //
     // Binds a given webapp object with something that
     //  is expected to support the following calls:
@@ -62,12 +85,17 @@ Item {
         internal.instance = instance;
     }
 
+    // PRIVATE FUNCTION: __isValidBindee
+    //
     function __isValidBindee(bindee) {
         var properties = [{'name': 'getUnityWebappsProxies', 'type': 'function'}];
         var validator = UnityWebAppsUtils.makePropertyValidator(properties);
         return validator(bindee);
     }
 
+    // PRIVATE FUNCTION: __areValidBindeeProxies
+    //
+    // Validates the bindeed proxies as exported by getUnityWebappsProxies
     function __areValidBindeeProxies(proxies) {
         var properties = [{'name': 'sendToPage', 'type': 'function'},
                 {'name': 'loadingStartedConnect', 'type': 'function'},
@@ -78,11 +106,15 @@ Item {
         return validator(proxies);
     }
 
+    // PRIVATE FUNCTION: __reset
+    //
     function __reset() {
         __unbind();
         UnityBackends.clearAll();
     }
 
+    // PRIVATE FUNCTION: __unbind
+    //
     function __unbind() {
         //TODO: make sure that now leaks here
         internal.instance = null;
@@ -107,12 +139,17 @@ Item {
         }
     }
 
+    // PRIVATE DATA
+    //
     QtObject {
         id: internal
         property var instance: null
         property var backends: null
     }
 
+
+    // PRIVATE FUNCTION: __makeBackendProxies
+    //
     // TODO lazily create the 'backends' on a getUnityObject
     // TODO the backends should prop be on the qml side and provided to here
     function __makeBackendProxies () {

@@ -24,15 +24,21 @@ QT += core qml
 
 SOURCES += \
     qml-plugin.cpp \
-    UnityWebappsApi.cpp \
-    UnityWebappsApiNotifications.cpp
+    unity-webapps-api.cpp \
+    unity-webapps-api-notifications.cpp \
+    unity-webapps-app-model.cpp \
+    unity-webapps-app-manifest-parser.cpp
 
 HEADERS += \
     qml-plugin.h \
-    UnityWebappsApi.h \
-    UnityWebappsApiNotifications.h
+    unity-webapps-api.h \
+    unity-webapps-api-notifications.h \
+    unity-webapps-app-model.h \
+    unity-webapps-app-manifest-parser.h \
+    unity-webapps-common-priv.h
 
-DEFINES += API_URI=\\\"$${API_URI}\\\"
+DEFINES += \
+    API_URI=\\\"$${API_URI}\\\"
 
 # plugin deployment
 PLUGIN_INSTALL_PATH = $$[QT_INSTALL_QML]/$$replace(API_URI, \\., /)

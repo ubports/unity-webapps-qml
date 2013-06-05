@@ -16,24 +16,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TST_PLUGIN_H
-#define TST_PLUGIN_H
-
+#include <QList>
+#include <QObject>
 #include <QTest>
+#include <QDebug>
 
-class PluginTest: public QObject
+#include "tst_manifestParser.h"
+#include "tst_plugin.h"
+#include "tst_webappsAppModel.h"
+
+
+int runTests(int argc, char ** argv)
 {
-    Q_OBJECT
+    static QList<QObject *> tests;
 
-public:
-    PluginTest();
+    tests.append(new WebappsAppModelTest());
+    tests.append(new ManifestParserTest());
 
-private Q_SLOTS:
-    void initTestCase();
+    Q_FOREACH(QObject *test, tests)
+    {
+        QTest::qExec(test, argc, argv);
+    }
 
-    // tests
-    void testLoadPlugin();
-    void testInit();
-};
+    return EXIT_SUCCESS;
+}
 
-#endif // TST_PLUGIN_H
+
+int main (int argc, char ** argv)
+{
+    return runTests(argc, argv);
+}
+
