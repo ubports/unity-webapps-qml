@@ -6,7 +6,7 @@
 
 // This placeholder gets munged with real data at build time.
 const WebappsGettextDict = JSON.parse(unescape(
-    ""
+  "[]"
 ));
 
 window.Unity = external.getUnityObject(1);
@@ -23,7 +23,6 @@ function isCorrectPage() {
 }
 
 function messagingIndicatorSetup() {
-    console.log('dddd')
     if (!isCorrectPage()) {
         return;
     }
@@ -48,5 +47,3 @@ Unity.init({ name: "BBC News",
              homepage: 'http://www.bbc.co.uk/news/',
              iconUrl: "icon://unity-webapps-bbc",
              onInit: wrapCallback(messagingIndicatorSetup) });
-
-console.log('Initi')
