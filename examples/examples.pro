@@ -1,4 +1,7 @@
 TEMPLATE=subdirs
 
 SUBDIRS += \
-    basic-webview
+    basic-webview \
+    webapps-app-model \
+    unity-webapps-example-bbcnews
+

@@ -39,6 +39,7 @@
 class UnityWebappsAppModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_ENUMS(WebAppsRoles)
 
 public:
 
@@ -69,10 +70,11 @@ public:
                          QObject* parent = 0);
     ~UnityWebappsAppModel();
 
-    enum Roles {
+    enum WebAppsRoles {
         Name = Qt::UserRole + 1,
         Domain,
         Urls,
+        Scripts,
         Content
     };
 
@@ -80,6 +82,30 @@ public:
     QHash<int, QByteArray> roleNames() const;
     int rowCount(const QModelIndex& parent = QModelIndex ()) const;
     QVariant data(const QModelIndex& index, int role) const;
+
+
+    // Exposed to QML
+    /*!
+     * \brief exists
+     * \param webappName
+     * \return
+     */
+    Q_INVOKABLE bool exists(const QString & webappName) const;
+
+
+    /*!
+     * \brief getWebappIndex
+     * \param webappName
+     * \return
+     */
+    Q_INVOKABLE int getWebappIndex(const QString & webappName) const;
+
+
+    /*!
+     * \brief data
+     * \return
+     */
+    Q_INVOKABLE QVariant data(int row, int role) const;
 
 
 private:
@@ -125,11 +151,13 @@ private:
 
     /*!
      * \brief addWebApp
-     * \param location
+     * \param userscriptLocation
+     * \param requiresLocation
      * \param manifest
-     * \param manifest
+     * \param content
      */
-    void addWebApp(const QString& location,
+    void addWebApp(const QString& userscriptLocation,
+                   const QString& requiresLocation,
                    const ManifestFileInfo& manifest,
                    const QString& content);
 
@@ -153,7 +181,8 @@ private:
 
     struct InstalledWebApp
     {
-        QString location;
+        QString userscriptLocation;
+        QString requiresLocation;
 
         struct
         {

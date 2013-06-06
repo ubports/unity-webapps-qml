@@ -31,6 +31,23 @@ class DefaultEnvironment : public UnityWebappsAppModel::Environment
 public:
     virtual QString getWebAppsSearchPath () const
     {
+        QString useLocalWebappInstallEnv (qgetenv("UNITY_WEBAPPS_BASE_USERSCRIPTS_FOLDER"));
+        if ( ! useLocalWebappInstallEnv.isEmpty())
+        {
+            if (QDir::isRelativePath(useLocalWebappInstallEnv))
+            {
+                QDir d(useLocalWebappInstallEnv);
+                d.makeAbsolute();
+                useLocalWebappInstallEnv = d.absolutePath();
+            }
+
+            qDebug() << "Using '"
+                     << useLocalWebappInstallEnv
+                     << "' as the default search path for installed webapps";
+
+            return useLocalWebappInstallEnv;
+        }
+
         return QLatin1String("/usr/share/unity-webapps/userscripts");
     }
 };
@@ -67,6 +84,7 @@ UnityWebappsAppModel::roleNames() const
         roles[Domain] = "domain";
         roles[Urls] = "urls";
         roles[Content] = "content";
+        roles[Scripts] = "scripts";
       }
     return roles;
 }
@@ -154,18 +172,27 @@ void UnityWebappsAppModel::load()
             continue;
         }
 
+        // FIXME: mmmh? ondemand or async?
         QString content =
                 loadUserScript (QDir(candidateWebappFolder.absoluteFilePath()),
                                 manifest.value());
 
+        const QString COMMON_BASE_PATH =
+                _environment->getWebAppsSearchPath()
+                + QDir::separator()
+                + _commonScriptsDirName;
+
+        //TODO: find proper common files (if any) considering the ones
+        // in local/ that could over take
         addWebApp (candidateWebappFolder.absoluteFilePath(),
+                   COMMON_BASE_PATH,
                    manifest.value(),
                    content);
     }
 }
 
 QString
-UnityWebappsAppModel::loadUserScript(const QDir& path,
+UnityWebappsAppModel::loadUserScript(const QDir& userscriptPath,
                                      const ManifestFileInfo& manifest)
 {
     if (manifest.scripts.count() == 0)
@@ -192,12 +219,13 @@ UnityWebappsAppModel::loadUserScript(const QDir& path,
     const QString COMMON_BASE_PATH =
             installationSearchPath + QDir::separator() + _commonScriptsDirName;
     READ_USER_SCRIPT(requires,COMMON_BASE_PATH);
-    READ_USER_SCRIPT(scripts,path.absolutePath());
+    READ_USER_SCRIPT(scripts,userscriptPath.absolutePath());
 
     return script;
 }
 
-void UnityWebappsAppModel::addWebApp(const QString& location,
+void UnityWebappsAppModel::addWebApp(const QString& userscriptLocation,
+                                     const QString& requiresLocation,
                                      const ManifestFileInfo& manifest,
                                      const QString& content)
 {
@@ -216,7 +244,8 @@ void UnityWebappsAppModel::addWebApp(const QString& location,
 
     InstalledWebApp webapp;
 
-    webapp.location = location;
+    webapp.userscriptLocation = userscriptLocation;
+    webapp.requiresLocation = requiresLocation;
     webapp.data.manifest = manifest;
     webapp.data.content = content;
 
@@ -237,15 +266,33 @@ int UnityWebappsAppModel::rowCount(const QModelIndex& parent) const
     return _webapps.count();
 }
 
-QVariant UnityWebappsAppModel::data(const QModelIndex& index, int role) const
+int UnityWebappsAppModel::getWebappIndex(const QString & webappName) const
 {
-    if (!index.isValid())
+    if (_webapps.empty())
+        return -1;
+
+    int idx = 0;
+    for (QList<InstalledWebApp>::const_iterator it = _webapps.begin()
+         ; it != _webapps.end()
+         ; ++idx, ++it)
     {
-        qDebug() << "UnityWebappsAppModel::data: Invalid index element";
-        return QVariant();
+        if (0 == it->data.manifest.name.toLower().compare(webappName.toLower()))
+        {
+            return idx;
+        }
     }
 
-    int row = index.row();
+    return -1;
+}
+
+bool UnityWebappsAppModel::exists(const QString & webappName) const
+{
+    //FIXME: efficiency
+    return getWebappIndex(webappName) != -1;
+}
+
+QVariant UnityWebappsAppModel::data(int row, int role) const
+{
     if ((row < 0) || (row >= _webapps.count()))
     {
         qDebug() << "UnityWebappsAppModel::data: Invalid index (out of bound)";
@@ -265,11 +312,34 @@ QVariant UnityWebappsAppModel::data(const QModelIndex& index, int role) const
     case Urls:
         return webapp.data.manifest.includes;
 
+    case Scripts:
+        {
+            QStringList scripts;
+            Q_FOREACH(QString require, webapp.data.manifest.requires)
+            {
+                scripts.append(webapp.requiresLocation + "/" + require);
+            }
+            Q_FOREACH(QString script, webapp.data.manifest.scripts)
+            {
+                scripts.append(webapp.userscriptLocation + "/" + script);
+            }
+            return scripts;
+        }
     case Content:
         return webapp.data.content;
     }
 
     return QVariant();
+}
+
+QVariant UnityWebappsAppModel::data(const QModelIndex& index, int role) const
+{
+    if ( ! index.isValid())
+    {
+        return QVariant();
+    }
+
+    return data(index.row(), role);
 }
 
 

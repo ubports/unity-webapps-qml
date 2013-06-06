@@ -11,7 +11,7 @@ Rectangle {
         id: webView
 
         // test url
-        url: "http://localhost:8181/"
+        url: "http://www.bbc.co.uk/news/"
         anchors.fill: parent
         width: parent.width
         height: parent.height

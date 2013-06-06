@@ -1,6 +1,7 @@
 import QtQuick 2.0
-import "UnityWebApps.js" as UnityWebApps
-import "UnityWebAppsUtils.js" as UnityWebAppsUtils
+import Ubuntu.UnityWebApps 0.1 as UbuntuUnityWebApps
+import "UnityWebApps.js" as UnityWebAppsJs
+import "UnityWebAppsUtils.js" as UnityWebAppsJsUtils
 import "UnityWebAppsBackendComponents.js" as UnityBackends
 
 //
@@ -9,7 +10,7 @@ import "UnityWebAppsBackendComponents.js" as UnityBackends
 //  -extract webview specific elements (postMessage)
 
 Item {
-    id: webapp
+    id: webapps
 
     /*!
       \qmlproperty string UnityWebApps::name
@@ -32,7 +33,7 @@ Item {
         that should return a BindeeExports:
 
         interface BindeeExports {
-            method injectUserScript(string userScriptUrl);
+            method injectUserScripts(string userScriptUrls);
             method sendToPage(string message);
             method loadingStartedConnect(Callback onLoadingStarted);
             method messageReceivedConnect(Callback onMessageReceived);
@@ -40,6 +41,13 @@ Item {
 
       */
     property var bindee
+
+
+    /*!
+      \qmlproperty
+
+     */
+    property var model: null
 
 
     /*!
@@ -57,7 +65,7 @@ Item {
     // Binds a given webapp object with something that
     //  is expected to support the following calls:
     //
-    function __bind(bindee) {
+    function __bind(bindee, webappUserscripts) {
         // FIXME: bad design
         if (internal.instance) {
             console.debug('__bind: ERROR Instance already set')
@@ -77,10 +85,11 @@ Item {
             return;
         }
 
-        var backends = webapp._opt_backendProxies || __makeBackendProxies();
-        var instance = new UnityWebApps.UnityWebApps(webapp,
+        var backends = webapps._opt_backendProxies || __makeBackendProxies();
+        var instance = new UnityWebAppsJs.UnityWebApps(webapps,
                                                      bindeeProxies,
-                                                     backends);
+                                                     backends,
+                                                     webappUserscripts);
         internal.backends = backends;
         internal.instance = instance;
     }
@@ -89,7 +98,7 @@ Item {
     //
     function __isValidBindee(bindee) {
         var properties = [{'name': 'getUnityWebappsProxies', 'type': 'function'}];
-        var validator = UnityWebAppsUtils.makePropertyValidator(properties);
+        var validator = UnityWebAppsJsUtils.makePropertyValidator(properties);
         return validator(bindee);
     }
 
@@ -100,9 +109,9 @@ Item {
         var properties = [{'name': 'sendToPage', 'type': 'function'},
                 {'name': 'loadingStartedConnect', 'type': 'function'},
                 {'name': 'messageReceivedConnect', 'type': 'function'},
-                {'name': 'injectUserScript', 'type': 'function'}];
+                {'name': 'injectUserScripts', 'type': 'function'}];
 
-        var validator = UnityWebAppsUtils.makePropertyValidator(properties);
+        var validator = UnityWebAppsJsUtils.makePropertyValidator(properties);
         return validator(proxies);
     }
 
@@ -121,11 +130,32 @@ Item {
         internal.backends = null;
     }
 
-    onBindeeChanged: {
-        if (bindee != null) {
-            webapps.__unbind();
-            webapps.__bind(bindee);
+    Component.onCompleted: {
+        if (bindee == null || name == "") {
+            console.log("Invalid component");
+            return;
         }
+
+        webapps.__unbind();
+
+        UnityBackends.clearAll();
+        UnityBackends.createAllWithAsync(webapps, {name: name});
+
+        var userscripts = [];
+        if (model != null && model.exists && model.exists(name)) {
+            var idx = model.getWebappIndex(name);
+            userscripts = model.data(idx, UbuntuUnityWebApps.UnityWebappsAppModel.Scripts);
+
+            // FIXME: hack
+            userscripts = userscripts.map(function (script) { return 'file://' + script; });
+            console.log(userscripts)
+        }
+
+        webapps.__bind(bindee, userscripts);
+    }
+
+    onBindeeChanged: {
+        //TODO?
     }
 
     // TODO: review this (multiple name changes), make sure that depends & syncs
@@ -133,10 +163,7 @@ Item {
     //  move this kind of deferred stuff into a more centralized sync point like QQmlParserStatus?
     //
     onNameChanged: {
-        if (name !== "") {
-            UnityBackends.clearAll();
-            UnityBackends.createAllWithAsync(webapp, {name: name});
-        }
+        //TODO?
     }
 
     // PRIVATE DATA

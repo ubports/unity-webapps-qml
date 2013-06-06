@@ -27,7 +27,8 @@ SOURCES += \
     unity-webapps-api.cpp \
     unity-webapps-api-notifications.cpp \
     unity-webapps-app-model.cpp \
-    unity-webapps-app-manifest-parser.cpp
+    unity-webapps-app-manifest-parser.cpp \
+    unity-webapps-app-model-filter-proxy.cpp
 
 HEADERS += \
     qml-plugin.h \
@@ -35,7 +36,8 @@ HEADERS += \
     unity-webapps-api-notifications.h \
     unity-webapps-app-model.h \
     unity-webapps-app-manifest-parser.h \
-    unity-webapps-common-priv.h
+    unity-webapps-common-priv.h \
+    unity-webapps-app-model-filter-proxy.h
 
 DEFINES += \
     API_URI=\\\"$${API_URI}\\\"

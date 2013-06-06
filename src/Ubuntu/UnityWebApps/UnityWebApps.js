@@ -30,10 +30,17 @@ var UnityWebApps = (function () {
 
     var json = JSON;
 
-    function _UnityWebApps(parentItem, bindeeProxies, backends) {
+    /*!
+        \param parentItem
+        \param bindeeProxies
+        \param backends
+        \param userscriptContent
+     */
+    function _UnityWebApps(parentItem, bindeeProxies, backends, userscripts) {
         this._injected_unity_api_path = Qt.resolvedUrl('unity-webapps-api.js');
         this._bindeeProxies = bindeeProxies;
         this._backends = backends;
+        this._userscripts = userscripts;
 
         this._bind();
     };
@@ -42,7 +49,10 @@ var UnityWebApps = (function () {
         _bind: function () {
             var self = this;
             self._bindeeProxies.loadingStartedConnect(function () {
-                self._bindeeProxies.injectUserScript(self._injected_unity_api_path);
+                var scripts = [self._injected_unity_api_path];
+                for(var i = 0; i < self._userscripts.length; ++i)
+                    scripts.push(Qt.resolvedUrl(self._userscripts[i]));
+                self._bindeeProxies.injectUserScripts(scripts);
             });
             self._bindeeProxies.messageReceivedConnect(function (message) {
                 if (!message)

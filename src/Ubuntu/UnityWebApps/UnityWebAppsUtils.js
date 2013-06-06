@@ -26,9 +26,10 @@
 //
 function makeProxiesForQtWebViewBindee(webViewId) {
     return {
-        injectUserScript: function(userScriptUrl) {
+        injectUserScripts: function(userScriptUrls) {
             var scripts = webViewId.experimental.userScripts;
-            scripts.push(userScriptUrl);
+            for (var i = 0; i < userScriptUrls.length; ++i)
+                scripts.push(userScriptUrls[i]);
             webViewId.experimental.userScripts = scripts;
         },
         sendToPage: function (message) {

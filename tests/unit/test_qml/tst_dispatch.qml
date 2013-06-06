@@ -129,8 +129,8 @@ TestCase {
 
         function getUnityWebappsProxies() {
             return  {
-                injectUserScript: function(userScriptUrl) {
-                    injected(userScriptUrl);
+                injectUserScripts: function(userScriptUrls) {
+                    injected(userScriptUrls);
                 },
                 sendToPage: function (message) {
                 },
