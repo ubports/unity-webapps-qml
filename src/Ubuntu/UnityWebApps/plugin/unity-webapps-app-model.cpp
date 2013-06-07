@@ -24,6 +24,34 @@
 #include "unity-webapps-app-manifest-parser.h"
 
 
+/*!
+  \qmltype UnityWebappsAppModel
+  \inqmlmodule Ubuntu.UnityWebApps 0.1
+  \ingroup ubuntu
+  \brief Provides a model for the list of the currently installed WebApps.
+
+  Besides providing information about the currently installed webapps, it can
+  typically be used in conjunction with the UnityWebApps QML component that already
+  takes care of making sure that the Unity WebApps API is available to a given
+  QML WebView. What the UnityWebappsAppModel can provide is a way to ask the
+  WebApp QML component to inject the userscripts corresponding to a given webapp
+  along with the API itself.
+
+  \qml
+    UnityWebApps {
+        id: webapps
+        name: webappName
+        bindee: webview
+        model: UnityWebappsAppModel {}
+    }
+  \endqml
+
+  If the WebApp whose name is specified as part of the "name" property is found in the
+  specified model, its scripts (along with their dependancies) will be injected.
+  Otherwise only the API will be made available.
+*/
+
+
 namespace priv {
 
 class DefaultEnvironment : public UnityWebappsAppModel::Environment

@@ -10,7 +10,39 @@ import "UnityWebAppsBackendComponents.js" as UnityBackends
 //  -extract webview specific elements (postMessage)
 
 /*!
- */
+    \qmltype UnityWebApps
+    \inqmlmodule Ubuntu.UnityWebApps 0.1
+    \ingroup ubuntu
+    \brief The QML component that binds to a QML WebView and exposes the Unity WebApps
+        API to it's javascript.
+
+    Examples:
+    \qml
+        UnityWebApps {
+            id: webapps
+            name: "MyApp"
+            bindee: webView
+        }
+    \endqml
+
+    On the page's javascript side, an event is being sent to the document when the API is exposed
+    and ready to be used: "ubuntu-webapps-api-ready".
+
+    So a typical pattern for the page's javascript could be:
+
+    \code
+        function init() {
+            // The Unity APIs are available throuhg external.getUnityObject
+            var Unity = external.getUnityObject(1);
+        }
+        if (!external.getUnityObject) {
+            document.addEventListener ("ubuntu-webapps-api-ready", function () {
+                    init();
+                });
+        }
+    \endcode
+
+*/
 Item {
     id: webapps
 
@@ -30,23 +62,29 @@ Item {
       The UnityWebApps QML component expects any bindee to duck-type with
         the following IDL signature:
 
-        method getUnityWebappsProxies()
+        \code
+            method getUnityWebappsProxies()
+        \endcode
 
         that should return a BindeeExports:
 
-        interface BindeeExports {
-            method injectUserScripts(string userScriptUrls);
-            method sendToPage(string message);
-            method loadingStartedConnect(Callback onLoadingStarted);
-            method messageReceivedConnect(Callback onMessageReceived);
-        }
+        \code
+            interface BindeeExports {
+                method injectUserScripts(string userScriptUrls);
+                method sendToPage(string message);
+                method loadingStartedConnect(Callback onLoadingStarted);
+                method messageReceivedConnect(Callback onMessageReceived);
+            }
+        \endcode
 
       */
     property var bindee
 
 
     /*!
-      \qmlproperty
+      \qmlproperty UnityWebappsAppModel UnityWebApps::model
+
+      \preliminary
 
      */
     property var model: null
@@ -62,11 +100,14 @@ Item {
     property var _opt_backendProxies: null
 
 
-    // PRIVATE FUNCTION: __bind
-    //
-    // Binds a given webapp object with something that
-    //  is expected to support the following calls:
-    //
+    /*!
+      \internal
+
+      PRIVATE FUNCTION: __bind
+
+      Binds a given webapp object with something that
+      is expected to support the following calls:
+     */
     function __bind(bindee, webappUserscripts) {
         // FIXME: bad design
         if (internal.instance) {
@@ -96,17 +137,24 @@ Item {
         internal.instance = instance;
     }
 
-    // PRIVATE FUNCTION: __isValidBindee
-    //
+    /*!
+      \internal
+
+      PRIVATE FUNCTION: __isValidBindee
+     */
     function __isValidBindee(bindee) {
         var properties = [{'name': 'getUnityWebappsProxies', 'type': 'function'}];
         var validator = UnityWebAppsJsUtils.makePropertyValidator(properties);
         return validator(bindee);
     }
 
-    // PRIVATE FUNCTION: __areValidBindeeProxies
-    //
-    // Validates the bindeed proxies as exported by getUnityWebappsProxies
+    /*!
+      \internal
+
+      PRIVATE FUNCTION: __areValidBindeeProxies
+
+      Validates the bindeed proxies as exported by getUnityWebappsProxies
+     */
     function __areValidBindeeProxies(proxies) {
         var properties = [{'name': 'sendToPage', 'type': 'function'},
                 {'name': 'loadingStartedConnect', 'type': 'function'},
@@ -117,15 +165,21 @@ Item {
         return validator(proxies);
     }
 
-    // PRIVATE FUNCTION: __reset
-    //
+    /*!
+      \internal
+
+      PRIVATE FUNCTION: __reset
+     */
     function __reset() {
         __unbind();
         UnityBackends.clearAll();
     }
 
-    // PRIVATE FUNCTION: __unbind
-    //
+    /*!
+      \internal
+
+      PRIVATE FUNCTION: __unbind
+     */
     function __unbind() {
         //TODO: make sure that now leaks here
         internal.instance = null;
@@ -156,20 +210,26 @@ Item {
         webapps.__bind(bindee, userscripts);
     }
 
+    /*!
+      \internal
+
+     */
     onBindeeChanged: {
         //TODO?
     }
 
-    // TODO: review this (multiple name changes), make sure that depends & syncs
-    //  between unitywebapps & backends is ok (when backends are destroyed)
-    //  move this kind of deferred stuff into a more centralized sync point like QQmlParserStatus?
-    //
+    /*!
+      \internal
+
+     */
     onNameChanged: {
         //TODO?
     }
 
-    // PRIVATE DATA
-    //
+    /*!
+      \internal
+
+     */
     QtObject {
         id: internal
         property var instance: null
@@ -177,10 +237,14 @@ Item {
     }
 
 
-    // PRIVATE FUNCTION: __makeBackendProxies
-    //
-    // TODO lazily create the 'backends' on a getUnityObject
-    // TODO the backends should prop be on the qml side and provided to here
+    /*!
+      \internal
+
+      PRIVATE FUNCTION: __makeBackendProxies
+
+      TODO lazily create the 'backends' on a getUnityObject
+      TODO the backends should prop be on the qml side and provided to here
+     */
     function __makeBackendProxies () {
         return {
             init: function (params) {console.debug('calls init')
