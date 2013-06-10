@@ -1,0 +1,130 @@
+body
+{
+	font-size: 10pt;
+	font-family: "Ubuntu";
+	text-align: justify;
+	background-image: url("http://unity.ubuntu.com/wp-content/themes/unity-wordpress-theme/images/bg_dot.png");
+}
+
+#header
+{
+    margin:15px;
+    margin-top:15px;
+	font-size: 18pt;
+	width: 100%;
+	
+}
+
+#fullheader
+{
+    background-image: url("http://unity.ubuntu.com/wp-content/themes/unity-wordpress-theme/images/header-bg.png");
+    color:white;
+    width:100%;
+-moz-border-radius: 4px;
+-webkit-border-radius: 4px;
+border-radius: 4px;
+-webkit-box-shadow: 0 2px 2px 0 #C2C2C2;
+box-shadow: 0 2px 2px 0 #C2C2C2;
+height:66px;
+margin-bottom:2px;
+width:960px;
+align:center;
+margin-left:auto;
+margin-right:auto;
+}
+
+#headerText
+{
+    position:relative;
+    top:5px;
+}
+
+#maincontent
+{
+-moz-border-radius: 4px;
+-webkit-border-radius: 4px;
+border-radius: 4px;
+-webkit-box-shadow: 0 2px 2px 0 #C2C2C2;
+box-shadow: 0 2px 2px 0 #C2C2C2;
+margin-bottom:15px;
+background:white;
+width:960px;
+margin-left:auto;
+margin-right:auto;
+overflow:clip;
+}
+
+#subheader
+{
+    margin:15px;
+	font-size: 12pt;
+	width: 100%;
+}
+
+div.section
+{
+	font-size: 16pt;
+	width:954px;
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 10px;
+	margin-top:4px;
+	margin-left:6px;
+}
+
+div.subsection
+{
+	font-size: 12pt;
+	width: 952px;
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 8px;
+	margin-left: 10px;
+}
+
+
+
+p
+{
+	margin-left: 10px;
+	margin-right:10px;
+	text-indent: 0em;
+}
+
+pre
+{
+	margin-left: 30px;
+	padding: 7px;
+	border: 1px solid #ccc;
+	background-color: #EFEFEF;
+}
+
+div.filename
+{
+    margin-left: 25px;
+    font-weight: bold;
+    width: 70%;
+    border-bottom: 1px solid #ccc;
+}
+
+code
+{
+    font-weight: bold;
+}
+
+namespace
+{
+    color:#ef2929;
+}
+
+type
+{
+    color:#73d216;
+}
+
+member
+{
+    color:#729fcf;
+}
+
+a,a:link,a:visited {
+color: rgb(221, 72, 20);
+} 
