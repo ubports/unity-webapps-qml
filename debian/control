@@ -9,6 +9,7 @@ Build-Depends: dbus-test-runner,
                qt5-default,
                qtbase5-dev,
                qtdeclarative5-dev,
+               libnotify-dev,
 Standards-Version: 3.9.4
 Homepage: https://launchpad.net/unity-webapp-qml
 Vcs-Bzr: https://code.launchpad.net/~webapps/unity-webapps-qml/trunk
