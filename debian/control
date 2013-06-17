@@ -2,13 +2,13 @@ Source: unity-webapps-qml
 Section: gnome
 Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
-Build-Depends: dbus-test-runner,
-               debhelper (>= 9),
+Build-Depends: debhelper (>= 9),
                gdb,
                pkg-config,
                qt5-default,
                qtbase5-dev,
                qtdeclarative5-dev,
+	       qtdeclarative5-qtmultimedia-plugin,
 Standards-Version: 3.9.4
 Homepage: https://launchpad.net/unity-webapp-qml
 Vcs-Bzr: https://code.launchpad.net/~webapps/unity-webapps-qml/trunk
@@ -28,3 +28,16 @@ Depends: ${misc:Depends},
          unity-webapps-qml (= ${binary:Version})
 Description: Example usage of Unity Webapps QML component
  Example usage of Unity Webapps QML component
+
+Package: unity-webapps-qml-doc
+Section: doc
+Architecture: all
+Multi-Arch: foreign
+Pre-Depends: dpkg (>= 1.15.6~), ${misc:Pre-Depends}
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+Description: Documentation for Unity Webapps QML - documentation
+ Unity Webapps QML component
+ .
+ This package contains developer documentation.
+

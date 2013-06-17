@@ -24,12 +24,13 @@ import Ubuntu.UnityWebApps 0.1
 Rectangle {
     width: 640
     height: 640
+    
+    property string url: ""
 
     WebView {
         id: webView
 
-        // test url
-        url: "http://www.bbc.co.uk/news/"
+        url: parent.url
         anchors.fill: parent
         width: parent.width
         height: parent.height
@@ -41,15 +42,6 @@ Rectangle {
         experimental.userAgent: {
             return "Mozilla/5.0 (iPad; CPU OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3"
         }
-        experimental.onMessageReceived: {
-            var msg = null
-            try {
-                msg = JSON.parse(message.data)
-            } catch (error) {
-                console.debug('DEBUG:', message.data)
-                return
-            }
-        }
 
         function getUnityWebappsProxies() {
             return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
@@ -57,7 +49,7 @@ Rectangle {
 
         UnityWebApps {
             id: webapps
-            name: "BBCNews"
+            name: "FullWebViewApp"
             bindee: webView
             model: UnityWebappsAppModel { }
         }

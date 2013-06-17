@@ -39,7 +39,6 @@ public:
     void classBegin();
     void componentComplete();
 
-
 public Q_SLOTS:
 
     // API functions

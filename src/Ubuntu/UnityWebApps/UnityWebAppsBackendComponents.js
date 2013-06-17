@@ -27,19 +27,16 @@ function __areValidParams(params) {
     return params && __has(params, 'name');
 };
 
-function __createQmlObject(qmlStatement, parentItem, params, onCreated) {
-    var component;
+function __createQmlObject(qmlStatement, parentItem, params) {
+    var component = null;
+    var error = null;
 
-    if (!onCreated || !(onCreated instanceof Function)) {
-        //TODO error handling
-        throw "Invalid onCreated function"
-    }
     try {
         component = Qt.createQmlObject(qmlStatement, parentItem);
-        onCreated({object: component});
     } catch(e) {
-        console.debug(JSON.stringify(e.qmlErrors))
+        error = JSON.stringify(e.qmlErrors);
     }
+    return { object: component, error: error};
 };
 
 //TODO: bad mechanism, it could possibly be that the "base" backend is
@@ -68,8 +65,6 @@ function signalOnBackendReady(name, func) {
     if (!(func instanceof Function))
         return;
 
-    console.debug(get(name))
-
     // check if backend already ready
     if (!!get(name)) {
         console.debug('Backend ready: ' + name);
@@ -83,7 +78,20 @@ function signalOnBackendReady(name, func) {
     _backendReadyListeners[name].push(func);
 }
 
-//TODO very hacky
+/*!
+  \internal
+
+  Extracts the properties of a given js object and tries to
+  create a string for the definition of a QML object w/ those values.
+  e.g.
+  params = {name: "myname", version: 1}
+  ->
+  "name: 'myname'; version: 1"
+
+  It assumes a lot and is fragile (no array, complex object support, error handling, etc,)
+
+  FIXME: Shamefully hacky
+ */
 function __extractParams(params) {
     if (!params || !(params instanceof Object))
         return "";
@@ -105,37 +113,68 @@ function createAllWithAsync(parentItem, params) {
         throw new Error("Invalid creation parameters");
     }
     var extracted = __extractParams(params);
-    //TODO proper error reporting and more sound creation chaining
-    __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends;  Backends.UnityWebappsBase { }',
-                      parentItem,
-                      params,
-                      function (result) {
-                          if (!result.error) {
-                              __set("base", result.object);
-                              __onBackendReady("base");
-                          }
-                      });
 
-    __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends;  Backends.UnityWebappsNotificationsBinding { ' + extracted + ' }',
+    //FIXME:!!! lots of duplicated stuff
+
+    var result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends;  Backends.UnityWebappsBase { }',
                       parentItem,
-                      params,
-                      function (result) {
-                          if (!result.error) {
-                              __set("notify", result.object);
-                              __onBackendReady("notify");
-                          }
-                      });
+                      params);
+    if (result.error != null) {
+        console.debug('Could not create base backend: ' + result.error);
+        clearAll();
+        return false;
+    }
+    __set("base", result.object);
+    __onBackendReady("base");
+
+
+    result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends;  Backends.UnityWebappsNotificationsBinding { ' + extracted + ' }',
+                      parentItem,
+                      params);
+    if (result.error != null) {
+        console.debug('Could not create notifications backend: ' + result.error);
+        clearAll();
+        return false;
+    }
+    __set("notify", result.object);
+    __onBackendReady("notify");
+
+
+    result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; \
+                                Backends.UnityWebappsMessagingBinding { ' + extracted + ' }',
+                      parentItem,
+                      params);
+    if (result.error != null) {
+        console.debug('Could not create notifications backend: ' + result.error);
+        clearAll();
+        return false;
+    }
+    __set("messaging", result.object);
+    __onBackendReady("messaging");
+
 
     // hud
 /*    function HUDBackendAdaptor(parentItem) {
-        component = Qt.createComponent('import Ubuntu.HUD 0.1;  HUD { id: hud }', parentItem);
+        component = __createQmlObject('import Ubuntu.HUD 0.1;\
+                                        HUD {\
+                                          id: hud \
+                                          applicationIdentifier: "" \
+                                          Context { \
+                                            id: context \
+                                          } \
+                                        }', parentItem, params);
         this._hud = component.createObject(parentItem, params);
     };
     HUDBackendAdaptor.prototype.addAction = function (actionName, callback) {
+        var actionParams = __extractParams
+        this._hud.context.actions.append(__createQmlObject('import Ubuntu.HUD 0.1; HUD.Action { label }));
     }
-    HUDBackendAdaptor.prototype.removeAction = function (actionName, callback) {
+    HUDBackendAdaptor.prototype.removeAction = function (actionName) {
     }
-    _backends.hud = new HUDBackendAdaptor(parentItem);*/
+    HUDBackendAdaptor.prototype.removeActions = function () {
+    }
+    __set("hud", new HUDBackendAdaptor(parentItem));
+    __onBackendReady("hud");*/
 }
 
 function clearAll () {
@@ -153,6 +192,11 @@ function clearAll () {
     if (_backends.notify) {
         _backends.notify.destroy();
         delete _backends['notify'];
+    }
+
+    if (_backends.messaging) {
+        _backends.messaging.destroy();
+        delete _backends['messaging'];
     }
 };
 
