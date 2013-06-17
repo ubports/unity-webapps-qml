@@ -246,36 +246,43 @@ Item {
       TODO the backends should prop be on the qml side and provided to here
      */
     function __makeBackendProxies () {
+        var initialized = false;
         return {
             init: function (params) {console.debug('calls init')
                 UnityBackends.signalOnBackendReady("base", function () {
+                    initialized = true;
                     // base.init(params);
                     params.onInit();
                 });
             },
 
             addAction: function(actionName, onActionInvoked) {
-
+                if (!initialized)
+                    return;
                 // hud add action
-                // internal.backends.hud.addAction(actionName, onActionInvoked);
-                console.debug('addAction not implemented yet');
+                UnityBackends.get("hud").addAction(actionName, onActionInvoked);
             },
 
             removeAction: function(actionName) {
+                if (!initialized)
+                    return;
 
                 // hud remove action
-                // internal.backends.hud.removeAction(actionName);
-                console.debug('removeAction not implemented yet');
+                UnityBackends.get("hud").removeAction(actionName);
             },
 
             removeActions: function() {
+                if (!initialized)
+                    return;
 
                 // hud remove all action
-                console.debug('removeActions not implemented yet');
+                UnityBackends.get("hud").removeActions();
             },
 
             Notification: {
                 showNotification: function (summary, body, iconUrl) {
+                    if (!initialized)
+                        return;
                     //TODO: fix that underterministic crap ("notify" being badly independantly
                     // checked from the others)
                     UnityBackends.signalOnBackendReady("notify", function () {
@@ -286,13 +293,31 @@ Item {
 
             MessagingIndicator: {
                 showIndicator: function (name, properties) {
-                    console.debug('MessagingIndicator.showIndicator not implemented yet');
+                    if (!initialized)
+                        return;
+                    UnityBackends.get("messaging").showIndicator(String(name));
+
+                    for (i in properties) {
+                        if (i == "time") {
+                            UnityBackends.get("messaging").setProperty(String(name), i, UnityMiscUtils.toISODate(properties[i]));
+                        }
+                        else if (i == "count") {
+                            UnityBackends.get("messaging").setProperty(String(name), i, String(Number(properties[i])));
+                        }
+                        else {
+                            UnityBackends.get("messaging").setProperty(String(name), i, String(properties[i]));
+                        }
+                    }
                 },
                 clearIndicator: function (name) {
-                    console.debug('MessagingIndicator.clearIndicator not implemented yet');
+                    if (!initialized)
+                        return;
+                    UnityBackends.get("messaging").clearIndicator(name);
                 },
                 clearIndicators: function () {
-                    console.debug('MessagingIndicator.clearIndicators not implemented yet');
+                    if (!initialized)
+                        return;
+                    UnityBackends.get("messaging").clearIndicators();
                 },
                 addAction: function (name, onActionInvoked) {
                     console.debug('MessagingIndicator.addAction not implemented yet');

@@ -5,8 +5,9 @@ CONFIG += qt plugin no_keywords
 
 unix {
     CONFIG += link_pkgconfig
-#    PKGCONFIG += libunity_webapps-0.2
-    PKGCONFIG += libnotify
+    PKGCONFIG += libnotify \
+                messaging-menu \
+                glib-2.0
 }
 
 TEMPLATE = lib
@@ -26,6 +27,7 @@ SOURCES += \
     qml-plugin.cpp \
     unity-webapps-api.cpp \
     unity-webapps-api-notifications.cpp \
+    unity-webapps-api-messaging-menu.cpp \
     unity-webapps-app-model.cpp \
     unity-webapps-app-manifest-parser.cpp \
     unity-webapps-app-model-filter-proxy.cpp
@@ -34,6 +36,7 @@ HEADERS += \
     qml-plugin.h \
     unity-webapps-api.h \
     unity-webapps-api-notifications.h \
+    unity-webapps-api-messaging-menu.h \
     unity-webapps-app-model.h \
     unity-webapps-app-manifest-parser.h \
     unity-webapps-common-priv.h \
