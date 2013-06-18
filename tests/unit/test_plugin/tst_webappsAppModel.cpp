@@ -91,6 +91,8 @@ void WebappsAppModelTest::testWebappsModel()
         QVariant content = model.data(model.index(i), UnityWebappsAppModel::Content);
         QVERIFY(content.canConvert(QVariant::String));
         QVERIFY(!content.toString().isEmpty());
+
+        QVERIFY(!model.getDomainFor(d.toString()).isEmpty());
     }
 }
 

@@ -65,8 +65,8 @@ void UnityWebappsMessagingMenuPrivate::clear()
 
 void UnityWebappsMessagingMenuPrivate::init()
 {
-    _mmapp = messaging_menu_app_new (getDesktopFilenameFor(_name).toStdString().c_str());
-    messaging_menu_app_register (_mmapp);
+//    _mmapp = messaging_menu_app_new (getDesktopFilenameFor(_name).toStdString().c_str());
+//    messaging_menu_app_register (_mmapp);
 }
 
 

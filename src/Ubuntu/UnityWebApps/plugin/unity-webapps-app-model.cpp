@@ -252,6 +252,23 @@ UnityWebappsAppModel::loadUserScript(const QDir& userscriptPath,
     return script;
 }
 
+QString UnityWebappsAppModel::getDomainFor(const QString & webappName) const
+{
+    //FIXME: very inefficient
+
+    if (!exists(webappName))
+        return QString();
+
+    int idx = getWebappIndex(webappName);
+    if (Q_UNLIKELY(idx == -1))
+    {
+        qDebug() << "Invalid index for a supposedly existing webapp: " << webappName;
+        return QString();
+    }
+
+    return data(idx, Domain).toString();
+}
+
 void UnityWebappsAppModel::addWebApp(const QString& userscriptLocation,
                                      const QString& requiresLocation,
                                      const ManifestFileInfo& manifest,

@@ -102,6 +102,12 @@ public:
 
 
     /*!
+     * \brief
+     */
+    Q_INVOKABLE QString getDomainFor(const QString & webappName) const;
+
+
+    /*!
      * \brief data
      * \return
      */
@@ -192,6 +198,7 @@ private:
     };
     QList<InstalledWebApp> _webapps;
 
+    // Webapp environment specific settings
     QSharedPointer<Environment> _environment;
 
     static QString _commonScriptsDirName;
