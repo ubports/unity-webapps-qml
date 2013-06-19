@@ -30,25 +30,6 @@
 #include "plugin/unity-webapps-app-model.h"
 
 
-class TestEnvironment: public UnityWebappsAppModel::Environment
-{
-public:
-    virtual QString getWebAppsSearchPath () const
-    {
-        return "./data/installed-webapps";
-    }
-};
-
-class EmptyTestEnvironment: public UnityWebappsAppModel::Environment
-{
-public:
-    virtual QString getWebAppsSearchPath () const
-    {
-        return "./data/no-installed-webapps";
-    }
-};
-
-
 WebappsAppModelTest::WebappsAppModelTest()
     :QObject(0)
 {}
@@ -61,23 +42,22 @@ void WebappsAppModelTest::initTestCase()
 void WebappsAppModelTest::testEmptyWebappsModel()
 {
     UnityWebappsAppModel
-            model(QSharedPointer<UnityWebappsAppModel::Environment>(new EmptyTestEnvironment()));
+            model;
+    model.setSearchPath("./data/no-installed-webapps");
 
     QVERIFY(model.rowCount() == 0);
 }
 
 void WebappsAppModelTest::testWebappsModel()
 {
-    QSharedPointer<UnityWebappsAppModel::Environment>
-            environment(new TestEnvironment());
-
     const int VALID_INSTALLED_WEBAPPS_COUNT =
             QDir(environment->getWebAppsSearchPath())
              .entryInfoList (QStringList("*-valid"), QDir::Dirs)
              .count();
 
     UnityWebappsAppModel
-            model(environment);
+            model;
+    model.setSearchPath("./data/installed-webapps");
 
     const int FOUND_COUNT = model.rowCount();
     QCOMPARE(FOUND_COUNT, VALID_INSTALLED_WEBAPPS_COUNT);
@@ -98,16 +78,14 @@ void WebappsAppModelTest::testWebappsModel()
 
 void WebappsAppModelTest::testWebappsContentWithRequiresModel()
 {
-    QSharedPointer<UnityWebappsAppModel::Environment>
-            environment(new TestEnvironment());
-
     const int VALID_INSTALLED_WEBAPPS_COUNT =
             QDir(environment->getWebAppsSearchPath())
              .entryInfoList (QStringList("*-valid"), QDir::Dirs)
              .count();
 
     UnityWebappsAppModel
-            model(environment);
+            model;
+    model.setSearchPath("./data/installed-webapps");
 
     const int FOUND_COUNT = model.rowCount();
     QCOMPARE(FOUND_COUNT, VALID_INSTALLED_WEBAPPS_COUNT);

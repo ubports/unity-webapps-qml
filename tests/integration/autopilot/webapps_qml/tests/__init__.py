@@ -44,7 +44,11 @@ class UnityWebappsTestCaseBaseWithHTTPServer(UnityWebappsTestCaseBase):
 
 class UnityWebappsLocalPageServedTestCaseBase(UnityWebappsTestCaseBaseWithHTTPServer):
     def setUp(self):
+        self.url = "http://localhost:%d" % HTTP_SERVER_PORT
+
         super(UnityWebappsLocalPageServedTestCaseBase, self).setUp()
 
-        self.url = "http://localhost:%d" % HTTP_SERVER_PORT
+    def tearDown(self):
+        super(UnityWebappsLocalPageServedTestCaseBase, self).tearDown()
+
 

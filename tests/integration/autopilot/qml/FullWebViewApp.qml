@@ -22,10 +22,14 @@ import QtWebKit.experimental 1.0
 import Ubuntu.UnityWebApps 0.1
 
 Rectangle {
+    id: root
+
     width: 640
     height: 640
     
     property string url: ""
+    property string webappName: ""
+    property string webappSearchPath: ""
 
     WebView {
         id: webView
@@ -51,7 +55,7 @@ Rectangle {
             id: webapps
             name: "FullWebViewApp"
             bindee: webView
-            model: UnityWebappsAppModel { }
+            model: UnityWebappsAppModel { path: root.webappSearchPath }
         }
     }
 }

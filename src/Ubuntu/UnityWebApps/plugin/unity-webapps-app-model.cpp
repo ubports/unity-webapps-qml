@@ -52,55 +52,54 @@
 */
 
 
-namespace priv {
-
-class DefaultEnvironment : public UnityWebappsAppModel::Environment
-{
-public:
-    virtual QString getWebAppsSearchPath () const
-    {
-        QString useLocalWebappInstallEnv (qgetenv("UNITY_WEBAPPS_BASE_USERSCRIPTS_FOLDER"));
-        if ( ! useLocalWebappInstallEnv.isEmpty())
-        {
-            if (QDir::isRelativePath(useLocalWebappInstallEnv))
-            {
-                QDir d(useLocalWebappInstallEnv);
-                d.makeAbsolute();
-                useLocalWebappInstallEnv = d.absolutePath();
-            }
-
-            qDebug() << "Using '"
-                     << useLocalWebappInstallEnv
-                     << "' as the default search path for installed webapps";
-
-            return useLocalWebappInstallEnv;
-        }
-
-        return QLatin1String("/usr/share/unity-webapps/userscripts");
-    }
-};
-
-} // namespace {
-
-
 // TODO add local folders
 QString UnityWebappsAppModel::_commonScriptsDirName = "common";
 QString UnityWebappsAppModel::_webappDirPrefix = "unity-webapps-";
 
-UnityWebappsAppModel::UnityWebappsAppModel(
-            QSharedPointer<Environment> environment,
-            QObject* parent)
-    : QAbstractListModel(parent)
-    , _environment(environment)
+static QString
+UnityWebappsAppModel::doCorrectSearchPath(const QString & p)
 {
-    if (_environment.isNull())
-        _environment.reset(new priv::DefaultEnvironment());
+    QString fixedPath = p;
+    if (QDir::isRelativePath(fixedPath))
+    {
+        QDir d(fixedPath);
+        d.makeAbsolute();
+        fixedPath = d.absolutePath();
+    }
+    return fixedPath;
+}
 
+static QString
+UnityWebappsAppModel::getDefaultWebappsInstallationSearchPath()
+{
+    return "/usr/share/unity-webapps/userscripts";
+}
+
+UnityWebappsAppModel::UnityWebappsAppModel(QObject* parent)
+    : QAbstractListModel(parent)
+    , _searchPath(getDefaultWebappsInstallationSearchPath())
+{
     load();
 }
 
 UnityWebappsAppModel::~UnityWebappsAppModel()
 {}
+
+QString UnityWebappsAppModel::searchPath() const
+{
+    return _searchPath;
+}
+
+void UnityWebappsAppModel::setSearchPath(const QString& path)
+{
+    _searchPath = doCorrectSearchPath(path);
+
+    qDebug() << "Using '"
+             << _searchPath
+             << "' as the default search path for installed webapps";
+
+    Q_EMIT searchPathChanged(_searchPath);
+}
 
 QHash<int, QByteArray>
 UnityWebappsAppModel::roleNames() const
