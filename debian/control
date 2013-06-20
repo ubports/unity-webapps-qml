@@ -4,30 +4,32 @@ Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 Build-Depends: debhelper (>= 9),
                gdb,
+               libmessaging-menu-dev,
+               libnotify-dev,
                pkg-config,
                qt5-default,
                qtbase5-dev,
                qtdeclarative5-dev,
-               libnotify-dev,
-	       qtdeclarative5-qtmultimedia-plugin,
-	       libmessaging-menu-dev,
+               qtdeclarative5-qtmultimedia-plugin,
 Standards-Version: 3.9.4
 Homepage: https://launchpad.net/unity-webapp-qml
+# If you aren't a member of ~webapps but need to upload packaging changes,
+# just go ahead.  ~webapps will notice and sync up the code again.
 Vcs-Bzr: https://code.launchpad.net/~webapps/unity-webapps-qml/trunk
 
 Package: unity-webapps-qml
-Architecture: i386 amd64 armhf
+Architecture: any
 Depends: ${misc:Depends},
-         ${shlibs:Depends}
+         ${shlibs:Depends},
 Description: Unity Webapps QML component
  Unity Webapps QML component
 
 Package: unity-webapps-qml-example
 Section: libs
-Architecture: i386 amd64 armhf
-Depends: ${misc:Depends},
+Architecture: any
+Depends: unity-webapps-qml (>= ${binary:Version}),
+         ${misc:Depends},
          ${shlibs:Depends},
-         unity-webapps-qml (= ${binary:Version})
 Description: Example usage of Unity Webapps QML component
  Example usage of Unity Webapps QML component
 
@@ -35,11 +37,11 @@ Package: unity-webapps-qml-doc
 Section: doc
 Architecture: all
 Multi-Arch: foreign
-Pre-Depends: dpkg (>= 1.15.6~), ${misc:Pre-Depends}
+Pre-Depends: dpkg (>= 1.15.6~),
+             ${misc:Pre-Depends},
 Depends: ${misc:Depends},
          ${shlibs:Depends},
 Description: Documentation for Unity Webapps QML - documentation
  Unity Webapps QML component
  .
  This package contains developer documentation.
-
