@@ -103,6 +103,14 @@ Q_SIGNALS:
     void searchPathChanged(const QString & path);
 
 
+private Q_SLOTS:
+
+    /*!
+     * \brief Starts loading all the WebApps
+     */
+    void load();
+
+
 private:
 
     /*!
@@ -146,9 +154,9 @@ private:
     doCorrectSearchPath(const QString & p);
 
     /*!
-     * \brief Starts loading all the WebApps
+     * \brief Cleanup the object and already loaded WebApps
      */
-    void load();
+    void cleanup();
 
     /*!
      * \brief addWebApp

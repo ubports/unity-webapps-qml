@@ -18,14 +18,13 @@ from autopilot.matchers import Eventually
 from autopilot.testcase import AutopilotTestCase
 from autopilot.input import Mouse, Touch, Pointer
 
-
 class UnityWebappsTestCaseBase(AutopilotTestCase):
-    LOCAL_BROWSER_CONTAINER_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../qml/FullWebViewApp.qml')
-    LOCAL_QML_LAUNCHER_APP_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../../tools/qml-launcher/qml-launcher')
+    LOCAL_QML_LAUNCHER_APP_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../../../../tools/qml-launcher/unity-webapps-qml-launcher')
+    INSTALLED_QML_LAUNCHER_APP_PATH = 'unity-webapps-qml-launcher'
 
     # TODO create __init__.py.in
+    LOCAL_BROWSER_CONTAINER_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../qml/FullWebViewApp.qml')
     INSTALLED_BROWSER_CONTAINER_PATH = '/usr/share/unity-webapps-qml/tests/qml/webview.qml'
-    INSTALLED_QML_LAUNCHER_APP_PATH = '/usr/share/unity-webapps-qml/tests/tools/qml-launcher/qml-launcher'
 
     BASE_URL = ''
 
@@ -49,7 +48,8 @@ class UnityWebappsTestCaseBase(AutopilotTestCase):
 
         self.app = self.launch_test_application(self.get_qml_launcher_path(),
             '--qml=' + self.get_qml_browser_container_path(),
-            '--url=' + url, app_type='qt')
+            '--url=' + url,
+            app_type='qt')
 
         self.assert_url_eventually_loaded(url)
         self.webviewContainer = self.get_webviewContainer()

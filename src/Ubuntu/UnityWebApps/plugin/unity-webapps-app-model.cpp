@@ -80,6 +80,8 @@ UnityWebappsAppModel::UnityWebappsAppModel(QObject* parent)
     , _searchPath(getDefaultWebappsInstallationSearchPath())
 {
     load();
+
+    QObject::connect(this, SIGNAL(searchPathChanged(const QString)), SLOT(load()));
 }
 
 UnityWebappsAppModel::~UnityWebappsAppModel()
@@ -155,9 +157,16 @@ UnityWebappsAppModel::getCandidateInstalledWebappsFolders (const QString& instal
     return webappsDir.entryInfoList (QStringList(_webappDirPrefix + "*"), QDir::Dirs);
 }
 
+void UnityWebappsAppModel::cleanup()
+{
+    _webapps.clear();
+}
+
 void UnityWebappsAppModel::load()
 {
-    QString installationSearchPath = _searchPath;
+    cleanup();
+
+    QString installationSearchPath = searchPath();
 
     if (!isValidInstall(installationSearchPath))
     {

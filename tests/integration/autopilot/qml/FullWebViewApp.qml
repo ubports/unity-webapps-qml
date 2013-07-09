@@ -72,9 +72,7 @@ Window {
 
             name: "FullWebViewApp"
             bindee: webView
-            model: UnityWebappsAppModel { }
-
-  //            model: UnityWebappsAppModel { searchPath: root.webappSearchPath }
+            model: UnityWebappsAppModel { searchPath: root.webappSearchPath }
         }
     }
 }
