@@ -18,7 +18,7 @@ from webapps_qml.tests import UnityWebappsTestCaseBase
 class UnityWebappsApiInjectedTestCaseBase(UnityWebappsTestCaseBase):
     LOCAL_HTML_TEST_FILE = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../html/test_webapps_api_injected.html')
 
-    INSTALLED_HTML_TEST_FILE = '/usr/share/unity-webapps-qml/tests/html/test_webapps_api_injected.html'
+    INSTALLED_HTML_TEST_FILE = '/usr/share/unity-webapps-qml/autopilot-tests/html/test_webapps_api_injected.html'
 
     def get_html_test_file(self):
         if os.path.exists(self.LOCAL_HTML_TEST_FILE):

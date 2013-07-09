@@ -24,7 +24,7 @@ class UnityWebappsTestCaseBase(AutopilotTestCase):
 
     # TODO create __init__.py.in
     LOCAL_BROWSER_CONTAINER_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../qml/FullWebViewApp.qml')
-    INSTALLED_BROWSER_CONTAINER_PATH = '/usr/share/unity-webapps-qml/tests/qml/webview.qml'
+    INSTALLED_BROWSER_CONTAINER_PATH = '/usr/share/unity-webapps-qml/autopilot-tests/qml/FullWebViewApp.qml'
 
     BASE_URL = ''
 
