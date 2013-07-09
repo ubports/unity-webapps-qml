@@ -13,7 +13,7 @@ import os
 from testtools.matchers import Equals, GreaterThan, NotEquals
 from autopilot.matchers import Eventually
 
-from webapps_qml.tests import UnityWebappsTestCaseBase
+from unity_webapps_qml.tests import UnityWebappsTestCaseBase
 
 class UnityWebappsApiInjectedTestCaseBase(UnityWebappsTestCaseBase):
     LOCAL_HTML_TEST_FILE = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../html/test_webapps_api_injected.html')
