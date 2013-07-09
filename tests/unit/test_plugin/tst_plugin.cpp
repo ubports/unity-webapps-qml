@@ -16,9 +16,7 @@ PluginTest::PluginTest()
 }
 
 void PluginTest::initTestCase()
-{
-    qputenv("QML2_IMPORT_PATH", "../../../bin");
-}
+{}
 
 void PluginTest::testLoadPlugin()
 {

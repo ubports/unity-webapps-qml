@@ -7,7 +7,8 @@ CONFIG += ordered
 SUBDIRS = \
     src \
     tests \
-    examples
+    examples \
+    tools
 
 include(common-installs-config.pri)
 
