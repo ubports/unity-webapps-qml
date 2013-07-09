@@ -30,6 +30,12 @@
 #include "plugin/unity-webapps-app-model.h"
 
 
+namespace {
+
+QString VALID_INSTALLED_WEBAPPS_SEARCH_PATH = "./data/installed-webapps";
+
+}
+
 WebappsAppModelTest::WebappsAppModelTest()
     :QObject(0)
 {}
@@ -51,13 +57,13 @@ void WebappsAppModelTest::testEmptyWebappsModel()
 void WebappsAppModelTest::testWebappsModel()
 {
     const int VALID_INSTALLED_WEBAPPS_COUNT =
-            QDir(environment->getWebAppsSearchPath())
+            QDir(VALID_INSTALLED_WEBAPPS_SEARCH_PATH)
              .entryInfoList (QStringList("*-valid"), QDir::Dirs)
              .count();
 
     UnityWebappsAppModel
             model;
-    model.setSearchPath("./data/installed-webapps");
+    model.setSearchPath(VALID_INSTALLED_WEBAPPS_SEARCH_PATH);
 
     const int FOUND_COUNT = model.rowCount();
     QCOMPARE(FOUND_COUNT, VALID_INSTALLED_WEBAPPS_COUNT);
@@ -68,7 +74,7 @@ void WebappsAppModelTest::testWebappsModel()
         QVERIFY(d.canConvert(QVariant::String));
         QVERIFY(d.toString().endsWith("-valid"));
 
-        QVariant content = model.data(model.index(i), UnityWebappsAppModel::Content);
+        QVariant content = model.data(model.index(i), UnityWebappsAppModel::ScriptsContent);
         QVERIFY(content.canConvert(QVariant::String));
         QVERIFY(!content.toString().isEmpty());
 
@@ -79,13 +85,13 @@ void WebappsAppModelTest::testWebappsModel()
 void WebappsAppModelTest::testWebappsContentWithRequiresModel()
 {
     const int VALID_INSTALLED_WEBAPPS_COUNT =
-            QDir(environment->getWebAppsSearchPath())
+            QDir(VALID_INSTALLED_WEBAPPS_SEARCH_PATH)
              .entryInfoList (QStringList("*-valid"), QDir::Dirs)
              .count();
 
     UnityWebappsAppModel
             model;
-    model.setSearchPath("./data/installed-webapps");
+    model.setSearchPath(VALID_INSTALLED_WEBAPPS_SEARCH_PATH);
 
     const int FOUND_COUNT = model.rowCount();
     QCOMPARE(FOUND_COUNT, VALID_INSTALLED_WEBAPPS_COUNT);
@@ -99,7 +105,7 @@ void WebappsAppModelTest::testWebappsContentWithRequiresModel()
 
         if (d.toString() == "with-requires-valid")
         {
-            QVariant content = model.data(model.index(i), UnityWebappsAppModel::Content);
+            QVariant content = model.data(model.index(i), UnityWebappsAppModel::ScriptsContent);
             QVERIFY(content.canConvert(QVariant::String));
             QVERIFY(!content.toString().isEmpty());
 

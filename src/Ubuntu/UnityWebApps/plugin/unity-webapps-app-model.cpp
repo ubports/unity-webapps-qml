@@ -56,7 +56,7 @@
 QString UnityWebappsAppModel::_commonScriptsDirName = "common";
 QString UnityWebappsAppModel::_webappDirPrefix = "unity-webapps-";
 
-static QString
+QString
 UnityWebappsAppModel::doCorrectSearchPath(const QString & p)
 {
     QString fixedPath = p;
@@ -69,7 +69,7 @@ UnityWebappsAppModel::doCorrectSearchPath(const QString & p)
     return fixedPath;
 }
 
-static QString
+QString
 UnityWebappsAppModel::getDefaultWebappsInstallationSearchPath()
 {
     return "/usr/share/unity-webapps/userscripts";
@@ -110,7 +110,7 @@ UnityWebappsAppModel::roleNames() const
         roles[Name] = "name";
         roles[Domain] = "domain";
         roles[Urls] = "urls";
-        roles[Content] = "content";
+        roles[ScriptsContent] = "content";
         roles[Scripts] = "scripts";
       }
     return roles;
@@ -157,8 +157,7 @@ UnityWebappsAppModel::getCandidateInstalledWebappsFolders (const QString& instal
 
 void UnityWebappsAppModel::load()
 {
-    QString installationSearchPath =
-            _environment->getWebAppsSearchPath();
+    QString installationSearchPath = _searchPath;
 
     if (!isValidInstall(installationSearchPath))
     {
@@ -205,7 +204,7 @@ void UnityWebappsAppModel::load()
                                 manifest.value());
 
         const QString COMMON_BASE_PATH =
-                _environment->getWebAppsSearchPath()
+                _searchPath
                 + QDir::separator()
                 + _commonScriptsDirName;
 
@@ -241,7 +240,7 @@ UnityWebappsAppModel::loadUserScript(const QDir& userscriptPath,
         script += "\n\n"; \
     }
 
-    QString installationSearchPath = _environment->getWebAppsSearchPath();
+    QString installationSearchPath = _searchPath;
 
     const QString COMMON_BASE_PATH =
             installationSearchPath + QDir::separator() + _commonScriptsDirName;
@@ -369,7 +368,7 @@ QVariant UnityWebappsAppModel::data(int row, int role) const
             }
             return scripts;
         }
-    case Content:
+    case ScriptsContent:
         return webapp.data.content;
     }
 

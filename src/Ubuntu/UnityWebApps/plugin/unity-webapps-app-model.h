@@ -54,7 +54,7 @@ public:
         Domain,
         Urls,
         Scripts,
-        Content
+        ScriptsContent
     };
 
     // QAbstractListModel implementation
@@ -63,6 +63,7 @@ public:
     QVariant data(const QModelIndex& index, int role) const;
 
 
+    // Properties
     QString searchPath() const;
     void setSearchPath (const QString& path);
 
