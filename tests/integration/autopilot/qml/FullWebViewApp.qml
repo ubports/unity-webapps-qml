@@ -17,25 +17,44 @@
  */
 
 import QtQuick 2.0
+import QtQuick.Window 2.0
 import QtWebKit 3.0
 import QtWebKit.experimental 1.0
 import Ubuntu.UnityWebApps 0.1
 
-Rectangle {
+import "dom-introspection-utils.js" as DomIntrospectionUtils
+
+
+Window {
+    id: root
+    objectName: "webviewContainer"
+
     width: 640
     height: 640
-    
-    property string url: ""
+
+    signal resultUpdated(string message)
+
+    function evalInPageUnsafe(expr) {
+        var tid = DomIntrospectionUtils.gentid();
+        webView.experimental.evaluateJavaScript(DomIntrospectionUtils.wrapJsCommands(expr),
+            function(result) { console.log('Result: ' + result); root.resultUpdated(DomIntrospectionUtils.createResult(result)); });
+    }
+
+    property alias url: webView.url
+    property string webappName: ""
+    property string webappSearchPath: ""
+    property string testUserScript: ""
 
     WebView {
         id: webView
+        objectName: "webview"
 
         url: parent.url
         anchors.fill: parent
         width: parent.width
         height: parent.height
 
-        experimental.userScripts: []
+        experimental.userScripts: [Qt.resolvedUrl("injected-script.js")]
         experimental.preferences.navigatorQtObjectEnabled: true
         experimental.preferences.developerExtrasEnabled: true
 
@@ -49,9 +68,11 @@ Rectangle {
 
         UnityWebApps {
             id: webapps
+            objectName: "webappsContainer"
+
             name: "FullWebViewApp"
             bindee: webView
-            model: UnityWebappsAppModel { }
+            model: UnityWebappsAppModel { searchPath: root.webappSearchPath }
         }
     }
 }

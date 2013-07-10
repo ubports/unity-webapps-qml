@@ -39,35 +39,14 @@
 class UnityWebappsAppModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(QString searchPath READ searchPath WRITE setSearchPath NOTIFY searchPathChanged)
+
     Q_ENUMS(WebAppsRoles)
+    
 
 public:
 
-    /*!
-     * \brief Acts as a sink for environment specific values
-     *
-     */
-    class Environment
-    {
-    public:
-        virtual ~Environment() {}
-
-        /*!
-         * \brief getWebAppsSearchPath
-         * \return Search location for installed WebApps
-         */
-        virtual QString getWebAppsSearchPath () const = 0;
-    };
-
-
-public:
-
-    /*!
-     * \param environment optionally set an environment from where to pull the installed WebApps
-     *                    if none is specified a default one is picked that looks in the std paths
-     */
-    UnityWebappsAppModel(QSharedPointer<Environment> environment = QSharedPointer<Environment>(),
-                         QObject* parent = 0);
+    UnityWebappsAppModel(QObject* parent = 0);
     ~UnityWebappsAppModel();
 
     enum WebAppsRoles {
@@ -75,13 +54,18 @@ public:
         Domain,
         Urls,
         Scripts,
-        Content
+        ScriptsContent
     };
 
     // QAbstractListModel implementation
     QHash<int, QByteArray> roleNames() const;
     int rowCount(const QModelIndex& parent = QModelIndex ()) const;
     QVariant data(const QModelIndex& index, int role) const;
+
+
+    // Properties
+    QString searchPath() const;
+    void setSearchPath (const QString& path);
 
 
     // Exposed to QML
@@ -112,6 +96,19 @@ public:
      * \return
      */
     Q_INVOKABLE QVariant data(int row, int role) const;
+
+
+Q_SIGNALS:
+
+    void searchPathChanged(const QString & path);
+
+
+private Q_SLOTS:
+
+    /*!
+     * \brief Starts loading all the WebApps
+     */
+    void load();
 
 
 private:
@@ -150,10 +147,16 @@ private:
     static QFileInfoList
     getCandidateInstalledWebappsFolders (const QString& installationSearchPath);
 
+    static QString
+    getDefaultWebappsInstallationSearchPath();
+
+    static QString
+    doCorrectSearchPath(const QString & p);
+
     /*!
-     * \brief Starts loading all the WebApps
+     * \brief Cleanup the object and already loaded WebApps
      */
-    void load();
+    void cleanup();
 
     /*!
      * \brief addWebApp
@@ -198,8 +201,7 @@ private:
     };
     QList<InstalledWebApp> _webapps;
 
-    // Webapp environment specific settings
-    QSharedPointer<Environment> _environment;
+    QString _searchPath;
 
     static QString _commonScriptsDirName;
     static QString _webappDirPrefix;

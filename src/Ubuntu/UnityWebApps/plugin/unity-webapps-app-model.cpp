@@ -52,55 +52,56 @@
 */
 
 
-namespace priv {
-
-class DefaultEnvironment : public UnityWebappsAppModel::Environment
-{
-public:
-    virtual QString getWebAppsSearchPath () const
-    {
-        QString useLocalWebappInstallEnv (qgetenv("UNITY_WEBAPPS_BASE_USERSCRIPTS_FOLDER"));
-        if ( ! useLocalWebappInstallEnv.isEmpty())
-        {
-            if (QDir::isRelativePath(useLocalWebappInstallEnv))
-            {
-                QDir d(useLocalWebappInstallEnv);
-                d.makeAbsolute();
-                useLocalWebappInstallEnv = d.absolutePath();
-            }
-
-            qDebug() << "Using '"
-                     << useLocalWebappInstallEnv
-                     << "' as the default search path for installed webapps";
-
-            return useLocalWebappInstallEnv;
-        }
-
-        return QLatin1String("/usr/share/unity-webapps/userscripts");
-    }
-};
-
-} // namespace {
-
-
 // TODO add local folders
 QString UnityWebappsAppModel::_commonScriptsDirName = "common";
 QString UnityWebappsAppModel::_webappDirPrefix = "unity-webapps-";
 
-UnityWebappsAppModel::UnityWebappsAppModel(
-            QSharedPointer<Environment> environment,
-            QObject* parent)
-    : QAbstractListModel(parent)
-    , _environment(environment)
+QString
+UnityWebappsAppModel::doCorrectSearchPath(const QString & p)
 {
-    if (_environment.isNull())
-        _environment.reset(new priv::DefaultEnvironment());
+    QString fixedPath = p;
+    if (QDir::isRelativePath(fixedPath))
+    {
+        QDir d(fixedPath);
+        d.makeAbsolute();
+        fixedPath = d.absolutePath();
+    }
+    return fixedPath;
+}
 
+QString
+UnityWebappsAppModel::getDefaultWebappsInstallationSearchPath()
+{
+    return "/usr/share/unity-webapps/userscripts";
+}
+
+UnityWebappsAppModel::UnityWebappsAppModel(QObject* parent)
+    : QAbstractListModel(parent)
+    , _searchPath(getDefaultWebappsInstallationSearchPath())
+{
     load();
+
+    QObject::connect(this, SIGNAL(searchPathChanged(const QString)), SLOT(load()));
 }
 
 UnityWebappsAppModel::~UnityWebappsAppModel()
 {}
+
+QString UnityWebappsAppModel::searchPath() const
+{
+    return _searchPath;
+}
+
+void UnityWebappsAppModel::setSearchPath(const QString& path)
+{
+    _searchPath = doCorrectSearchPath(path);
+
+    qDebug() << "Using '"
+             << _searchPath
+             << "' as the default search path for installed webapps";
+
+    Q_EMIT searchPathChanged(_searchPath);
+}
 
 QHash<int, QByteArray>
 UnityWebappsAppModel::roleNames() const
@@ -111,7 +112,7 @@ UnityWebappsAppModel::roleNames() const
         roles[Name] = "name";
         roles[Domain] = "domain";
         roles[Urls] = "urls";
-        roles[Content] = "content";
+        roles[ScriptsContent] = "content";
         roles[Scripts] = "scripts";
       }
     return roles;
@@ -156,10 +157,16 @@ UnityWebappsAppModel::getCandidateInstalledWebappsFolders (const QString& instal
     return webappsDir.entryInfoList (QStringList(_webappDirPrefix + "*"), QDir::Dirs);
 }
 
+void UnityWebappsAppModel::cleanup()
+{
+    _webapps.clear();
+}
+
 void UnityWebappsAppModel::load()
 {
-    QString installationSearchPath =
-            _environment->getWebAppsSearchPath();
+    cleanup();
+
+    QString installationSearchPath = searchPath();
 
     if (!isValidInstall(installationSearchPath))
     {
@@ -206,7 +213,7 @@ void UnityWebappsAppModel::load()
                                 manifest.value());
 
         const QString COMMON_BASE_PATH =
-                _environment->getWebAppsSearchPath()
+                _searchPath
                 + QDir::separator()
                 + _commonScriptsDirName;
 
@@ -242,7 +249,7 @@ UnityWebappsAppModel::loadUserScript(const QDir& userscriptPath,
         script += "\n\n"; \
     }
 
-    QString installationSearchPath = _environment->getWebAppsSearchPath();
+    QString installationSearchPath = _searchPath;
 
     const QString COMMON_BASE_PATH =
             installationSearchPath + QDir::separator() + _commonScriptsDirName;
@@ -370,7 +377,7 @@ QVariant UnityWebappsAppModel::data(int row, int role) const
             }
             return scripts;
         }
-    case Content:
+    case ScriptsContent:
         return webapp.data.content;
     }
 

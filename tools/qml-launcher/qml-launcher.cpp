@@ -21,6 +21,34 @@
 #include <QtQuick/QQuickView>
 #include <QDebug>
 #include <QFileInfo>
+#include <QLibrary>
+#include <QQmlEngine>
+#include <QQmlContext>
+#include <QQmlComponent>
+
+namespace {
+
+void loadQtTestability(const QStringList & arguments)
+{
+    // The testability driver is only loaded by QApplication but not by QGuiApplication.
+    // However, QApplication depends on QWidget which would add some unneeded overhead => Let's load the testability driver on our own.
+    if (arguments.contains(QLatin1String("-testability"))) {
+        QLibrary testLib(QLatin1String("qttestability"));
+        if (testLib.load()) {
+            typedef void (*TasInitialize)(void);
+            TasInitialize initFunction = (TasInitialize)testLib.resolve("qt_testability_init");
+            if (initFunction) {
+                initFunction();
+            } else {
+                qCritical("Library qttestability resolve failed!");
+            }
+        } else {
+            qCritical("Library qttestability load failed!");
+        }
+    }
+}
+
+} // namespace
 
 
 int main(int argc, char *argv[])
@@ -32,6 +60,8 @@ int main(int argc, char *argv[])
         qDebug() << "Invalid inputs args";
         return EXIT_FAILURE;
     }
+
+    loadQtTestability(app.arguments());
 
     const QString QML_FILE_ARG_HEADER = "--qml=";
     const QString ARG_HEADER = "--";
@@ -86,20 +116,31 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    QQuickView view;
-    view.setSource(QUrl::fromLocalFile(qmlfile));
+    QQmlEngine engine;
+    QQmlContext *context = new QQmlContext(engine.rootContext());
 
-    QQuickItem* root = view.rootObject();
+    QQmlComponent component(&engine, qmlfile);
+    QObject *object = component.create(context);
+
+    if (!component.isReady()) {
+        qWarning() << component.errorString();
+        return false;
+    }
+
+    QQuickWindow* window = qobject_cast<QQuickWindow*>(object);
 
     QHash<QString, QString>::iterator it;
     for(it = properties.begin();
         properties.end() != it;
         ++it)
     {
-        root->setProperty(it.key().toStdString().c_str(), QVariant(it.value()));
+        object->setProperty(it.key().toStdString().c_str(), QUrl(it.value()));
     }
 
-    view.show();
+    window->show();
 
     return app.exec();
 }
+
+
+

@@ -109,6 +109,9 @@ Item {
       is expected to support the following calls:
      */
     function __bind(bindee, webappUserscripts) {
+        if (!bindee)
+            return;
+
         // FIXME: bad design
         if (internal.instance) {
             console.debug('__bind: ERROR Instance already set')
@@ -128,7 +131,7 @@ Item {
             return;
         }
 
-        var backends = webapps._opt_backendProxies || __makeBackendProxies();
+        var backends = _opt_backendProxies || __makeBackendProxies();
         var instance = new UnityWebAppsJs.UnityWebApps(webapps,
                                                      bindeeProxies,
                                                      backends,
@@ -186,28 +189,33 @@ Item {
         internal.backends = null;
     }
 
-    Component.onCompleted: {
-        if (bindee == null || name == "") {
-            console.log("Invalid component");
-            return;
-        }
+    /*!
+      \internal
+      Gathers the webapps userscript associated with the webapp whose
+      name is passed as param.
 
-        webapps.__unbind();
-
-        UnityBackends.clearAll();
-        UnityBackends.createAllWithAsync(webapps, {name: name});
-
+      Returns the list of URIs for the associated scripts to be injected
+    */
+    function __gatherWebAppUserscripts(webappName) {
         var userscripts = [];
-        if (model != null && model.exists && model.exists(name)) {
-            var idx = model.getWebappIndex(name);
+        if (model != null && model.exists && model.exists(webappName)) {
+            var idx = model.getWebappIndex(webappName);
             userscripts = model.data(idx, UbuntuUnityWebApps.UnityWebappsAppModel.Scripts);
 
             // FIXME: hack
             userscripts = userscripts.map(function (script) { return 'file://' + script; });
-            console.log(userscripts)
         }
+        return userscripts;
+    }
 
-        webapps.__bind(bindee, userscripts);
+    Component.onCompleted: {
+        webapps.__unbind();
+        webapps.__bind(bindee, __gatherWebAppUserscripts(name));
+
+        if (name != "") {
+            UnityBackends.clearAll();
+            UnityBackends.createAllWithAsync(webapps, {name: name});
+        }
     }
 
     /*!
@@ -215,7 +223,8 @@ Item {
 
      */
     onBindeeChanged: {
-        //TODO?
+        __unbind();
+        __bind(bindee, __gatherWebAppUserscripts(name));
     }
 
     /*!
@@ -223,7 +232,7 @@ Item {
 
      */
     onNameChanged: {
-        //TODO?
+        //FIXME: we shouldn't allow webapp names to change
     }
 
     /*!

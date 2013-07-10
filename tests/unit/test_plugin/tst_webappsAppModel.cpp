@@ -30,24 +30,11 @@
 #include "plugin/unity-webapps-app-model.h"
 
 
-class TestEnvironment: public UnityWebappsAppModel::Environment
-{
-public:
-    virtual QString getWebAppsSearchPath () const
-    {
-        return "./data/installed-webapps";
-    }
-};
+namespace {
 
-class EmptyTestEnvironment: public UnityWebappsAppModel::Environment
-{
-public:
-    virtual QString getWebAppsSearchPath () const
-    {
-        return "./data/no-installed-webapps";
-    }
-};
+QString VALID_INSTALLED_WEBAPPS_SEARCH_PATH = "./data/installed-webapps";
 
+}
 
 WebappsAppModelTest::WebappsAppModelTest()
     :QObject(0)
@@ -61,23 +48,22 @@ void WebappsAppModelTest::initTestCase()
 void WebappsAppModelTest::testEmptyWebappsModel()
 {
     UnityWebappsAppModel
-            model(QSharedPointer<UnityWebappsAppModel::Environment>(new EmptyTestEnvironment()));
-
+            model;
+    model.setSearchPath("./data/no-installed-webapps");
+    qDebug() << model.rowCount();
     QVERIFY(model.rowCount() == 0);
 }
 
 void WebappsAppModelTest::testWebappsModel()
 {
-    QSharedPointer<UnityWebappsAppModel::Environment>
-            environment(new TestEnvironment());
-
     const int VALID_INSTALLED_WEBAPPS_COUNT =
-            QDir(environment->getWebAppsSearchPath())
+            QDir(VALID_INSTALLED_WEBAPPS_SEARCH_PATH)
              .entryInfoList (QStringList("*-valid"), QDir::Dirs)
              .count();
 
     UnityWebappsAppModel
-            model(environment);
+            model;
+    model.setSearchPath(VALID_INSTALLED_WEBAPPS_SEARCH_PATH);
 
     const int FOUND_COUNT = model.rowCount();
     QCOMPARE(FOUND_COUNT, VALID_INSTALLED_WEBAPPS_COUNT);
@@ -88,7 +74,7 @@ void WebappsAppModelTest::testWebappsModel()
         QVERIFY(d.canConvert(QVariant::String));
         QVERIFY(d.toString().endsWith("-valid"));
 
-        QVariant content = model.data(model.index(i), UnityWebappsAppModel::Content);
+        QVariant content = model.data(model.index(i), UnityWebappsAppModel::ScriptsContent);
         QVERIFY(content.canConvert(QVariant::String));
         QVERIFY(!content.toString().isEmpty());
 
@@ -98,16 +84,14 @@ void WebappsAppModelTest::testWebappsModel()
 
 void WebappsAppModelTest::testWebappsContentWithRequiresModel()
 {
-    QSharedPointer<UnityWebappsAppModel::Environment>
-            environment(new TestEnvironment());
-
     const int VALID_INSTALLED_WEBAPPS_COUNT =
-            QDir(environment->getWebAppsSearchPath())
+            QDir(VALID_INSTALLED_WEBAPPS_SEARCH_PATH)
              .entryInfoList (QStringList("*-valid"), QDir::Dirs)
              .count();
 
     UnityWebappsAppModel
-            model(environment);
+            model;
+    model.setSearchPath(VALID_INSTALLED_WEBAPPS_SEARCH_PATH);
 
     const int FOUND_COUNT = model.rowCount();
     QCOMPARE(FOUND_COUNT, VALID_INSTALLED_WEBAPPS_COUNT);
@@ -121,7 +105,7 @@ void WebappsAppModelTest::testWebappsContentWithRequiresModel()
 
         if (d.toString() == "with-requires-valid")
         {
-            QVariant content = model.data(model.index(i), UnityWebappsAppModel::Content);
+            QVariant content = model.data(model.index(i), UnityWebappsAppModel::ScriptsContent);
             QVERIFY(content.canConvert(QVariant::String));
             QVERIFY(!content.toString().isEmpty());
 
