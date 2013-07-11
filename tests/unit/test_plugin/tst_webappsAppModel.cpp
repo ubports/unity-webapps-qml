@@ -50,7 +50,6 @@ void WebappsAppModelTest::testEmptyWebappsModel()
     UnityWebappsAppModel
             model;
     model.setSearchPath("./data/no-installed-webapps");
-    qDebug() << model.rowCount();
     QVERIFY(model.rowCount() == 0);
 }
 

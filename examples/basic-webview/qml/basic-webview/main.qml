@@ -34,7 +34,11 @@ Rectangle {
         }
 
         function getUnityWebappsProxies() {
-            return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
+            var proxies = UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
+
+            // override the default navigate to request
+            proxies.navigateTo = function(url) {};
+            return proxies;
         }
 
         UnityWebApps {

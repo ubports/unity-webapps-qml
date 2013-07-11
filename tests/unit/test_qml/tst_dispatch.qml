@@ -134,6 +134,8 @@ TestCase {
                 },
                 sendToPage: function (message) {
                 },
+                navigateTo: function (url) {
+                },
                 loadingStartedConnect: function (onLoadingStarted) {
                     mockedWebView.loadingStarted.connect(onLoadingStarted);
                     loadingStartedConnected();

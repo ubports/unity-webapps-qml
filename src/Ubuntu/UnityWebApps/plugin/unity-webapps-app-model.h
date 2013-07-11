@@ -53,6 +53,7 @@ public:
         Name = Qt::UserRole + 1,
         Domain,
         Urls,
+        Homepage,
         Scripts,
         ScriptsContent
     };

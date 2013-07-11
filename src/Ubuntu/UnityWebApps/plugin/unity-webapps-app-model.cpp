@@ -111,6 +111,7 @@ UnityWebappsAppModel::roleNames() const
       {
         roles[Name] = "name";
         roles[Domain] = "domain";
+        roles[Homepage] = "homepage";
         roles[Urls] = "urls";
         roles[ScriptsContent] = "content";
         roles[Scripts] = "scripts";
@@ -360,6 +361,9 @@ QVariant UnityWebappsAppModel::data(int row, int role) const
 
     case Domain:
         return webapp.data.manifest.domain;
+
+    case Homepage:
+        return webapp.data.manifest.homepage;
 
     case Urls:
         return webapp.data.manifest.includes;
