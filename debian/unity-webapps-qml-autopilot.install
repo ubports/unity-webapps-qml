@@ -1,4 +1,3 @@
-usr/lib/python*
 tests/integration/autopilot/html/* usr/share/unity-webapps-qml/autopilot-tests/html/
 tests/integration/autopilot/qml/* usr/share/unity-webapps-qml/autopilot-tests/qml/
-
+usr/lib/python*
