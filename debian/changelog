@@ -1,5 +1,6 @@
 unity-webapps-qml (0.1-0ubuntu0) UNRELEASED; urgency=low
 
   * Initial release.
+  * Automatic snapshot from revision 17 (bootstrap)
 
  -- Alexandre Abreu <alexandre.abreu@canonical.com>  Tue, 28 May 2013 16:35:13 -0400
