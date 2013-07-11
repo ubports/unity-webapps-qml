@@ -4,11 +4,8 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-override_dh_install:
-	dh_install --fail-missing
-
 %:
-	dh $@ --fail-missing --with python2
+	dh $@ --with python2
 
 override_dh_install:
 	# install autopilot tests
@@ -18,4 +15,3 @@ override_dh_install:
 	done; \
 	cd $(CURDIR)
 	dh_install -X'*.pyc' --fail-missing
-

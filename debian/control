@@ -3,12 +3,12 @@ Section: gnome
 Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 Build-Depends: debhelper (>= 9),
-	       python (>= 2.7),
-	       python-setuptools,
                gdb,
                libmessaging-menu-dev,
                libnotify-dev,
                pkg-config,
+               python (>= 2.7),
+               python-setuptools,
                qt5-default,
                qt5-qmake,
                qtbase5-dev,
@@ -35,7 +35,7 @@ Depends: unity-webapps-qml (>= ${binary:Version}),
          ${misc:Depends},
          ${shlibs:Depends},
 Description: Example usage of Unity Webapps QML component
- Example usage of Unity Webapps QML component.
+ Some examples demonstrating the webapps QML component.
 
 Package: unity-webapps-qml-doc
 Section: doc
@@ -52,15 +52,15 @@ Description: Documentation for Unity Webapps QML - documentation
 
 Package: unity-webapps-qml-autopilot
 Architecture: all
-Depends: ${misc:Depends},
-         ${python:Depends},
-         dpkg-dev,
+Depends: dpkg-dev,
          libautopilot-qt,
          libqt5test5,
          libqt5webkit5-qmlwebkitplugin,
          qmlscene,
          qtdeclarative5-qtquick2-plugin,
-         unity-webapps-qml (= ${binary:Version}),
+         unity-webapps-qml (>= ${source:Version}),
+         ${misc:Depends},
+         ${python:Depends},
 Description: Autopilot tests for the Unity Webapps QML
  Unity Webapps QML is a QML component that binds to a QML WebView and allows
  running javascript code to access Ubuntu stack components. This package
