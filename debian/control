@@ -35,7 +35,7 @@ Depends: unity-webapps-qml (>= ${binary:Version}),
          ${misc:Depends},
          ${shlibs:Depends},
 Description: Example usage of Unity Webapps QML component
- Example usage of Unity Webapps QML component.
+ Some examples demonstrating the webapps QML component.
 
 Package: unity-webapps-qml-doc
 Section: doc
@@ -58,7 +58,7 @@ Depends: dpkg-dev,
          libqt5webkit5-qmlwebkitplugin,
          qmlscene,
          qtdeclarative5-qtquick2-plugin,
-         unity-webapps-qml (= ${binary:Version}),
+         unity-webapps-qml (>= ${source:Version}),
          ${misc:Depends},
          ${python:Depends},
 Description: Autopilot tests for the Unity Webapps QML
