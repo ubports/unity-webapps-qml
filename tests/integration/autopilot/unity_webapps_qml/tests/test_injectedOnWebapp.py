@@ -42,7 +42,18 @@ class UnityWebappsApiInjectedTestCaseBase(UnityWebappsTestCaseBase):
     def test_notificationApiFound(self):
         expression = """
             var unity = window.external.getUnityObject(1.0);
-            return unity.Notification != null && unity.Notification.show != null;
+            return unity.Notification != null && unity.Notification.showNotification != null;
+        """
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(NotEquals(None)))
+
+    def test_messagingIndicatorApiFound(self):
+        expression = """
+            var unity = window.external.getUnityObject(1.0);
+            return unity.MessagingIndicator != null &&
+                unity.MessagingIndicator.addAction != null &&
+                unity.MessagingIndicator.clearIndicator != null &&
+                unity.MessagingIndicator.clearIndicators != null &&
+                unity.MessagingIndicator.showIndicator != null;
         """
         self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(NotEquals(None)))
 

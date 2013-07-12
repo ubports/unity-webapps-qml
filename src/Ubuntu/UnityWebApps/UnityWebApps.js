@@ -151,7 +151,11 @@ var UnityWebApps = (function () {
         },
 
         _isValidWebAppsMessage: function(message) {
-            return message != null && message.target && message.target === 'unity-webapps-call' && message.name && message.args;
+            return message != null &&
+                    message.target &&
+                    message.target === 'unity-webapps-call' &&
+                    message.name &&
+                    message.args;
         }
     };
 

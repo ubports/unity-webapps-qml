@@ -32,6 +32,9 @@ function makeProxiesForQtWebViewBindee(webViewId) {
                 scripts.push(userScriptUrls[i]);
             webViewId.experimental.userScripts = scripts;
         },
+        navigateTo: function(url) {
+            webViewId.url = url;
+        },
         sendToPage: function (message) {
             webViewId.experimental.postMessage(message);
         },

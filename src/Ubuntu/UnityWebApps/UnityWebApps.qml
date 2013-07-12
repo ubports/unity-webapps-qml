@@ -162,7 +162,8 @@ Item {
         var properties = [{'name': 'sendToPage', 'type': 'function'},
                 {'name': 'loadingStartedConnect', 'type': 'function'},
                 {'name': 'messageReceivedConnect', 'type': 'function'},
-                {'name': 'injectUserScripts', 'type': 'function'}];
+                {'name': 'injectUserScripts', 'type': 'function'},
+                {'name': 'navigateTo', 'type': 'function'}];
 
         var validator = UnityWebAppsJsUtils.makePropertyValidator(properties);
         return validator(proxies);
@@ -189,6 +190,10 @@ Item {
         internal.backends = null;
     }
 
+    function __isValidWebAppForModel(webappName) {
+        return model != null && model.exists && model.exists(webappName);
+    }
+
     /*!
       \internal
       Gathers the webapps userscript associated with the webapp whose
@@ -196,9 +201,9 @@ Item {
 
       Returns the list of URIs for the associated scripts to be injected
     */
-    function __gatherWebAppUserscripts(webappName) {
+    function __gatherWebAppUserscriptsIfAny(webappName) {
         var userscripts = [];
-        if (model != null && model.exists && model.exists(webappName)) {
+        if (__isValidWebAppForModel(webappName)) {
             var idx = model.getWebappIndex(webappName);
             userscripts = model.data(idx, UbuntuUnityWebApps.UnityWebappsAppModel.Scripts);
 
@@ -208,13 +213,35 @@ Item {
         return userscripts;
     }
 
+    /*!
+      \internal
+
+      If the component has been binded to a proper bindee (exposes proper interface)
+      and the webapps bridge has been initialized, this make sure that the bindee
+      is requested to navigate to a given 'homepage' url for the associated
+      webapp.
+    */
+    function __navigateToWebappHomepageInBindee(webappName) {
+        if (__isValidWebAppForModel(webappName) && internal.instance) {
+            var idx = model.getWebappIndex(webappName);
+            var homepage = model.data(idx, UbuntuUnityWebApps.UnityWebappsAppModel.Homepage);
+
+            console.debug('Requesting the bindee to navigate to: ' + homepage);
+
+            var bindeeProxies = bindee.getUnityWebappsProxies();
+            bindeeProxies.navigateTo(homepage);
+        }
+    }
+
     Component.onCompleted: {
         webapps.__unbind();
-        webapps.__bind(bindee, __gatherWebAppUserscripts(name));
+        webapps.__bind(bindee, __gatherWebAppUserscriptsIfAny(name));
 
         if (name != "") {
             UnityBackends.clearAll();
             UnityBackends.createAllWithAsync(webapps, {name: name});
+
+            __navigateToWebappHomepageInBindee(name);
         }
     }
 
@@ -224,7 +251,7 @@ Item {
      */
     onBindeeChanged: {
         __unbind();
-        __bind(bindee, __gatherWebAppUserscripts(name));
+        __bind(bindee, __gatherWebAppUserscriptsIfAny(name));
     }
 
     /*!
@@ -253,11 +280,12 @@ Item {
 
       TODO lazily create the 'backends' on a getUnityObject
       TODO the backends should prop be on the qml side and provided to here
+      TODO move elsewhere (in js file)
      */
     function __makeBackendProxies () {
         var initialized = false;
         return {
-            init: function (params) {console.debug('calls init')
+            init: function (params) {
                 UnityBackends.signalOnBackendReady("base", function () {
                     initialized = true;
                     // base.init(params);
