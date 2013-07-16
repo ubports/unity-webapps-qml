@@ -40,11 +40,9 @@ Description: Example usage of Unity Webapps QML component
 Package: unity-webapps-qml-doc
 Section: doc
 Architecture: all
-Multi-Arch: foreign
-Pre-Depends: dpkg (>= 1.15.6~),
-             ${misc:Pre-Depends},
 Depends: ${misc:Depends},
          ${shlibs:Depends},
+Suggests: unity-webapps-qml-examples,
 Description: Documentation for Unity Webapps QML - documentation
  Unity Webapps QML component
  .
