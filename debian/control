@@ -28,7 +28,7 @@ Description: Unity Webapps QML component
  Unity Webapps QML is a QML component that binds to a QML WebView and allows
  running javascript code to access Ubuntu stack components.
 
-Package: unity-webapps-qml-example
+Package: unity-webapps-qml-examples
 Section: libs
 Architecture: any
 Depends: unity-webapps-qml (>= ${binary:Version}),
