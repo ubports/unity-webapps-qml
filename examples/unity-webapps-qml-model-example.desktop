@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Exec=/usr/share/unity-webapps-qml/examples/webapps-apps-model/launch_webapps_model_example
+Path=/usr/share/unity-webapps-qml/examples/webapps-apps-model
+Name=Unity WebApp QML Comonent - Example of WebApps Applications Model
+GenericName=Unity WebApp QML Comonent for Ubuntu Example of WebApps Applications Model
+Icon=/usr/share/unity-webapps-qml/examples/unity-webapps-qml-example-app.png
+Terminal=false
