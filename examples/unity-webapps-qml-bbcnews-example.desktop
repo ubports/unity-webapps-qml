@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Exec=/usr/share/unity-webapps-qml/examples/unity-webapps-example-bbcnews/launch_webapps_example_bbcnews
+Path=/usr/share/unity-webapps-qml/examples/unity-webapps-example-bbcnews
+Name=Unity WebApp QML Comonent - Example using BBCNews binding
+GenericName=Unity WebApp QML Comonent for Ubuntu Example using BBCNews binding
+Icon=/usr/share/unity-webapps-qml/examples/unity-webapps-qml-example-app.png
+Terminal=false

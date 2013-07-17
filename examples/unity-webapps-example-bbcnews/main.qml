@@ -1,3 +1,21 @@
+/*
+ * Copyright 2013 Canonical Ltd.
+ *
+ * This file is part of unity-webapps-qml.
+ *
+ * unity-webapps-qml is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 3.
+ *
+ * webbrowser-app is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import QtQuick 2.0
 import QtWebKit 3.0
 import QtWebKit.experimental 1.0
@@ -10,8 +28,6 @@ Rectangle {
     WebView {
         id: webView
 
-        // test url
-        url: "http://localhost:8181/"
         anchors.fill: parent
         width: parent.width
         height: parent.height
@@ -34,18 +50,14 @@ Rectangle {
         }
 
         function getUnityWebappsProxies() {
-            var proxies = UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
-
-            // override the default navigate to request
-            proxies.navigateTo = function(url) {};
-            return proxies;
+            return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
         }
 
         UnityWebApps {
             id: webapps
             name: "BBCNews"
             bindee: webView
-            model: UnityWebappsAppModel { }
+            model: UnityWebappsAppModel { searchPath: '/usr/share/unity-webapps-qml/examples/data/userscripts'}
         }
     }
 }

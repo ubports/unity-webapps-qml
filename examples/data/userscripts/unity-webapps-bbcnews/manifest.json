@@ -8,10 +8,6 @@
     "integration-version": "2.3",
     "package-name": "BBCNews",
     "icons": {
-        "128": "128/unity-webapps-bbc.png",
-        "48": "48/unity-webapps-bbc.png",
-        "52": "52/unity-webapps-bbc.png",
-        "64": "64/unity-webapps-bbc.png"
     },
     "domain": "bbc.co.uk",
     "homepage": "http://www.bbc.co.uk/news/",
