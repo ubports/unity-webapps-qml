@@ -1,6 +1,19 @@
-unity-webapps-qml (0.1-0ubuntu0) UNRELEASED; urgency=low
+unity-webapps-qml (0.1+13.10.20130719-0ubuntu1) saucy; urgency=low
 
+  [ Alexandre Abreu ]
   * Initial release.
   * Automatic snapshot from revision 17 (bootstrap)
+  * Automatic update of url to webapp homepage.
+  * Examples have been stripped of their unnecessary native coating (no
+    more native stuff), and common data files have been bundled
+    together. I also added desktop files and simple bash script to
+    launch the sample apps, . (LP: #1201892)
 
- -- Alexandre Abreu <alexandre.abreu@canonical.com>  Tue, 28 May 2013 16:35:13 -0400
+  [ Robert Bruce Park ]
+  * Minor packaging fixes.
+  * Packaging fixes.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 22
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 19 Jul 2013 05:01:32 +0000
