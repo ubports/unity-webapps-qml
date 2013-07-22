@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+13.10.20130722-0ubuntu1) saucy; urgency=low
+
+  [ Alexandre Abreu ]
+  * Fix autopilot tests depends . (LP: #1203086)
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 24
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 22 Jul 2013 05:01:48 +0000
+
 unity-webapps-qml (0.1+13.10.20130719-0ubuntu1) saucy; urgency=low
 
   [ Alexandre Abreu ]
