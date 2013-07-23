@@ -1,3 +1,9 @@
+unity-webapps-qml (0.1+13.10.20130723-0ubuntu1) saucy; urgency=low
+
+  * Automatic snapshot from revision 25
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 23 Jul 2013 05:02:04 +0000
+
 unity-webapps-qml (0.1+13.10.20130722-0ubuntu1) saucy; urgency=low
 
   [ Alexandre Abreu ]
