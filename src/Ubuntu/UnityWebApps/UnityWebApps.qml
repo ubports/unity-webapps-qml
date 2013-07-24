@@ -349,7 +349,7 @@ Item {
 
                     for (i in properties) {
                         if (i == "time") {
-                            UnityBackends.get("messaging").setProperty(String(name), i, UnityMiscUtils.toISODate(properties[i]));
+                            UnityBackends.get("messaging").setProperty(String(name), i, UnityWebAppsJsUtils.toISODate(properties[i]));
                         }
                         else if (i == "count") {
                             UnityBackends.get("messaging").setProperty(String(name), i, String(Number(properties[i])));
