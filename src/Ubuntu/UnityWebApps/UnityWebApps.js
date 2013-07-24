@@ -139,8 +139,10 @@ var UnityWebApps = (function () {
               // Assumes that we are calling a 'callable' from a succession of objects
               names.reduce (
                 function (prev, cur) {
-                  return typeof prev[cur] == "function" ? prev[cur].bind(prev) : prev[cur];
+                    var f = (function(prev, cur) { return prev[cur].bind(prev); })(prev, cur);
+                    return (typeof prev[cur] == "function") ?  f : prev[cur];
                 }, reducetarget).apply (null, args);
+
             } catch (err) {
               this._log('Error while dispatching call to ' + names.join('.') + ': ' + err);
             }

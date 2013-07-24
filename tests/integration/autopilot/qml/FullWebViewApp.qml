@@ -20,6 +20,7 @@ import QtQuick 2.0
 import QtQuick.Window 2.0
 import QtWebKit 3.0
 import QtWebKit.experimental 1.0
+import Ubuntu.HUD 1.0 as HUD
 import Ubuntu.UnityWebApps 0.1
 
 import "dom-introspection-utils.js" as DomIntrospectionUtils
@@ -45,6 +46,14 @@ Window {
     property string webappSearchPath: ""
     property string testUserScript: ""
 
+    HUD.HUD {
+        applicationIdentifier: "unity-webapps-qml-autopilot-test-app"
+
+        HUD.Context {
+            id: hudContext
+        }
+    }
+
     WebView {
         id: webView
         objectName: "webview"
@@ -69,7 +78,7 @@ Window {
         UnityWebApps {
             id: webapps
             objectName: "webappsContainer"
-
+            actionsContext: hudContext
             name: "FullWebViewApp"
             bindee: webView
             model: UnityWebappsAppModel { searchPath: root.webappSearchPath }

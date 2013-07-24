@@ -128,6 +128,7 @@ function createAllWithAsync(parentItem, params) {
     __onBackendReady("base");
 
 
+    // notifications
     result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends;  Backends.UnityWebappsNotificationsBinding { ' + extracted + ' }',
                       parentItem,
                       params);
@@ -140,6 +141,7 @@ function createAllWithAsync(parentItem, params) {
     __onBackendReady("notify");
 
 
+    // messaging menu
     result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; \
                                 Backends.UnityWebappsMessagingBinding { ' + extracted + ' }',
                       parentItem,
@@ -154,27 +156,44 @@ function createAllWithAsync(parentItem, params) {
 
 
     // hud
-/*    function HUDBackendAdaptor(parentItem) {
-        component = __createQmlObject('import Ubuntu.HUD 0.1;\
-                                        HUD {\
-                                          id: hud \
-                                          applicationIdentifier: "" \
-                                          Context { \
-                                            id: context \
-                                          } \
-                                        }', parentItem, params);
-        this._hud = component.createObject(parentItem, params);
+    function HUDBackendAdaptor(parentItem, actionsContext) {
+        this._actions = {};
+        this._actionsContext = actionsContext;
+    };
+    HUDBackendAdaptor.prototype.__actionExists = function (actionName) {
+        if (!actionName || typeof(actionName) != 'string' || actionName.lenght === 0)
+            return false;
+        return this._actions[actionName] != null;
     };
     HUDBackendAdaptor.prototype.addAction = function (actionName, callback) {
-        var actionParams = __extractParams
-        this._hud.context.actions.append(__createQmlObject('import Ubuntu.HUD 0.1; HUD.Action { label }));
+        if (this.__actionExists(actionName))
+            this.removeAction(actionName);
+
+        var action = __createQmlObject('import Ubuntu.HUD 1.0 as HUD; HUD.Action { label: "' + actionName + '"; enabled: true; }', this._actionsContext);
+        action.onTriggered = callback;
     }
     HUDBackendAdaptor.prototype.removeAction = function (actionName) {
+        if ( ! this.__actionExists(actionName))
+            return;
+        try {
+            this._actions[actionName].destroy();
+            this._actions[actionName] = null;
+        } catch(e) {
+            console.debug('Error while removing an action: ' + e);
+        }
     }
     HUDBackendAdaptor.prototype.removeActions = function () {
+        for(var action in this._actions) {
+            if (this._actions.hasOwnProperty(action) && this._actions[action] != null)
+                this.removeAction(action);
+        }
     }
-    __set("hud", new HUDBackendAdaptor(parentItem));
-    __onBackendReady("hud");*/
+
+    //FIXME: find a better way to access parentItem.actionsContext
+    if (parentItem.actionsContext) {
+        __set("hud", new HUDBackendAdaptor(parentItem, parentItem.actionsContext));
+        __onBackendReady("hud");
+    }
 }
 
 function clearAll () {

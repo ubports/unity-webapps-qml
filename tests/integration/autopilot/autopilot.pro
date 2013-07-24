@@ -1,15 +1,14 @@
-TEMPLATE=subdirs
-
-# make check target
-check.target = check
-check.commands = "set -e;"
-for(TEST, TESTS) {
-  check.commands += ./runtest.sh $${TARGET} $${TEST} ../../../src;
-}
+TEMPLATE=aux
 
 OTHER_FILES += \
-    $$system(ls ./autopilot/qml/*) \
-    $$system(ls ./autopilot/html/*) \
-    $$system(ls ./autopilot/webapps_qml/emulators/*.py) \
-    $$system(ls ./autopilot/webapps_qml/tests/*.py)
+    $$system(ls ./qml/*) \
+    $$system(ls ./html/*) \
+    $$system(ls ./webapps_qml/emulators/*.py) \
+    $$system(ls ./webapps_qml/tests/*.py) \
+    $$system(ls ./data/installed-webapps/*)
+
+desktop_files_installs.files = $$system(ls ./desktop-files/*.desktop)
+desktop_files_installs.path = /usr/share/applications
+
+INSTALLS += desktop_files_installs
 

@@ -91,6 +91,16 @@ Item {
 
 
     /*!
+      \qmlproperty HUD.Context UnityWebApps::actionsContext
+
+      The actions context that this element can reach out to for
+      additional actions.
+
+     */
+    property var actionsContext: null
+
+
+    /*!
       \qmlproperty string UnityWebApps::_opt_backendProxies
 
       Used only for testing.
@@ -190,6 +200,11 @@ Item {
         internal.backends = null;
     }
 
+    /*!
+      \internal
+
+      Validates that an installed webapp has been found in the current model (if any)
+     */
     function __isValidWebAppForModel(webappName) {
         return model != null && model.exists && model.exists(webappName);
     }
@@ -303,7 +318,6 @@ Item {
             removeAction: function(actionName) {
                 if (!initialized)
                     return;
-
                 // hud remove action
                 UnityBackends.get("hud").removeAction(actionName);
             },
@@ -311,7 +325,6 @@ Item {
             removeActions: function() {
                 if (!initialized)
                     return;
-
                 // hud remove all action
                 UnityBackends.get("hud").removeActions();
             },

@@ -9,10 +9,12 @@ Build-Depends: debhelper (>= 9),
                pkg-config,
                python (>= 2.7),
                python-setuptools,
+               libqt5webkit5-dev,
                qt5-default,
                qt5-qmake,
                qtbase5-dev,
                qtdeclarative5-dev,
+               qtdeclarative5-test-plugin,
                qtdeclarative5-qtmultimedia-plugin,
 Standards-Version: 3.9.4
 Homepage: https://launchpad.net/unity-webapp-qml
@@ -24,6 +26,10 @@ Package: unity-webapps-qml
 Architecture: any
 Depends: ${misc:Depends},
          ${shlibs:Depends},
+         qtdeclarative5-hud1.0,
+         libqt5webkit5-qmlwebkitplugin,
+         qtdeclarative5-hud1.0,
+         qtdeclarative5-qtquick2-plugin,
 Description: Unity Webapps QML component
  Unity Webapps QML is a QML component that binds to a QML WebView and allows
  running javascript code to access Ubuntu stack components.
@@ -53,10 +59,10 @@ Architecture: all
 Depends: dpkg-dev,
          libautopilot-qt,
          libqt5test5,
-         libqt5webkit5-qmlwebkitplugin,
          qmlscene,
-         qtdeclarative5-qtquick2-plugin,
          qtdeclarative5-window-plugin,
+         qtdeclarative5-hud1.0,
+	 unity-autopilot,
          unity-webapps-qml (>= ${source:Version}),
          ${misc:Depends},
          ${python:Depends},

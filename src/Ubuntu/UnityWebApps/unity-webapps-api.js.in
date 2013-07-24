@@ -18,6 +18,8 @@
 
 (function () {
 
+    console.log('----- unity-webapps-api-js');
+
     //@include UnityWebAppsUtils.js
 
     var callbackManager = makeCallbackManager();
@@ -305,13 +307,13 @@
                                              })
         ,
         clearAction: createArgumentsSanitaizer(null,
-                           [{ str: true }]
-                                               , function (name) {
+                                               [{ str: true }],
+                                               function (name) {
                                                  backend('clearAction', [name]);
                                                })
         ,
         clearActions: createArgumentsSanitaizer(null,
-                            [],
+                                                [],
                                                 function () {
                                                   backend('clearActions', []);
                                                 })
