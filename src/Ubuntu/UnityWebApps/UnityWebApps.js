@@ -46,19 +46,30 @@ var UnityWebApps = (function () {
     };
 
     _UnityWebApps.prototype = {
+
         _bind: function () {
             var self = this;
-            self._bindeeProxies.loadingStartedConnect(function () {
-                var scripts = [self._injected_unity_api_path];
-                for(var i = 0; i < self._userscripts.length; ++i)
-                    scripts.push(Qt.resolvedUrl(self._userscripts[i]));
-                self._bindeeProxies.injectUserScripts(scripts);
-            });
-            self._bindeeProxies.messageReceivedConnect(function (message) {
-                if (!message)
-                    return;
-                self._onMessage(message);
-            });
+
+            var cb = this._onLoadingStartedCallback.bind(self);
+            self._bindeeProxies.loadingStartedConnect(cb);
+
+            cb = this._onMessageReceivedCallback.bind(self);
+            self._bindeeProxies.messageReceivedConnect(cb);
+        },
+
+        _onLoadingStartedCallback: function () {
+            var scripts = [this._injected_unity_api_path];
+            for(var i = 0; i < this._userscripts.length; ++i) {
+                scripts.push(Qt.resolvedUrl(this._userscripts[i]));
+            }
+
+            this._bindeeProxies.injectUserScripts(scripts);
+        },
+
+        _onMessageReceivedCallback: function (message) {
+            if (!message)
+                return;
+            this._onMessage(message);
         },
 
         //FIXME: api design
@@ -139,8 +150,10 @@ var UnityWebApps = (function () {
               // Assumes that we are calling a 'callable' from a succession of objects
               names.reduce (
                 function (prev, cur) {
-                  return typeof prev[cur] == "function" ? prev[cur].bind(prev) : prev[cur];
+                    var f = (function(prev, cur) { return prev[cur].bind(prev); })(prev, cur);
+                    return (typeof prev[cur] == "function") ?  f : prev[cur];
                 }, reducetarget).apply (null, args);
+
             } catch (err) {
               this._log('Error while dispatching call to ' + names.join('.') + ': ' + err);
             }

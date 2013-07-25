@@ -1,9 +1,9 @@
 [Desktop Entry]
 Encoding=UTF-8
 Type=Application
-Exec=/usr/share/unity-webapps-qml/examples/basic-webview/launch_basic_webview_api_test
+Exec=qmlscene /usr/share/unity-webapps-qml/examples/basic-webview/main.qml
 Path=/usr/share/unity-webapps-qml/examples/basic-webview
 Name=Unity WebApp QML Comonent - Basic API Showcase App
 GenericName=Unity WebApp QML Comonent for Ubuntu Basic API Showcase App
-Icon=/usr/share/unity-webapps-qml/examples/unity-webapps-qml-example-app.png
+Icon=drive-multidisk-symbolicx
 Terminal=false

@@ -1,9 +1,9 @@
 [Desktop Entry]
 Encoding=UTF-8
 Type=Application
-Exec=/usr/share/unity-webapps-qml/examples/unity-webapps-example-bbcnews/launch_webapps_example_bbcnews
+Exec=qmlscene /usr/share/unity-webapps-qml/examples/unity-webapps-example-bbcnews/main.qml
 Path=/usr/share/unity-webapps-qml/examples/unity-webapps-example-bbcnews
-Name=Unity WebApp QML Comonent - Example using BBCNews binding
-GenericName=Unity WebApp QML Comonent for Ubuntu Example using BBCNews binding
-Icon=/usr/share/unity-webapps-qml/examples/unity-webapps-qml-example-app.png
+Name=Unity WebApp QML Component - Example using BBCNews binding
+GenericName=Unity WebApp QML Component for Ubuntu Example using BBCNews binding
+Icon=drive-multidisk-symbolic
 Terminal=false

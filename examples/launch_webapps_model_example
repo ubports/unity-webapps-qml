@@ -1,2 +1,0 @@
-#!/bin/bash
-/usr/lib/*/qt5/bin/qmlscene /usr/share/unity-webapps-qml/examples/webapps-app-model/main.qml

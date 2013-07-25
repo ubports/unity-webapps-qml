@@ -18,6 +18,8 @@
 
 (function () {
 
+    console.log('----- unity-webapps-api-js');
+
     //@include UnityWebAppsUtils.js
 
     var callbackManager = makeCallbackManager();
@@ -304,16 +306,16 @@
                                                backend('addAction', [name, callback]);
                                              })
         ,
-        clearAction: createArgumentsSanitaizer(null,
-                           [{ str: true }]
-                                               , function (name) {
-                                                 backend('clearAction', [name]);
+        removeAction: createArgumentsSanitaizer(null,
+                                               [{ str: true }],
+                                               function (name) {
+                                                 backend('removeAction', [name]);
                                                })
         ,
-        clearActions: createArgumentsSanitaizer(null,
-                            [],
+        removeActions: createArgumentsSanitaizer(null,
+                                                [],
                                                 function () {
-                                                  backend('clearActions', []);
+                                                  backend('removeActions', []);
                                                 })
         ,
         MediaPlayer: {

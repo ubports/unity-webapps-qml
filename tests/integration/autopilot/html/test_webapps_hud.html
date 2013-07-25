@@ -1,0 +1,49 @@
+<html>
+
+<head>
+<title>Unity Webapps QML test: HUD</title>
+
+<script>
+
+var unity;
+function onInit() {
+  unity.addAction('This is an action', function() {
+    document.getElementById('content').style.display = 'none';
+  });
+  unity.addAction('This is an other action', function() {
+    document.getElementById('content').style.display = 'none';
+  });
+  document.getElementById('status').innerHTML = 'actionadded';
+}
+
+document.addEventListener('ubuntu-webapps-api-ready', function () {
+  console.log('ubuntu-webapps-api-ready received');
+
+  unity = window.external.getUnityObject('1.0');
+  unity.init({name: 'HUD TEST', domain: 'localhost', onInit: onInit});
+}, false);
+
+
+document.addEventListener('unity-webapps-do-call', function(e) {
+  var action = JSON.parse(e.detail);
+  unity[action.name].apply(unity, action.args);
+}, false);
+
+</script>
+
+</head>
+
+<body>
+
+HELLO WORLD
+
+<div id="content">
+  <h1>THE CONTENT IS VISIBLE</h1>
+</div>
+
+<!-- Used as a communication status (to avoid races) between the app & the test -->
+<div id="status"></div>
+
+</body>
+
+</html>

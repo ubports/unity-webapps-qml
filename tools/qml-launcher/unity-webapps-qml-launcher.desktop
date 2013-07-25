@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Terminal=false
+Exec=/usr/bin/unity-webapps-qml-launcher $@
+Name=Unity Webapps QML Test Launcher
+Icon=qmlscene
+X-Ubuntu-Touch=true
+

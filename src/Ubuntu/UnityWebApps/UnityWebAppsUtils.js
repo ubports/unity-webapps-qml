@@ -25,11 +25,25 @@
 // \param props list of object properties to validate. Each property is an object w/ a 'name' and 'type' (as in typeof()).
 //
 function makeProxiesForQtWebViewBindee(webViewId) {
+    //FIXME: properly handle disconnects
+    // _callbackDestructorFuncs = [];
+/*
+        dispose: function() {
+            for(var i = 0; i < this._callbackDestructorFuncs.length; ++i) {
+                if (typeof(this._callbackDestructorFuncs[i]) === 'function') {
+                    this._callbackDestructorFuncs[i]();
+                }
+            }
+        },
+*/
+
     return {
         injectUserScripts: function(userScriptUrls) {
             var scripts = webViewId.experimental.userScripts;
-            for (var i = 0; i < userScriptUrls.length; ++i)
+            for (var i = 0; i < userScriptUrls.length; ++i) {
                 scripts.push(userScriptUrls[i]);
+            }
+
             webViewId.experimental.userScripts = scripts;
         },
         navigateTo: function(url) {
@@ -143,4 +157,22 @@ var makeCallbackManager = function () {
     }
   };
 };
+
+
+//
+//
+//
+var toISODate = function(d) {
+    function pad(n) {
+        return n < 10 ? '0' + n : n;
+    }
+
+    return d.getUTCFullYear() + '-'
+        + pad(d.getUTCMonth() + 1) + '-'
+        + pad(d.getUTCDate()) + 'T'
+        + pad(d.getUTCHours()) + ':'
+        + pad(d.getUTCMinutes()) + ':'
+        + pad(d.getUTCSeconds()) + 'Z';
+};
+
 

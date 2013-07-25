@@ -1,2 +1,3 @@
-usr/bin
+usr/bin/unity-webapps-qml-launcher
 usr/lib/*/qt5/qml/Ubuntu/UnityWebApps/*
+usr/share/applications/unity-webapps-qml-launcher.desktop

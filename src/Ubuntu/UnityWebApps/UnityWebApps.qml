@@ -91,6 +91,16 @@ Item {
 
 
     /*!
+      \qmlproperty HUD.Context UnityWebApps::actionsContext
+
+      The actions context that this element can reach out to for
+      additional actions.
+
+     */
+    property var actionsContext: null
+
+
+    /*!
       \qmlproperty string UnityWebApps::_opt_backendProxies
 
       Used only for testing.
@@ -186,10 +196,17 @@ Item {
      */
     function __unbind() {
         //TODO: make sure that now leaks here
+        if (internal.instance)
+            internal.instance.dispose();
         internal.instance = null;
         internal.backends = null;
     }
 
+    /*!
+      \internal
+
+      Validates that an installed webapp has been found in the current model (if any)
+     */
     function __isValidWebAppForModel(webappName) {
         return model != null && model.exists && model.exists(webappName);
     }
@@ -250,8 +267,7 @@ Item {
 
      */
     onBindeeChanged: {
-        __unbind();
-        __bind(bindee, __gatherWebAppUserscriptsIfAny(name));
+        //FIXME: we shouldn't allow bindee to change
     }
 
     /*!
@@ -303,7 +319,6 @@ Item {
             removeAction: function(actionName) {
                 if (!initialized)
                     return;
-
                 // hud remove action
                 UnityBackends.get("hud").removeAction(actionName);
             },
@@ -311,7 +326,6 @@ Item {
             removeActions: function() {
                 if (!initialized)
                     return;
-
                 // hud remove all action
                 UnityBackends.get("hud").removeActions();
             },
@@ -336,7 +350,7 @@ Item {
 
                     for (i in properties) {
                         if (i == "time") {
-                            UnityBackends.get("messaging").setProperty(String(name), i, UnityMiscUtils.toISODate(properties[i]));
+                            UnityBackends.get("messaging").setProperty(String(name), i, UnityWebAppsJsUtils.toISODate(properties[i]));
                         }
                         else if (i == "count") {
                             UnityBackends.get("messaging").setProperty(String(name), i, String(Number(properties[i])));

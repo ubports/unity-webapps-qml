@@ -18,6 +18,9 @@ from autopilot.matchers import Eventually
 from autopilot.testcase import AutopilotTestCase
 from autopilot.input import Mouse, Touch, Pointer
 
+from unity.emulators.unity import Unity
+
+
 class UnityWebappsTestCaseBase(AutopilotTestCase):
     LOCAL_QML_LAUNCHER_APP_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../../../../tools/qml-launcher/unity-webapps-qml-launcher')
     INSTALLED_QML_LAUNCHER_APP_PATH = 'unity-webapps-qml-launcher'
@@ -27,6 +30,10 @@ class UnityWebappsTestCaseBase(AutopilotTestCase):
     INSTALLED_BROWSER_CONTAINER_PATH = '/usr/share/unity-webapps-qml/autopilot-tests/qml/FullWebViewApp.qml'
 
     BASE_URL = ''
+
+    @property
+    def unity(self):
+        return Unity.get_root_instance()
 
     def create_file_url(self, path):
         return 'file://' + path
