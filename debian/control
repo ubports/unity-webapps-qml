@@ -6,16 +6,16 @@ Build-Depends: debhelper (>= 9),
                gdb,
                libmessaging-menu-dev,
                libnotify-dev,
+               libqt5webkit5-dev,
                pkg-config,
                python (>= 2.7),
                python-setuptools,
-               libqt5webkit5-dev,
                qt5-default,
                qt5-qmake,
                qtbase5-dev,
                qtdeclarative5-dev,
-               qtdeclarative5-test-plugin,
                qtdeclarative5-qtmultimedia-plugin,
+               qtdeclarative5-test-plugin,
 Standards-Version: 3.9.4
 Homepage: https://launchpad.net/unity-webapp-qml
 # If you aren't a member of ~webapps but need to upload packaging changes,
@@ -23,13 +23,13 @@ Homepage: https://launchpad.net/unity-webapp-qml
 Vcs-Bzr: https://code.launchpad.net/~webapps/unity-webapps-qml/trunk
 
 Package: unity-webapps-qml
-Architecture: any
-Depends: ${misc:Depends},
-         ${shlibs:Depends},
-         qtdeclarative5-hud1.0,
-         libqt5webkit5-qmlwebkitplugin,
+Architecture: amd64 armhf i386
+Multi-Arch: same
+Depends: libqt5webkit5-qmlwebkitplugin,
          qtdeclarative5-hud1.0,
          qtdeclarative5-qtquick2-plugin,
+         ${misc:Depends},
+         ${shlibs:Depends},
 Description: Unity Webapps QML component
  Unity Webapps QML is a QML component that binds to a QML WebView and allows
  running javascript code to access Ubuntu stack components.
@@ -60,9 +60,9 @@ Depends: dpkg-dev,
          libautopilot-qt,
          libqt5test5,
          qmlscene,
-         qtdeclarative5-window-plugin,
          qtdeclarative5-hud1.0,
-	 unity-autopilot,
+         qtdeclarative5-window-plugin,
+         unity-autopilot,
          unity-webapps-qml (>= ${source:Version}),
          ${misc:Depends},
          ${python:Depends},

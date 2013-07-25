@@ -46,9 +46,8 @@ Window {
     property string webappSearchPath: ""
     property string testUserScript: ""
 
-    HUD.HUD {
-        applicationIdentifier: "unity-webapps-qml-autopilot-test-app"
-
+    HUD.HUD {        
+        applicationIdentifier: "unity-webapps-qml-launcher"
         HUD.Context {
             id: hudContext
         }

@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Terminal=false
-Exec=/usr/bin/unity-webapps-qml-launcher --qml=/usr/share/unity-webapps-qml/autopilot-tests/qml/FullWebViewApp.qml --url=$@
-Name=UnityWebapps QML Autopilot Test Application
-Icon=qmlscene
-X-Ubuntu-Touch=true

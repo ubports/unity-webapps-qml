@@ -48,7 +48,13 @@ class UnityWebappsHudTestCase(UnityWebappsTestCaseBase):
 
     def test_removeAction(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('actionadded')))
-        self.eval_expression_in_page_unsafe("unity.removeAction('This is an action');")
+        expr = """
+           var e = document.createEvent ("Events");
+           e.initEvent ('unity-webapps-do-call', false, false);
+           e.data = {'name': removeAction, 'args': '["This is an action"]'};
+           document.dispatchEvent (e);
+        """
+        self.eval_expression_in_page_unsafe(expr)
 
         self.unity.hud.ensure_visible()
         self.addCleanup(self.unity.hud.ensure_hidden)
@@ -58,9 +64,16 @@ class UnityWebappsHudTestCase(UnityWebappsTestCaseBase):
 
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('content').style.display;"), Eventually(NotEquals('none')))
 
-    def test_removeAction(self):
+    def test_removeActions(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('actionadded')))
-        self.eval_expression_in_page_unsafe("unity.removeActions();")
+        expr = """
+           var e = document.createEvent ("Events");
+           e.initEvent ('unity-webapps-do-call', false, false);
+           e.data = {'name': removeActions, 'args': '[]'};
+           document.dispatchEvent (e);
+        """
+
+        self.eval_expression_in_page_unsafe(expr)
 
         actions = ['This is an action', 'This is another action']
         for action in actions:

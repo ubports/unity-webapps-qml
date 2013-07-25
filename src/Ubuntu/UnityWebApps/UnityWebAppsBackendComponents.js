@@ -169,14 +169,18 @@ function createAllWithAsync(parentItem, params) {
         if (this.__actionExists(actionName))
             this.removeAction(actionName);
 
-        var action = __createQmlObject('import Ubuntu.HUD 1.0 as HUD; HUD.Action { label: "' + actionName + '"; enabled: true; }', this._actionsContext);
-        action.onTriggered = callback;
+        var action = __createQmlObject('import Ubuntu.HUD 1.0 as HUD; HUD.Action { label: "' + actionName + '"; enabled: true; }', this._actionsContext).object;
+        this._actionsContext.addAction(action);
+
+        action.triggered.connect(callback);
+
+        this._actions[actionName] = action;
     }
     HUDBackendAdaptor.prototype.removeAction = function (actionName) {
         if ( ! this.__actionExists(actionName))
             return;
         try {
-            this._actions[actionName].destroy();
+            this._actionsContext.removeAction(this._actions[actionName]);
             this._actions[actionName] = null;
         } catch(e) {
             console.debug('Error while removing an action: ' + e);
