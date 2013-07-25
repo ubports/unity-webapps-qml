@@ -306,16 +306,16 @@
                                                backend('addAction', [name, callback]);
                                              })
         ,
-        clearAction: createArgumentsSanitaizer(null,
+        removeAction: createArgumentsSanitaizer(null,
                                                [{ str: true }],
                                                function (name) {
-                                                 backend('clearAction', [name]);
+                                                 backend('removeAction', [name]);
                                                })
         ,
-        clearActions: createArgumentsSanitaizer(null,
+        removeActions: createArgumentsSanitaizer(null,
                                                 [],
                                                 function () {
-                                                  backend('clearActions', []);
+                                                  backend('removeActions', []);
                                                 })
         ,
         MediaPlayer: {

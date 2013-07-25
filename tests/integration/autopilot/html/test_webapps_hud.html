@@ -23,8 +23,9 @@ document.addEventListener('ubuntu-webapps-api-ready', function () {
   unity.init({name: 'HUD TEST', domain: 'localhost', onInit: onInit});
 }, false);
 
+
 document.addEventListener('unity-webapps-do-call', function(e) {
-  var action = JSON.parse(e.data);
+  var action = JSON.parse(e.detail);
   unity[action.name].apply(unity, action.args);
 }, false);
 

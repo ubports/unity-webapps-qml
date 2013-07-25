@@ -196,6 +196,8 @@ Item {
      */
     function __unbind() {
         //TODO: make sure that now leaks here
+        if (internal.instance)
+            internal.instance.dispose();
         internal.instance = null;
         internal.backends = null;
     }
@@ -265,8 +267,7 @@ Item {
 
      */
     onBindeeChanged: {
-        __unbind();
-        __bind(bindee, __gatherWebAppUserscriptsIfAny(name));
+        //FIXME: we shouldn't allow bindee to change
     }
 
     /*!

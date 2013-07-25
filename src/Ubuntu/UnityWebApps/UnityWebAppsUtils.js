@@ -25,11 +25,25 @@
 // \param props list of object properties to validate. Each property is an object w/ a 'name' and 'type' (as in typeof()).
 //
 function makeProxiesForQtWebViewBindee(webViewId) {
+    //FIXME: properly handle disconnects
+    // _callbackDestructorFuncs = [];
+/*
+        dispose: function() {
+            for(var i = 0; i < this._callbackDestructorFuncs.length; ++i) {
+                if (typeof(this._callbackDestructorFuncs[i]) === 'function') {
+                    this._callbackDestructorFuncs[i]();
+                }
+            }
+        },
+*/
+
     return {
         injectUserScripts: function(userScriptUrls) {
             var scripts = webViewId.experimental.userScripts;
-            for (var i = 0; i < userScriptUrls.length; ++i)
+            for (var i = 0; i < userScriptUrls.length; ++i) {
                 scripts.push(userScriptUrls[i]);
+            }
+
             webViewId.experimental.userScripts = scripts;
         },
         navigateTo: function(url) {

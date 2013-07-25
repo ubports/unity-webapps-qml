@@ -163,7 +163,7 @@ function createAllWithAsync(parentItem, params) {
     HUDBackendAdaptor.prototype.__actionExists = function (actionName) {
         if (!actionName || typeof(actionName) != 'string' || actionName.lenght === 0)
             return false;
-        return this._actions[actionName] != null;
+        return this._actions[actionName] != null && this._actions[actionName].action != null;
     };
     HUDBackendAdaptor.prototype.addAction = function (actionName, callback) {
         if (this.__actionExists(actionName))
@@ -174,13 +174,15 @@ function createAllWithAsync(parentItem, params) {
 
         action.triggered.connect(callback);
 
-        this._actions[actionName] = action;
+        this._actions[actionName] = { action: action, callback: callback};
     }
     HUDBackendAdaptor.prototype.removeAction = function (actionName) {
         if ( ! this.__actionExists(actionName))
             return;
         try {
-            this._actionsContext.removeAction(this._actions[actionName]);
+            this._actionsContext.removeAction(this._actions[actionName].action);
+            this._actions[actionName].action.enabled = false;
+            this._actions[actionName].action.triggered.disconnect(this._actions[actionName].callback);
             this._actions[actionName] = null;
         } catch(e) {
             console.debug('Error while removing an action: ' + e);
@@ -206,7 +208,6 @@ function clearAll () {
         delete _backends['base'];
     }
 
-    //TODO hu?
     if (_backends.hud) {
         _backends.hud._hud.destroy();
         delete _backends['hud'];

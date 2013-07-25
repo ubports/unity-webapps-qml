@@ -57,7 +57,6 @@ Window {
         id: webView
         objectName: "webview"
 
-        url: parent.url
         anchors.fill: parent
         width: parent.width
         height: parent.height
@@ -70,8 +69,15 @@ Window {
             return "Mozilla/5.0 (iPad; CPU OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3"
         }
 
+        onLoadingChanged: console.log('loading ' + loadRequest.url)
+
         function getUnityWebappsProxies() {
-            return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
+            var p = UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
+            p.navigateTo = function(url) {
+                console.log('navigate to ' + url);
+                p.navigateTo(url);
+            };
+            return p;
         }
 
         UnityWebApps {
