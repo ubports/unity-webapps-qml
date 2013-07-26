@@ -25,48 +25,71 @@
 // \param props list of object properties to validate. Each property is an object w/ a 'name' and 'type' (as in typeof()).
 //
 function makeProxiesForQtWebViewBindee(webViewId) {
-    //FIXME: properly handle disconnects
-    // _callbackDestructorFuncs = [];
-/*
-        dispose: function() {
-            for(var i = 0; i < this._callbackDestructorFuncs.length; ++i) {
-                if (typeof(this._callbackDestructorFuncs[i]) === 'function') {
-                    this._callbackDestructorFuncs[i]();
-                }
-            }
-        },
-*/
 
-    return {
-        injectUserScripts: function(userScriptUrls) {
-            var scripts = webViewId.experimental.userScripts;
-            for (var i = 0; i < userScriptUrls.length; ++i) {
-                scripts.push(userScriptUrls[i]);
+    function SignalConnectionDisposer() {
+        this._signalConnectionDisposers = [];
+    }
+    SignalConnectionDisposer.prototype.disposeAndCleanupAll = function() {
+        for(var i = 0; i < this._signalConnectionDisposers.length; ++i) {
+            if (typeof(this._signalConnectionDisposers[i]) === 'function') {
+                this._signalConnectionDisposers[i]();
             }
-
-            webViewId.experimental.userScripts = scripts;
-        },
-        navigateTo: function(url) {
-            webViewId.url = url;
-        },
-        sendToPage: function (message) {
-            webViewId.experimental.postMessage(message);
-        },
-        loadingStartedConnect: function (onLoadingStarted) {
-            webViewId.loadingChanged.connect(function (loadRequest) {
-                // bad bad,...
-                var LoadStartedStatus = 0;
-                if (loadRequest.status === LoadStartedStatus) {
-                    onLoadingStarted();
-                }
-            });
-        },
-        messageReceivedConnect: function (onMessageReceived) {
-            webViewId.experimental.messageReceived.connect(function (raw) {
-                onMessageReceived(JSON.parse(raw.data));
-            });
         }
+        this._signalConnectionDisposers = [];
     };
+    SignalConnectionDisposer.prototype.addDisposer = function(d) {
+        if ( ! this._signalConnectionDisposers.some(function(elt) { return elt === d; }))
+            this._signalConnectionDisposers.push(d);
+    };
+
+    return (function (disposer) {
+
+        var makeSignalDisconnecter = function(sig, callback) {
+            return function () {
+                sig.disconnect(callback);
+            };
+        };
+
+        return {
+            injectUserScripts: function(userScriptUrls) {
+                var scripts = webViewId.experimental.userScripts;
+                for (var i = 0; i < userScriptUrls.length; ++i) {
+                    scripts.push(userScriptUrls[i]);
+                }
+
+                webViewId.experimental.userScripts = scripts;
+            },
+            navigateTo: function(url) {
+                webViewId.url = url;
+            },
+            sendToPage: function (message) {
+                webViewId.experimental.postMessage(message);
+            },
+            loadingStartedConnect: function (onLoadingStarted) {
+                var handler = function (loadRequest) {
+                    // bad bad,...
+                    var LoadStartedStatus = 0;
+                    if (loadRequest.status === LoadStartedStatus) {
+                        onLoadingStarted();
+                    }
+                };
+                webViewId.loadingChanged.connect(handler);
+
+                disposer.addDisposer(makeSignalDisconnecter(webViewId.loadingChanged, handler));
+            },
+            messageReceivedConnect: function (onMessageReceived) {
+                var handler = function (raw) {
+                    onMessageReceived(JSON.parse(raw.data));
+                };
+                webViewId.experimental.messageReceived.connect(handler);
+
+                disposer.addDisposer(makeSignalDisconnecter(webViewId.experimental.messageReceived, handler));
+            },
+            cleanup: function() {
+                disposer.disposeAndCleanupAll();
+            }
+        };
+    })(new SignalConnectionDisposer());
 }
 
 //

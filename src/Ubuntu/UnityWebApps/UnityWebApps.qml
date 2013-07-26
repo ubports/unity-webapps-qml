@@ -141,13 +141,30 @@ Item {
             return;
         }
 
-        var backends = _opt_backendProxies || __makeBackendProxies();
+        var backends = __createBackendsIfNeeded();
+
         var instance = new UnityWebAppsJs.UnityWebApps(webapps,
                                                      bindeeProxies,
                                                      backends,
                                                      webappUserscripts);
         internal.backends = backends;
         internal.instance = instance;
+    }
+
+    function __createBackendsIfNeeded() {
+        var backends;
+        if (_opt_backendProxies != null)
+            backends = _opt_backendProxies;
+        else {
+            backends = __makeBackendProxies();
+
+            // create the real Unity backends
+            if (typeof(name) === 'string' && name !== "") {
+                UnityBackends.clearAll();
+                UnityBackends.createAllWithAsync(webapps, {name: name});
+            }
+        }
+        return backends;
     }
 
     /*!
@@ -186,7 +203,9 @@ Item {
      */
     function __reset() {
         __unbind();
-        UnityBackends.clearAll();
+
+        if (typeof(name) === 'string' && name !== "")
+            UnityBackends.clearAll();
     }
 
     /*!
@@ -197,7 +216,7 @@ Item {
     function __unbind() {
         //TODO: make sure that now leaks here
         if (internal.instance)
-            internal.instance.dispose();
+            internal.instance.cleanup();
         internal.instance = null;
         internal.backends = null;
     }
@@ -251,15 +270,14 @@ Item {
     }
 
     Component.onCompleted: {
+        if (bindee == null || name == null || name === "")
+            return;
+
         webapps.__unbind();
         webapps.__bind(bindee, __gatherWebAppUserscriptsIfAny(name));
 
-        if (name != "") {
-            UnityBackends.clearAll();
-            UnityBackends.createAllWithAsync(webapps, {name: name});
-
+        if (typeof(name) === 'string' && name !== "")
             __navigateToWebappHomepageInBindee(name);
-        }
     }
 
     /*!
