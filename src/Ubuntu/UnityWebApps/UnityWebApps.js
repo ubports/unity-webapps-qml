@@ -47,6 +47,11 @@ var UnityWebApps = (function () {
 
     _UnityWebApps.prototype = {
 
+        cleanup: function() {
+            if (this._bindeeProxies.cleanup && typeof(this._bindeeProxies.cleanup) == 'function')
+                this._bindeeProxies.cleanup();
+        },
+
         _bind: function () {
             var self = this;
 
@@ -150,8 +155,7 @@ var UnityWebApps = (function () {
               // Assumes that we are calling a 'callable' from a succession of objects
               names.reduce (
                 function (prev, cur) {
-                    var f = (function(prev, cur) { return prev[cur].bind(prev); })(prev, cur);
-                    return (typeof prev[cur] == "function") ?  f : prev[cur];
+                    return (typeof prev[cur] == "function") ?  (function(prev, cur) { return prev[cur].bind(prev); })(prev, cur) : prev[cur];
                 }, reducetarget).apply (null, args);
 
             } catch (err) {
