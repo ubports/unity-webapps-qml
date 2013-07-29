@@ -22,6 +22,9 @@
 #include <QObject>
 #include <QQmlParserStatus>
 
+#include "unity-webapps-app-model.h"
+
+
 class UnityWebappsMessagingMenuPrivate;
 
 class UnityWebappsMessagingMenu: public QObject, public QQmlParserStatus
@@ -29,17 +32,21 @@ class UnityWebappsMessagingMenu: public QObject, public QQmlParserStatus
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
 
-    Q_PROPERTY(QString name READ name WRITE setName)
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(UnityWebappsAppModel* model READ model WRITE setModel NOTIFY modelChanged)
+
 
 public:
     UnityWebappsMessagingMenu(QObject * parent = 0);
     virtual ~UnityWebappsMessagingMenu();
 
-    Q_INVOKABLE void showIndicator(const QString& name);
-    Q_INVOKABLE void setProperty(const QString& name, const QVariant& value);
-    Q_INVOKABLE void clearIndicator(const QString& name);
+    // Supported WebApps APIs
+    Q_INVOKABLE void showIndicator(const QString& indicatorName);
+    Q_INVOKABLE void setProperty(const QString& indicatorName,
+                                 const QString& propertyName,
+                                 const QVariant& value);
+    Q_INVOKABLE void clearIndicator(const QString& indicatorName);
     Q_INVOKABLE void clearIndicators();
-
 
     /*!
      * \brief setName
@@ -53,9 +60,17 @@ public:
      */
     QString name() const;
 
-    // TODO: don't really need it?
+    UnityWebappsAppModel* model() const;
+    void setModel(UnityWebappsAppModel *);
+
     void classBegin();
     void componentComplete();
+
+
+Q_SIGNALS:
+
+    void nameChanged(const QString& name);
+    void modelChanged(UnityWebappsAppModel * model);
 
 
 private:

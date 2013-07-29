@@ -225,6 +225,8 @@ void UnityWebappsAppModel::load()
                    manifest.value(),
                    content);
     }
+
+    Q_EMIT modelChanged();
 }
 
 QString
@@ -276,6 +278,25 @@ QString UnityWebappsAppModel::getDomainFor(const QString & webappName) const
 
     return data(idx, Domain).toString();
 }
+
+
+QString UnityWebappsAppModel::getDisplayNameFor(const QString & webappName) const
+{
+    //FIXME: very inefficient
+
+    if (!exists(webappName))
+        return QString();
+
+    int idx = getWebappIndex(webappName);
+    if (Q_UNLIKELY(idx == -1))
+    {
+        qDebug() << "Invalid index for a supposedly existing webapp: " << webappName;
+        return QString();
+    }
+
+    return data(idx, Name).toString();
+}
+
 
 void UnityWebappsAppModel::addWebApp(const QString& userscriptLocation,
                                      const QString& requiresLocation,

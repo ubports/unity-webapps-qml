@@ -93,6 +93,12 @@ public:
 
 
     /*!
+     * \brief
+     */
+    Q_INVOKABLE QString getDisplayNameFor(const QString & webappName) const;
+
+
+    /*!
      * \brief data
      * \return
      */
@@ -102,6 +108,7 @@ public:
 Q_SIGNALS:
 
     void searchPathChanged(const QString & path);
+    void modelChanged();
 
 
 private Q_SLOTS:

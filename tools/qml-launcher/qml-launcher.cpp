@@ -64,16 +64,30 @@ int main(int argc, char *argv[])
     loadQtTestability(app.arguments());
 
     const QString QML_FILE_ARG_HEADER = "--qml=";
+    const QString QML_FILE_IMPORT_ARG_HEADER = "--import=";
+    const QString QML_INSPECTOR_ARG_HEADER = "--inspector=";
     const QString ARG_HEADER = "--";
     const QString VALUE_HEADER = "=";
     QHash<QString, QString> properties;
     QString qmlfile;
+    QString importPath;
+    QString inspector;
 
     Q_FOREACH(QString argument, app.arguments())
     {
         if (argument.contains(QML_FILE_ARG_HEADER))
         {
             qmlfile = argument.right(argument.count() - QML_FILE_ARG_HEADER.count());
+        }
+        else
+        if (argument.contains(QML_FILE_IMPORT_ARG_HEADER))
+        {
+            importPath = argument.right(argument.count() - QML_FILE_IMPORT_ARG_HEADER.count());
+        }
+        else
+        if (argument.contains(QML_INSPECTOR_ARG_HEADER))
+        {
+            inspector = argument.right(argument.count() - QML_INSPECTOR_ARG_HEADER.count());
         }
         else
         if (argument.startsWith(ARG_HEADER)
@@ -114,6 +128,20 @@ int main(int argc, char *argv[])
     {
         qDebug() << "QML file not found or not a file: " << qmlfile;
         return EXIT_FAILURE;
+    }
+
+    if ( ! importPath.isEmpty())
+    {
+        qDebug() << "Setting import path to: " << importPath;
+
+        qputenv("QML2_IMPORT_PATH", importPath.toLatin1());
+    }
+
+    if ( ! inspector.isEmpty())
+    {
+        qDebug() << "Inspector server being set to: " << inspector;
+
+        qputenv("QTWEBKIT_INSPECTOR_SERVER", inspector.toLatin1());
     }
 
     QQmlEngine engine;
