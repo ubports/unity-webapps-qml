@@ -74,7 +74,7 @@ class UnityWebappsHudTestCase(UnityWebappsTestCaseBase):
 
         self.eval_expression_in_page_unsafe(expr)
 
-        actions = ['This is an action', 'This is another action']
+        actions = ['This is an action', 'Another action']
         for action in actions:
             self.unity.hud.ensure_visible()
             self.addCleanup(self.unity.hud.ensure_hidden)

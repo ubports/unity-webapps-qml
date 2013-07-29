@@ -169,7 +169,8 @@ function createAllWithAsync(parentItem, params) {
         if (this.__actionExists(actionName))
             this.removeAction(actionName);
 
-        var action = __createQmlObject('import Ubuntu.HUD 1.0 as HUD; HUD.Action { label: "' + actionName + '"; enabled: true; }', this._actionsContext).object;
+        var action = __createQmlObject('import Ubuntu.Unity.Action 1.0 as UnityActions; UnityActions.Action { text: "' + actionName + '"; enabled: true; }',
+                                       this._actionsContext).object;
         this._actionsContext.addAction(action);
 
         action.triggered.connect(callback);
