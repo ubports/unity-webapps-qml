@@ -20,7 +20,7 @@ import QtQuick 2.0
 import QtQuick.Window 2.0
 import QtWebKit 3.0
 import QtWebKit.experimental 1.0
-import Ubuntu.HUD 1.0 as HUD
+import Ubuntu.Unity.Action 1.0 as UnityActions
 import Ubuntu.UnityWebApps 0.1
 
 import "dom-introspection-utils.js" as DomIntrospectionUtils
@@ -46,11 +46,12 @@ Window {
     property string webappSearchPath: ""
     property string testUserScript: ""
 
-    HUD.HUD {        
-        applicationIdentifier: "unity-webapps-qml-launcher"
-        HUD.Context {
-            id: hudContext
-        }
+    UnityActions.ActionManager {
+        localContexts: [webappsActionsContext]
+    }
+    UnityActions.ActionContext {
+        id: webappsActionsContext
+        active: true
     }
 
     WebView {
@@ -72,18 +73,13 @@ Window {
         onLoadingChanged: console.log('loading ' + loadRequest.url)
 
         function getUnityWebappsProxies() {
-            var p = UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
-            p.navigateTo = function(url) {
-                console.log('navigate to ' + url);
-                p.navigateTo(url);
-            };
-            return p;
+            return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
         }
 
         UnityWebApps {
             id: webapps
             objectName: "webappsContainer"
-            actionsContext: hudContext
+            actionsContext: webappsActionsContext
             name: "FullWebViewApp"
             bindee: webView
             model: UnityWebappsAppModel { searchPath: root.webappSearchPath }

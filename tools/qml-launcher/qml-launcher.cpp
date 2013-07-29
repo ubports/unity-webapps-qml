@@ -64,10 +64,14 @@ int main(int argc, char *argv[])
     loadQtTestability(app.arguments());
 
     const QString QML_FILE_ARG_HEADER = "--qml=";
+    const QString QML_FILE_IMPORT_ARG_HEADER = "--import=";
+    const QString QML_APP_ID_ARG_HEADER = "--app-id=";
     const QString ARG_HEADER = "--";
     const QString VALUE_HEADER = "=";
     QHash<QString, QString> properties;
     QString qmlfile;
+    QString appid;
+    QString importPath;
 
     Q_FOREACH(QString argument, app.arguments())
     {
@@ -76,6 +80,16 @@ int main(int argc, char *argv[])
             qmlfile = argument.right(argument.count() - QML_FILE_ARG_HEADER.count());
         }
         else
+        if (argument.contains(QML_FILE_IMPORT_ARG_HEADER))
+        {
+            importPath = argument.right(argument.count() - QML_FILE_IMPORT_ARG_HEADER.count());
+        }
+        else
+            if (argument.contains(QML_APP_ID_ARG_HEADER))
+            {
+                appid = argument.right(argument.count() - QML_APP_ID_ARG_HEADER.count());
+            }
+            else
         if (argument.startsWith(ARG_HEADER)
                 && argument.right(argument.count() - ARG_HEADER.count()).contains("="))
         {
@@ -114,6 +128,17 @@ int main(int argc, char *argv[])
     {
         qDebug() << "QML file not found or not a file: " << qmlfile;
         return EXIT_FAILURE;
+    }
+
+    if ( ! importPath.isEmpty())
+    {
+        qDebug() << "Setting import path to: " << importPath;
+        qputenv("QML2_IMPORT_PATH", importPath.toLatin1());
+    }
+
+    if ( ! appid.isEmpty())
+    {
+        qputenv("APP_ID", appid.toLatin1());
     }
 
     QQmlEngine engine;
