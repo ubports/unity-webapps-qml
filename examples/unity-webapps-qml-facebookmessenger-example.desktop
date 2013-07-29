@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Exec=qmlscene /usr/share/unity-webapps-qml/examples/unity-webapps-example-facebookmessenger/main.qml
+Path=/usr/share/unity-webapps-qml/examples/unity-webapps-example-facebookmessenger
+Name=Unity WebApp QML Component - Example using FacebookMessenger
+GenericName=Unity WebApp QML Component for Ubuntu Example using FacebookMessenger binding
+Icon=drive-multidisk-symbolic
+Terminal=false

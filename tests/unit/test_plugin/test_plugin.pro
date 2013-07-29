@@ -20,6 +20,7 @@ SOURCES += \
     tst_webappsAppModel.cpp \
     $${PLUGIN_SRC_DIR}/unity-webapps-app-model.cpp \
     $${PLUGIN_SRC_DIR}/unity-webapps-app-manifest-parser.cpp \
+    $${PLUGIN_SRC_DIR}/unity-webapps-desktop-infos.cpp \
     main.cpp
 
 HEADERS += \
@@ -27,6 +28,7 @@ HEADERS += \
     tst_manifestParser.h \
     tst_webappsAppModel.h \
     $${PLUGIN_SRC_DIR}/unity-webapps-app-model.h \
+    $${PLUGIN_SRC_DIR}/unity-webapps-desktop-infos.h \
     $${PLUGIN_SRC_DIR}/unity-webapps-app-manifest-parser.h
 
 INCLUDEPATH += \
