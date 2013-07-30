@@ -35,7 +35,7 @@ class UnityWebappsApiInjectedTestCaseBase(UnityWebappsTestCaseBase):
     def test_actionsApiFound(self):
         expression = """
             var unity = window.external.getUnityObject(1.0);
-            return unity.addAction != null && unity.clearAction && unity.clearActions != null;
+            return unity.addAction != null && unity.removeAction && unity.removeActions != null;
         """
         self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(NotEquals(None)))
 

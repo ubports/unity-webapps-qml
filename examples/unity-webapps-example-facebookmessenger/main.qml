@@ -17,60 +17,37 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Window 2.0
 import QtWebKit 3.0
 import QtWebKit.experimental 1.0
-import Ubuntu.Unity.Action 1.0 as UnityActions
 import Ubuntu.UnityWebApps 0.1
 
-import "dom-introspection-utils.js" as DomIntrospectionUtils
-
-
-Window {
-    id: root
-    objectName: "webviewContainer"
-
+Rectangle {
     width: 640
     height: 640
 
-    signal resultUpdated(string message)
-
-    function evalInPageUnsafe(expr) {
-        var tid = DomIntrospectionUtils.gentid();
-        webView.experimental.evaluateJavaScript(DomIntrospectionUtils.wrapJsCommands(expr),
-            function(result) { console.log('Result: ' + result); root.resultUpdated(DomIntrospectionUtils.createResult(result)); });
-    }
-
-    property alias url: webView.url
-    property string webappName: ""
-    property string webappSearchPath: ""
-    property string testUserScript: ""
-
-    UnityActions.ActionManager {
-        localContexts: [webappsActionsContext]
-    }
-    UnityActions.ActionContext {
-        id: webappsActionsContext
-        active: true
-    }
-
     WebView {
         id: webView
-        objectName: "webview"
 
         anchors.fill: parent
         width: parent.width
         height: parent.height
 
-        experimental.userScripts: [Qt.resolvedUrl("injected-script.js")]
+        experimental.userScripts: []
         experimental.preferences.navigatorQtObjectEnabled: true
         experimental.preferences.developerExtrasEnabled: true
 
         experimental.userAgent: {
             return "Mozilla/5.0 (iPad; CPU OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3"
         }
-
-        onLoadingChanged: console.log('loadin: ' + loadRequest.url + ', ' + loadRequest.errorString)
+        experimental.onMessageReceived: {
+            var msg = null
+            try {
+                msg = JSON.parse(message.data)
+            } catch (error) {
+                console.debug('DEBUG:', message.data)
+                return
+            }
+        }
 
         function getUnityWebappsProxies() {
             return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
@@ -78,11 +55,9 @@ Window {
 
         UnityWebApps {
             id: webapps
-            objectName: "webappsContainer"
-            actionsContext: webappsActionsContext
-            name: root.webappName
+            name: "FacebookMessenger"
             bindee: webView
-            model: UnityWebappsAppModel { searchPath: root.webappSearchPath }
+            model: UnityWebappsAppModel { searchPath: '/usr/share/unity-webapps-qml/examples/data/userscripts'}
         }
     }
 }

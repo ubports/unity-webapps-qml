@@ -49,7 +49,7 @@ class UnityWebappsTestCaseBase(AutopilotTestCase):
         return self.INSTALLED_QML_LAUNCHER_APP_PATH
 
     def get_launch_params(self, url):
-        base_params = ['--qml=' + self.get_qml_browser_container_path(), '--url=' + url, '--app-id=unity-webapps-qml-launcher']
+        base_params = ['--qml=' + self.get_qml_browser_container_path(), '--url=' + url, '--app-id=unity-webapps-qml-launcher', '--webappName=AutopilotTest']
         if os.path.exists(self.LOCAL_QML_LAUNCHER_APP_PATH):
             # we are local
             base_params.append('--import=' + os.path.join (os.path.dirname(os.path.realpath(__file__)), '../../../../../src'))
@@ -59,9 +59,11 @@ class UnityWebappsTestCaseBase(AutopilotTestCase):
         self.assertThat(os.path.exists(html_filepath), Equals(True))
 
         url = self.create_file_url(html_filepath)
+        params = self.get_launch_params(url)
 
+        print 'Launching test with params:', params
         self.app = self.launch_test_application(self.get_qml_launcher_path(),
-            *self.get_launch_params(url),
+            *params,
             app_type='qt')
 
         self.assert_url_eventually_loaded(url)

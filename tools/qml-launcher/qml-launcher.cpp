@@ -66,12 +66,14 @@ int main(int argc, char *argv[])
     const QString QML_FILE_ARG_HEADER = "--qml=";
     const QString QML_FILE_IMPORT_ARG_HEADER = "--import=";
     const QString QML_APP_ID_ARG_HEADER = "--app-id=";
+    const QString QML_INSPECTOR_ARG_HEADER = "--inspector=";
     const QString ARG_HEADER = "--";
     const QString VALUE_HEADER = "=";
     QHash<QString, QString> properties;
     QString qmlfile;
     QString appid;
     QString importPath;
+    QString inspector;
 
     Q_FOREACH(QString argument, app.arguments())
     {
@@ -85,11 +87,16 @@ int main(int argc, char *argv[])
             importPath = argument.right(argument.count() - QML_FILE_IMPORT_ARG_HEADER.count());
         }
         else
-            if (argument.contains(QML_APP_ID_ARG_HEADER))
-            {
-                appid = argument.right(argument.count() - QML_APP_ID_ARG_HEADER.count());
-            }
-            else
+        if (argument.contains(QML_APP_ID_ARG_HEADER))
+        {
+            appid = argument.right(argument.count() - QML_APP_ID_ARG_HEADER.count());
+        }
+        else
+        if (argument.contains(QML_INSPECTOR_ARG_HEADER))
+        {
+            inspector = argument.right(argument.count() - QML_INSPECTOR_ARG_HEADER.count());
+        }
+        else
         if (argument.startsWith(ARG_HEADER)
                 && argument.right(argument.count() - ARG_HEADER.count()).contains("="))
         {
@@ -139,6 +146,13 @@ int main(int argc, char *argv[])
     if ( ! appid.isEmpty())
     {
         qputenv("APP_ID", appid.toLatin1());
+    }
+
+    if ( ! inspector.isEmpty())
+    {
+        qDebug() << "Inspector server being set to: " << inspector;
+
+        qputenv("QTWEBKIT_INSPECTOR_SERVER", inspector.toLatin1());
     }
 
     QQmlEngine engine;

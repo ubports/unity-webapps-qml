@@ -11,6 +11,7 @@ for(file, EXAMPLE_DATA_FILES) {
 DESKTOP_EXAMPLE_FILES = \
     unity-webapps-qml-basic-example.desktop \
     unity-webapps-qml-bbcnews-example.desktop \
+    unity-webapps-qml-facebookmessenger-example.desktop \
     unity-webapps-qml-model-example.desktop
 
 OTHER_FILES += $$DESKTOP_EXAMPLE_FILES
@@ -30,6 +31,9 @@ html_data_files.files = $$system(ls data/html/*)
 bbcnews_example_install.path = /usr/share/unity-webapps-qml/examples/unity-webapps-example-bbcnews
 bbcnews_example_install.files = $$system(ls unity-webapps-example-bbcnews/*)
 
+facebookmessenger_example_install.path = /usr/share/unity-webapps-qml/examples/unity-webapps-example-facebookmessenger
+facebookmessenger_example_install.files = $$system(ls unity-webapps-example-facebookmessenger/*)
+
 basic_webview_install.path = /usr/share/unity-webapps-qml/examples/basic-webview
 basic_webview_install.files = $$system(ls basic-webview/*)
 
@@ -42,7 +46,7 @@ INSTALLS += desktop_files \
     bbcnews_example_install \
     common_data_files \
     bbcnews_userscript_data_files \
+    facebookmessenger_example_install \
     html_data_files
-
 
 

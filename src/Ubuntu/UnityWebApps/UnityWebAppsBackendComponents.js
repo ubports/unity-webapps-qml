@@ -116,7 +116,8 @@ function createAllWithAsync(parentItem, params) {
 
     //FIXME:!!! lots of duplicated stuff
 
-    var result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends;  Backends.UnityWebappsBase { }',
+    var result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; \
+                                    Backends.UnityWebappsBase { }',
                       parentItem,
                       params);
     if (result.error != null) {
@@ -142,6 +143,8 @@ function createAllWithAsync(parentItem, params) {
 
 
     // messaging menu
+    console.debug('parent.model ' + parentItem.model);
+
     result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; \
                                 Backends.UnityWebappsMessagingBinding { ' + extracted + ' }',
                       parentItem,
@@ -151,6 +154,7 @@ function createAllWithAsync(parentItem, params) {
         clearAll();
         return false;
     }
+    result.object.model = parentItem.model;
     __set("messaging", result.object);
     __onBackendReady("messaging");
 

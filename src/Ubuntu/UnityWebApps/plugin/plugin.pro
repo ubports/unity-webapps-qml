@@ -7,7 +7,8 @@ unix {
     CONFIG += link_pkgconfig
     PKGCONFIG += libnotify \
                 messaging-menu \
-                glib-2.0
+                glib-2.0 \
+                gio-2.0
 }
 
 TEMPLATE = lib
@@ -30,7 +31,9 @@ SOURCES += \
     unity-webapps-api-messaging-menu.cpp \
     unity-webapps-app-model.cpp \
     unity-webapps-app-manifest-parser.cpp \
-    unity-webapps-app-model-filter-proxy.cpp
+    unity-webapps-app-model-filter-proxy.cpp \
+    unity-webapps-desktop-infos.cpp \
+    callback.cpp
 
 HEADERS += \
     qml-plugin.h \
@@ -40,7 +43,9 @@ HEADERS += \
     unity-webapps-app-model.h \
     unity-webapps-app-manifest-parser.h \
     unity-webapps-common-priv.h \
-    unity-webapps-app-model-filter-proxy.h
+    unity-webapps-app-model-filter-proxy.h \
+    unity-webapps-desktop-infos.h \
+    callback.h
 
 DEFINES += \
     API_URI=\\\"$${API_URI}\\\"
