@@ -143,8 +143,6 @@ function createAllWithAsync(parentItem, params) {
 
 
     // messaging menu
-    console.debug('parent.model ' + parentItem.model);
-
     result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; \
                                 Backends.UnityWebappsMessagingBinding { ' + extracted + ' }',
                       parentItem,

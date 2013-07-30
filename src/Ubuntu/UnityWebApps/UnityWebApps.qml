@@ -160,7 +160,7 @@ Item {
             backends = _opt_backendProxies;
         else {
             backends = __makeBackendProxies();
-console.debug('name: ' + name)
+
             // create the real Unity backends
             if (typeof(name) === 'string' && name !== "") {
                 UnityBackends.clearAll();
@@ -276,8 +276,6 @@ console.debug('name: ' + name)
         webapps.__unbind();
         webapps.__bind(bindee, __gatherWebAppUserscriptsIfAny(name));
 
-        console.debug('on completed: ' + name + ', ' + bindee)
-
         if (__isValidWebAppName(name)) {
             __navigateToWebappHomepageInBindee(name);
         }
@@ -342,7 +340,6 @@ console.debug('name: ' + name)
         var initialized = false;
         return {
             init: function (params) {
-                console.debug('init')
                 UnityBackends.signalOnBackendReady("base", function () {
                     initialized = true;
                     // base.init(params);

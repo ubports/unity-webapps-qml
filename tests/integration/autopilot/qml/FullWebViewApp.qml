@@ -70,8 +70,6 @@ Window {
             return "Mozilla/5.0 (iPad; CPU OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3"
         }
 
-        onLoadingChanged: console.log('loadin: ' + loadRequest.url + ', ' + loadRequest.errorString)
-
         function getUnityWebappsProxies() {
             return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
         }
@@ -82,7 +80,7 @@ Window {
             actionsContext: webappsActionsContext
             name: root.webappName
             bindee: webView
-            model: UnityWebappsAppModel { searchPath: root.webappSearchPath }
+            model: UnityWebappsAppModel { }
         }
     }
 }
