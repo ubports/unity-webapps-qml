@@ -23,7 +23,7 @@ Homepage: https://launchpad.net/unity-webapp-qml
 Vcs-Bzr: https://code.launchpad.net/~webapps/unity-webapps-qml/trunk
 
 Package: unity-webapps-qml
-Architecture: amd64 armhf i386
+Architecture: any
 Multi-Arch: same
 Depends: libqt5webkit5-qmlwebkitplugin,
          qtdeclarative5-unity-action-plugin,
