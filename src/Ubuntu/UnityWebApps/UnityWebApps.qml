@@ -147,6 +147,9 @@ Item {
                                                      bindeeProxies,
                                                      backends,
                                                      webappUserscripts);
+
+        console.debug(instance);
+
         internal.backends = backends;
         internal.instance = instance;
     }
@@ -270,14 +273,20 @@ Item {
     }
 
     Component.onCompleted: {
-        if (bindee == null || name == null || name === "")
-            return;
-
         webapps.__unbind();
         webapps.__bind(bindee, __gatherWebAppUserscriptsIfAny(name));
 
-        if (typeof(name) === 'string' && name !== "")
+        if (__isValidWebAppName(name)) {
             __navigateToWebappHomepageInBindee(name);
+        }
+
+        if (model) {
+            model.modelChanged.connect(function () {
+                webapps.__unbind();
+                webapps.__bind(bindee, __gatherWebAppUserscriptsIfAny(name));
+                __navigateToWebappHomepageInBindee(name);
+            });
+        }
     }
 
     /*!
@@ -294,6 +303,10 @@ Item {
      */
     onNameChanged: {
         //FIXME: we shouldn't allow webapp names to change
+        if (__isValidWebAppName(name)) {
+            UnityBackends.clearAll();
+            UnityBackends.createAllWithAsync(webapps, {name: name});
+        }
     }
 
     /*!
@@ -307,10 +320,17 @@ Item {
     }
 
 
+    function __isValidWebAppName(name) {
+        return name != null && typeof(name) === 'string' && name != "";
+    }
+
+
     /*!
       \internal
 
       PRIVATE FUNCTION: __makeBackendProxies
+
+      Binds the API dispatched calls to the Unity backends.
 
       TODO lazily create the 'backends' on a getUnityObject
       TODO the backends should prop be on the qml side and provided to here
@@ -364,17 +384,24 @@ Item {
                 showIndicator: function (name, properties) {
                     if (!initialized)
                         return;
+
                     UnityBackends.get("messaging").showIndicator(String(name));
 
-                    for (i in properties) {
-                        if (i == "time") {
+                    for (var i in properties) {
+                        if (i === "time") {
                             UnityBackends.get("messaging").setProperty(String(name), i, UnityWebAppsJsUtils.toISODate(properties[i]));
                         }
-                        else if (i == "count") {
+                        else if (i === "count") {
                             UnityBackends.get("messaging").setProperty(String(name), i, String(Number(properties[i])));
                         }
+                        else if (i === "callback") {
+                            var callback = Qt.createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; Backends.UnityWebappsCallback { }', bindee);
+                            callback.onTriggered.connect(properties[i])
+
+                            UnityBackends.get("messaging").setProperty(String(name), i, callback);
+                        }
                         else {
-                            UnityBackends.get("messaging").setProperty(String(name), i, String(properties[i]));
+                            UnityBackends.get("messaging").setProperty(String(name), i, properties[i]);
                         }
                     }
                 },
