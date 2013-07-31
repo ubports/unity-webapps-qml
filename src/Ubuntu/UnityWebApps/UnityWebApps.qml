@@ -4,11 +4,6 @@ import "UnityWebApps.js" as UnityWebAppsJs
 import "UnityWebAppsUtils.js" as UnityWebAppsJsUtils
 import "UnityWebAppsBackendComponents.js" as UnityBackends
 
-//
-// TODO:
-//  -monitor bindee changed
-//  -extract webview specific elements (postMessage)
-
 /*!
     \qmltype UnityWebApps
     \inqmlmodule Ubuntu.UnityWebApps 0.1
@@ -166,8 +161,6 @@ Item {
                                                      backends,
                                                      webappUserscripts);
 
-        console.debug(instance);
-
         internal.backends = backends;
         internal.instance = instance;
     }
@@ -290,7 +283,6 @@ Item {
     function __initWebappForName(name) {
         webapps.__unbind();
 
-        console.debug(name)
         if (bindee != null)
             webapps.__bind(bindee, __isValidWebAppForModel(name) ? __gatherWebAppUserscriptsIfAny(name) : null);
 
@@ -304,11 +296,14 @@ Item {
         function oncompleted() {
             __initWebappForName(name);
         }
-        oncompleted();
+        if ( ! internal.instance)
+            oncompleted();
 
         if (model) {
             model.modelChanged.connect(oncompleted);
         }
+
+        internal.componentComplete = true;
     }
 
     /*!
@@ -325,7 +320,8 @@ Item {
      */
     onNameChanged: {
         //FIXME: we shouldn't allow webapp names to change
-        __initWebappForName(name);
+        if (internal.componentComplete)
+            __initWebappForName(name);
     }
 
     /*!
@@ -336,6 +332,7 @@ Item {
         id: internal
         property var instance: null
         property var backends: null
+        property bool componentComplete: false
     }
 
 
@@ -382,7 +379,6 @@ Item {
 
                 function callOnInitScriptFunc() {
                     if (params.onInit && typeof(params.onInit) === 'function') {
-                        console.debug('calling on init')
                         params.onInit();
                     }
                 }

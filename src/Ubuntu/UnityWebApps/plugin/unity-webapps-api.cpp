@@ -99,7 +99,6 @@ bool UnityWebapps::ensureDesktopExists(const QString& webappName,
 
     GDesktopAppInfo *appinfo =
             g_desktop_app_info_new(desktopId.toLatin1());
-    qDebug() << "appinfo: " << appinfo;
     bool success = true;
     if ( ! appinfo)
     {

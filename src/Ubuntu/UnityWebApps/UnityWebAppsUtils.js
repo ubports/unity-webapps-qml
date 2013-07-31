@@ -66,7 +66,7 @@ function makeProxiesForQtWebViewBindee(webViewId) {
                 webViewId.experimental.postMessage(message);
             },
             loadingStartedConnect: function (onLoadingStarted) {
-                var handler = function (loadRequest) {
+                function handler(loadRequest) {
                     // bad bad,...
                     var LoadStartedStatus = 0;
                     if (loadRequest.status === LoadStartedStatus) {
@@ -78,7 +78,7 @@ function makeProxiesForQtWebViewBindee(webViewId) {
                 disposer.addDisposer(makeSignalDisconnecter(webViewId.loadingChanged, handler));
             },
             messageReceivedConnect: function (onMessageReceived) {
-                var handler = function (raw) {
+                function handler(raw) {
                     onMessageReceived(JSON.parse(raw.data));
                 };
                 webViewId.experimental.messageReceived.connect(handler);

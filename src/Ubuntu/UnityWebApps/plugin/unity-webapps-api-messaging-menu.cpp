@@ -238,8 +238,6 @@ QString UnityWebappsMessagingMenu::displayName() const
 
 void UnityWebappsMessagingMenu::showIndicator(const QString& indicatorName)
 {
-    qDebug() << "showIndicator: " << indicatorName;
-
     Q_D(UnityWebappsMessagingMenu);
 
     API_CALL_HEADER();

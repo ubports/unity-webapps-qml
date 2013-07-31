@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    if (!object)
+    if ( ! object)
     {
         qCritical() << "Cannot create object from qml base file";
         return -1;

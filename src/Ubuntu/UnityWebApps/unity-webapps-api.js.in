@@ -292,6 +292,7 @@
           if (props.homepage && !/^(http|https|file):\/\//.test(props.homepage)) {
             throw new TypeError("incorrect argument");
           }
+          props.__unity_webapps_hidden = {hostname: window.location.hostname};
           backend("init", [props]);
         }
         ,
