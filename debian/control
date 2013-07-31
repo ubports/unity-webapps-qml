@@ -38,6 +38,7 @@ Package: unity-webapps-qml-examples
 Section: libs
 Architecture: any
 Depends: unity-webapps-qml (>= ${binary:Version}),
+         qtdeclarative5-window-plugin,
          ${misc:Depends},
          ${shlibs:Depends},
 Description: Example usage of Unity Webapps QML component

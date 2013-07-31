@@ -1,7 +1,8 @@
 import QtQuick 2.0
+import QtQuick.Window 2.0
 import Ubuntu.UnityWebApps 0.1
 
-Rectangle {
+Window {
     id: rootItem
     width: 360
     height: 360

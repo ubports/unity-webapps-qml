@@ -24,7 +24,7 @@ function __set(id, component) {
 
 function __areValidParams(params) {
     function __has(o,n) { return n in o && o[n] != null && (typeof o[n] === 'string' ? o[n] !== "" : true); };
-    return params && __has(params, 'name');
+    return params && __has(params, 'name') && __has(params, 'displayName');
 };
 
 function __createQmlObject(qmlStatement, parentItem, params) {
@@ -130,7 +130,7 @@ function createAllWithAsync(parentItem, params) {
 
 
     // notifications
-    result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends;  Backends.UnityWebappsNotificationsBinding { ' + extracted + ' }',
+    result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends;  Backends.UnityWebappsNotificationsBinding { name: "' + params.name + '"; }',
                       parentItem,
                       params);
     if (result.error != null) {
@@ -162,6 +162,9 @@ function createAllWithAsync(parentItem, params) {
         this._actions = {};
         this._actionsContext = actionsContext;
     };
+    HUDBackendAdaptor.prototype.destroy = function () {
+        this.clearActions();
+    }
     HUDBackendAdaptor.prototype.__actionExists = function (actionName) {
         if (!actionName || typeof(actionName) != 'string' || actionName.lenght === 0)
             return false;
@@ -179,7 +182,7 @@ function createAllWithAsync(parentItem, params) {
 
         this._actions[actionName] = { action: action, callback: callback};
     }
-    HUDBackendAdaptor.prototype.removeAction = function (actionName) {
+    HUDBackendAdaptor.prototype.clearAction = function (actionName) {
         if ( ! this.__actionExists(actionName))
             return;
         try {
@@ -191,10 +194,10 @@ function createAllWithAsync(parentItem, params) {
             console.debug('Error while removing an action: ' + e);
         }
     }
-    HUDBackendAdaptor.prototype.removeActions = function () {
+    HUDBackendAdaptor.prototype.clearActions = function () {
         for(var action in this._actions) {
             if (this._actions.hasOwnProperty(action) && this._actions[action] != null)
-                this.removeAction(action);
+                this.clearAction(action);
         }
     }
 
@@ -208,22 +211,22 @@ function createAllWithAsync(parentItem, params) {
 function clearAll () {
     if (_backends.base) {
         _backends.base.destroy();
-        delete _backends['base'];
+        _backends['base'] = null;
     }
 
     if (_backends.hud) {
-        _backends.hud._hud.destroy();
-        delete _backends['hud'];
+        _backends.hud.destroy();
+        _backends['hud'] = null;
     }
 
     if (_backends.notify) {
         _backends.notify.destroy();
-        delete _backends['notify'];
+        _backends['notify'] = null;
     }
 
     if (_backends.messaging) {
         _backends.messaging.destroy();
-        delete _backends['messaging'];
+        _backends['messaging'] = null;
     }
 };
 

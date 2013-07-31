@@ -18,7 +18,9 @@
 
 (function () {
 
-    console.log('----- unity-webapps-api-js');
+    if (top !== self) {
+        return;
+    }
 
     //@include UnityWebAppsUtils.js
 
@@ -88,7 +90,6 @@
             data.map (
                 function (datum) {
                     var d = __transformCallbacksToIds (datum);
-                    console.log('TRansofrmed data: ' + d);
                     return d;
                 }
             )
@@ -291,6 +292,10 @@
           if (props.homepage && !/^(http|https|file):\/\//.test(props.homepage)) {
             throw new TypeError("incorrect argument");
           }
+          if (window.location.protocol !== 'file:')
+              props.__unity_webapps_hidden = {hostname: window.location.hostname};
+          else
+              props.__unity_webapps_hidden = {local: true};
           backend("init", [props]);
         }
         ,
@@ -306,16 +311,16 @@
                                                backend('addAction', [name, callback]);
                                              })
         ,
-        removeAction: createArgumentsSanitaizer(null,
+        clearAction: createArgumentsSanitaizer(null,
                                                [{ str: true }],
                                                function (name) {
-                                                 backend('removeAction', [name]);
+                                                 backend('clearAction', [name]);
                                                })
         ,
-        removeActions: createArgumentsSanitaizer(null,
+        clearActions: createArgumentsSanitaizer(null,
                                                 [],
                                                 function () {
-                                                  backend('removeActions', []);
+                                                  backend('clearActions', []);
                                                 })
         ,
         MediaPlayer: {
@@ -485,6 +490,10 @@
         return api;
     };
     sendApiCreatedAcknowledgeEvent();
+
+    //FIXME: for backward compatibility only, unsafeWindow was defined in the old extensions (inherited from ufe)
+    //  and used in the utils.js
+    unsafeWindow = window;
 
 }) ();
 

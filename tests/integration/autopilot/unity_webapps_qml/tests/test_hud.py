@@ -47,10 +47,10 @@ class UnityWebappsHudTestCase(UnityWebappsTestCaseBase):
 
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('content').style.display;"), Eventually(Equals('none')))
 
-    def test_removeAction(self):
+    def test_clearAction(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('actionadded')))
         expr = """
-           var e = new CustomEvent ("unity-webapps-do-call", {"detail": JSON.stringify({"name": 'removeAction', 'args': ['This is an action']})});
+           var e = new CustomEvent ("unity-webapps-do-call", {"detail": JSON.stringify({"name": 'clearAction', 'args': ['This is an action']})});
            document.dispatchEvent (e);
            return true;
         """
@@ -64,10 +64,10 @@ class UnityWebappsHudTestCase(UnityWebappsTestCaseBase):
 
         self.assertThat(self.eval_expression_in_page_unsafe("return document.getElementById('content').style.display;"), NotEquals('none'))
 
-    def test_removeActions(self):
+    def test_clearActions(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('actionadded')))
         expr = """
-           var e = new CustomEvent ("unity-webapps-do-call", {"detail": JSON.stringify({"name": 'removeActions', 'args': []})});
+           var e = new CustomEvent ("unity-webapps-do-call", {"detail": JSON.stringify({"name": 'clearActions', 'args': []})});
            document.dispatchEvent (e);
            return true;
         """

@@ -40,7 +40,7 @@ var UnityWebApps = (function () {
         this._injected_unity_api_path = Qt.resolvedUrl('unity-webapps-api.js');
         this._bindeeProxies = bindeeProxies;
         this._backends = backends;
-        this._userscripts = userscripts;
+        this._userscripts = userscripts || [];
 
         this._bind();
     };
@@ -65,6 +65,8 @@ var UnityWebApps = (function () {
         _onLoadingStartedCallback: function () {
             var scripts = [this._injected_unity_api_path];
             for(var i = 0; i < this._userscripts.length; ++i) {
+
+                console.debug('Injecting webapps script[' + i + '] : ' + Qt.resolvedUrl(this._userscripts[i]))
                 scripts.push(Qt.resolvedUrl(this._userscripts[i]));
             }
 

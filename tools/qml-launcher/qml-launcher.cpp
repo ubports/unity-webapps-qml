@@ -163,7 +163,13 @@ int main(int argc, char *argv[])
 
     if (!component.isReady()) {
         qWarning() << component.errorString();
-        return false;
+        return -1;
+    }
+
+    if ( ! object)
+    {
+        qCritical() << "Cannot create object from qml base file";
+        return -1;
     }
 
     QQuickWindow* window = qobject_cast<QQuickWindow*>(object);
@@ -176,7 +182,8 @@ int main(int argc, char *argv[])
         object->setProperty(it.key().toStdString().c_str(), QUrl(it.value()));
     }
 
-    window->show();
+    if (window)
+        window->show();
 
     return app.exec();
 }

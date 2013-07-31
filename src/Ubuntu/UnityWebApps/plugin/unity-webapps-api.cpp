@@ -18,9 +18,15 @@
 
 #include "unity-webapps-api.h"
 
-#include <QJsonValue>
 #include <QDebug>
 #include <QFile>
+#include <QStandardPaths>
+#include <QDir>
+#include <QUrl>
+
+#include <gio/gdesktopappinfo.h>
+
+#include "unity-webapps-desktop-infos.h"
 
 
 UnityWebapps::UnityWebapps(QObject *parent)
@@ -30,59 +36,134 @@ UnityWebapps::UnityWebapps(QObject *parent)
 UnityWebapps::~UnityWebapps()
 {}
 
-// TODO: return types (eval to undefined?):
-void UnityWebapps::init(const QVariant& args)
+void UnityWebapps::init(const QString& name, const QVariant& args)
 {
-    if (!args.type() != QMetaType::QVariantMap)
+    Q_UNUSED(name);
+
+    if (QString(args.typeName()).compare("QVariantMap") != 0)
     {
-        qDebug() << "Invalid init() parameter types";
+        qDebug() << "Invalid init() parameter types: " <<args.typeName();
+
+        Q_EMIT initCompleted(false);
+
         return;
     }
 
     QVariantMap initArgs =
         qvariant_cast<QVariantMap>(args);
-    if (!initArgs.contains("name") ||
-        !initArgs.contains("iconUrl"))
+    if ( ! initArgs.contains("name") ||
+         ! initArgs.contains("domain") ||
+         ! initArgs.contains("iconUrl")
+         )
     {
-        qDebug() << "Invalid init() parameter content (not found)";
+        qDebug() << "Invalid init() parameter content (not found): name, domain and iconUrl are mandatory";
+
+        Q_EMIT initCompleted(false);
+
         return;
     }
-    if (!initArgs.value("name").canConvert<QString>() ||
-        !initArgs.value("iconUrl").canConvert<QString>())
+    if ( ! initArgs.value("name").canConvert<QString>() ||
+         ! initArgs.value("domain").canConvert<QString>() ||
+         ! initArgs.value("iconUrl").canConvert<QString>()
+         )
     {
-        qDebug() << "Invalid init() parameter values";
+        qDebug() << "Invalid init() parameter value types.";
+
+        Q_EMIT initCompleted(false);
+
         return;
     }
 
-    QString name = initArgs.value("name").toString();
+    QString displayName = initArgs.value("name").toString();
     QString iconUrl = initArgs.value("iconUrl").toString();
+    QString domain = initArgs.value("domain").toString();
 
-    // Nothing much to do
-    _init(name, iconUrl);
+    bool success = init(displayName, domain, iconUrl);
 
-    Q_EMIT initCompleted();
+    Q_EMIT initCompleted(success);
 }
 
-void UnityWebapps::addAction(const QString& name, QVariant callback)
+bool UnityWebapps::init(const QString& name,
+                        const QString& domain,
+                        const QString& iconUrl)
 {
-    Q_UNUSED(name);
-    Q_UNUSED(callback);
+    return ensureDesktopExists(name, domain, iconUrl);
 }
 
-void UnityWebapps::removeAction(const QString& name)
+bool UnityWebapps::ensureDesktopExists(const QString& webappName,
+                                       const QString& domain,
+                                       const QString& iconName)
 {
-    Q_UNUSED(name);
+    QString desktopId =
+            QString("%1.desktop").arg(UnityWebappsQML::buildDesktopInfoFileForWebapp(webappName, domain));
+
+    GDesktopAppInfo *appinfo =
+            g_desktop_app_info_new(desktopId.toLatin1());
+    bool success = true;
+    if ( ! appinfo)
+    {
+        success = createDefaultDesktopFileFor(desktopId, webappName, domain, iconName);
+    }
+
+//    g_object_unref(appinfo);
+
+    return success;
 }
 
-void UnityWebapps::removeActions()
+bool UnityWebapps::createDefaultDesktopFileFor (const QString& desktopId,
+                                                const QString& webappName,
+                                                const QString& domain,
+                                                const QString& iconName)
 {
+    Q_UNUSED(domain);
+
+    bool success = false;
+
+    QStringList userhomeList =
+            QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
+    if (userhomeList.isEmpty())
+    {
+        qDebug() << "Error (cannot find ~) while trying to ensure that a desktop file exists for: " << webappName;
+        return success;
+    }
+
+    QDir home(userhomeList.at(0));
+    QString desktopFilePath =
+            QDir::cleanPath(home.absolutePath() + QDir::separator() + ".local/share/applications/" + desktopId);
+
+    // Should not happen
+    if (QFile::exists(desktopFilePath))
+    {
+        qDebug() << "Desktop file found when it should not be there: " << desktopFilePath;
+        return true;
+    }
+
+    //FIXME: encore webappName
+    QString contents = QString("[Desktop Entry]\n"
+                               "Name=%1\n"
+                               "Type=Application\n"
+                               "Icon=%2\n"
+                               "Actions=S0;S1;S2;S3;S4;S5;S6;S7;S8;S9;S10;\n"
+                               "Exec=webbrowser-app --chromeless --webapp=%3 %%u")
+            .arg(webappName)
+            .arg(iconName)
+            .arg(QString(QUrl::toPercentEncoding(webappName)));
+
+    QFile f(desktopFilePath);
+    if ( ! f.open(QIODevice::WriteOnly))
+    {
+        qCritical() << "Could not create desktop file: " << desktopFilePath;
+        return success;
+    }
+
+    f.write(contents.toUtf8());
+    f.close();
+
+    success = true;
+
+    return success;
 }
 
-void UnityWebapps::_init(const QString& name, const QString& iconUrl)
-{
-    Q_UNUSED(name);
-    Q_UNUSED(iconUrl);
-}
 
 // QMLParserStatus
 void UnityWebapps::classBegin()

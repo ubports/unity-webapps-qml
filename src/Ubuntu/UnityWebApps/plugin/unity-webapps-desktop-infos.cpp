@@ -23,13 +23,13 @@
 
 
 QString
-UnityWebapps::buildDesktopInfoFileForWebapp (const QString& name, const QString& domain)
+UnityWebappsQML::buildDesktopInfoFileForWebapp (const QString& name, const QString& domain)
 {
-    return QString("%1%2").arg(UnityWebapps::canonicalize(name)).arg(UnityWebapps::canonicalize(domain));
+    return QString("%1%2").arg(UnityWebappsQML::canonicalize(name)).arg(UnityWebappsQML::canonicalize(domain));
 }
 
 QString
-UnityWebapps::canonicalize(const QString& s, bool keep_whitespaces)
+UnityWebappsQML::canonicalize(const QString& s, bool keep_whitespaces)
 {
     QString canonicalized;
 
