@@ -1,3 +1,17 @@
+unity-webapps-qml (0.1+13.10.20130731-0ubuntu1) saucy; urgency=low
+
+  [ Alexandre Abreu ]
+  * hud support.
+  * fix unit tests add signal clean up when bindee is disconnected.
+  * Use new Unity Actions API; Fix tests; Add import statement to qml-
+    launcher for local autopilot testing.
+  * fix messaging menu support fix examples.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 30
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 31 Jul 2013 05:01:56 +0000
+
 unity-webapps-qml (0.1+13.10.20130723-0ubuntu1) saucy; urgency=low
 
   * Automatic snapshot from revision 25
