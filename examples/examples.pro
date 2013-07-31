@@ -22,14 +22,17 @@ desktop_files.files = $$DESKTOP_EXAMPLE_FILES
 common_data_files.path = /usr/share/unity-webapps-qml/examples/data/userscripts/common
 common_data_files.files = $$system(ls data/userscripts/common/*)
 
-bbcnews_userscript_data_files.path = /usr/share/unity-webapps-qml/examples/data/userscripts/unity-webapps-bbcnews
-bbcnews_userscript_data_files.files = $$system(ls data/userscripts/unity-webapps-bbcnews/*)
-
 html_data_files.path = /usr/share/unity-webapps-qml/examples/data/html
 html_data_files.files = $$system(ls data/html/*)
 
+bbcnews_userscript_data_files.path = /usr/share/unity-webapps-qml/examples/data/userscripts/unity-webapps-bbcnews
+bbcnews_userscript_data_files.files = $$system(ls data/userscripts/unity-webapps-bbcnews/*)
+
 bbcnews_example_install.path = /usr/share/unity-webapps-qml/examples/unity-webapps-example-bbcnews
 bbcnews_example_install.files = $$system(ls unity-webapps-example-bbcnews/*)
+
+facebookmessenger_userscript_data_files.path = /usr/share/unity-webapps-qml/examples/data/userscripts/unity-webapps-facebookmessenger
+facebookmessenger_userscript_data_files.files = $$system(ls data/userscripts/unity-webapps-facebookmessenger/*)
 
 facebookmessenger_example_install.path = /usr/share/unity-webapps-qml/examples/unity-webapps-example-facebookmessenger
 facebookmessenger_example_install.files = $$system(ls unity-webapps-example-facebookmessenger/*)
@@ -43,10 +46,11 @@ webapps_apps_model_install.files = $$system(ls webapps-app-model/*)
 INSTALLS += desktop_files \
     webapps_apps_model_install \
     basic_webview_install \
-    bbcnews_example_install \
     common_data_files \
+    bbcnews_example_install \
     bbcnews_userscript_data_files \
     facebookmessenger_example_install \
+    facebookmessenger_userscript_data_files \
     html_data_files
 
 

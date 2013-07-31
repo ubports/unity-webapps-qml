@@ -48,7 +48,9 @@ Item {
 
     /*!
       \qmlproperty string UnityWebApps::name
-      Holds the name of the application that is run as a WebApp.
+      Holds the name of the application that is run as a WebApp. It should be used
+        in conjunction with a model. The 'name' property is then used while looking up
+        for the webapp in the set of locally installed ones.
 
       The name should not change once it has been set. (?)
       */
@@ -74,6 +76,7 @@ Item {
                 method sendToPage(string message);
                 method loadingStartedConnect(Callback onLoadingStarted);
                 method messageReceivedConnect(Callback onMessageReceived);
+                method navigateTo(string url);
             }
         \endcode
 
@@ -84,14 +87,15 @@ Item {
     /*!
       \qmlproperty UnityWebappsAppModel UnityWebApps::model
 
-      \preliminary
+      An optional model used in conjunction with the 'name' property
+        as a location for looking up the desired webapps.
 
      */
     property var model: null
 
 
     /*!
-      \qmlproperty HUD.Context UnityWebApps::actionsContext
+      \qmlproperty UnityActions.Context UnityWebApps::actionsContext
 
       The actions context that this element can reach out to for
       additional actions.
@@ -104,7 +108,7 @@ Item {
       \qmlproperty string UnityWebApps::_opt_backendProxies
 
       Used only for testing.
-      Allows optional (not the default ones) backends to be used.
+      Allows optional (not the default ones) mocked backends to be used.
 
      */
     property var _opt_backendProxies: null
@@ -117,26 +121,40 @@ Item {
 
       Binds a given webapp object with something that
       is expected to support the following calls:
-     */
-    function __bind(bindee, webappUserscripts) {
-        if (!bindee)
-            return;
 
-        // FIXME: bad design
+       \code
+            interface BindeeExports {
+                method injectUserScripts(string userScriptUrls);
+                method sendToPage(string message);
+                method loadingStartedConnect(Callback onLoadingStarted);
+                method messageReceivedConnect(Callback onMessageReceived);
+                method navigateTo(string url);
+            }
+        \endcode
+
+       The bindee should not be null.
+    */
+    function __bind(bindee, webappUserscripts) {
+        if (!bindee) {
+            console.debug('__bind: ERROR Invalid bindee when trying to bind the QML WebApps component')
+            return;
+        }
+
         if (internal.instance) {
             console.debug('__bind: ERROR Instance already set')
             return;
         }
 
         if (!__isValidBindee(bindee)) {
-            // FIXME: error handling
             console.debug('__bind: ERROR not a valid bindee')
             return;
         }
 
+        // Get an instance of the bridging interface that
+        //  the bindee is supposed to provide.
+
         var bindeeProxies = bindee.getUnityWebappsProxies();
         if (!__areValidBindeeProxies(bindeeProxies)) {
-            // FIXME: error handling
             console.debug('__bind: ERROR bindee proxies not valid')
             return;
         }
@@ -160,12 +178,6 @@ Item {
             backends = _opt_backendProxies;
         else {
             backends = __makeBackendProxies();
-
-            // create the real Unity backends
-            if (typeof(name) === 'string' && name !== "") {
-                UnityBackends.clearAll();
-                UnityBackends.createAllWithAsync(webapps, {name: name});
-            }
         }
         return backends;
     }
@@ -227,10 +239,11 @@ Item {
     /*!
       \internal
 
-      Validates that an installed webapp has been found in the current model (if any)
+      Validates that an installed webapp has been found in the current model (if any) given the
+       webapp name.
      */
     function __isValidWebAppForModel(webappName) {
-        return model != null && model.exists && model.exists(webappName);
+        return __isValidWebAppName(webappName) && model != null && model.exists && model.exists(webappName);
     }
 
     /*!
@@ -265,27 +278,36 @@ Item {
             var idx = model.getWebappIndex(webappName);
             var homepage = model.data(idx, UbuntuUnityWebApps.UnityWebappsAppModel.Homepage);
 
-            console.debug('Requesting the bindee to navigate to: ' + homepage);
+            console.debug('Requesting the bindee to navigate to homepage: ' + homepage);
 
+            // We recreate a bindee object, but we call any function that requires
+            //  come custom cleanup (signals), so we are ok.
             var bindeeProxies = bindee.getUnityWebappsProxies();
             bindeeProxies.navigateTo(homepage);
         }
     }
 
-    Component.onCompleted: {
+    function __initWebappForName(name) {
         webapps.__unbind();
-        webapps.__bind(bindee, __gatherWebAppUserscriptsIfAny(name));
+
+        console.debug(name)
+        if (bindee != null)
+            webapps.__bind(bindee, __isValidWebAppForModel(name) ? __gatherWebAppUserscriptsIfAny(name) : null);
 
         if (__isValidWebAppName(name)) {
             __navigateToWebappHomepageInBindee(name);
         }
 
+    }
+
+    Component.onCompleted: {
+        function oncompleted() {
+            __initWebappForName(name);
+        }
+        oncompleted();
+
         if (model) {
-            model.modelChanged.connect(function () {
-                webapps.__unbind();
-                webapps.__bind(bindee, __gatherWebAppUserscriptsIfAny(name));
-                __navigateToWebappHomepageInBindee(name);
-            });
+            model.modelChanged.connect(oncompleted);
         }
     }
 
@@ -303,10 +325,7 @@ Item {
      */
     onNameChanged: {
         //FIXME: we shouldn't allow webapp names to change
-        if (__isValidWebAppName(name)) {
-            UnityBackends.clearAll();
-            UnityBackends.createAllWithAsync(webapps, {name: name});
-        }
+        __initWebappForName(name);
     }
 
     /*!
@@ -332,19 +351,75 @@ Item {
 
       Binds the API dispatched calls to the Unity backends.
 
-      TODO lazily create the 'backends' on a getUnityObject
-      TODO the backends should prop be on the qml side and provided to here
       TODO move elsewhere (in js file)
      */
     function __makeBackendProxies () {
         var initialized = false;
+
+        function isValidInitCall(params) {
+            if (! params)
+                return false;
+
+            if (! params.__unity_webapps_hidden || ! params.__unity_webapps_hidden.hostname) {
+                console.debug('Cannot find hidden initialization param');
+                return false;
+            }
+            if ( ! params.domain || typeof(params.domain) !== 'string' || params.domain.length === 0) {
+                console.debug('Cannot find a "domain" property');
+                return false;
+            }
+
+            return params.__unity_webapps_hidden.hostname.indexOf(params.domain) !== -1;
+        }
+
         return {
             init: function (params) {
-                UnityBackends.signalOnBackendReady("base", function () {
-                    initialized = true;
-                    // base.init(params);
-                    params.onInit();
-                });
+
+                if (! isValidInitCall(params)) {
+                    console.debug('Invalid init call');
+                    return;
+                }
+
+                function callOnInitScriptFunc() {
+                    if (params.onInit && typeof(params.onInit) === 'function') {
+                        console.debug('calling on init')
+                        params.onInit();
+                    }
+                }
+
+                if ( ! initialized) {
+                    // The 'name' property takes over the params.name property
+                    //  if any is set.
+                    var webappName = name ? name : params.name;
+
+                    // We should be all set & ready for the backends
+                    UnityBackends.clearAll();
+                    UnityBackends.createAllWithAsync(webapps, {name: webappName, displayName: params.name});
+
+                    UnityBackends.signalOnBackendReady("base", function () {
+
+                        var base = UnityBackends.get("base");
+                        function onInitCompleted(success) {
+                            console.debug('Received initCompleted signal, status: ' + success);
+
+                            base.initCompleted.disconnect(onInitCompleted);
+                            if (success) {
+                                initialized = true;
+
+                                console.debug(JSON.stringify(params));
+
+                                callOnInitScriptFunc();
+                            }
+                        };
+
+                        base.initCompleted.connect(onInitCompleted);
+
+                        base.init(webappName, params);
+                    });
+                }
+                else {
+                    callOnInitScriptFunc();
+                }
             },
 
             addAction: function(actionName, onActionInvoked) {
@@ -354,18 +429,18 @@ Item {
                 UnityBackends.get("hud").addAction(actionName, onActionInvoked);
             },
 
-            removeAction: function(actionName) {
+            clearAction: function(actionName) {
                 if (!initialized)
                     return;
                 // hud remove action
-                UnityBackends.get("hud").removeAction(actionName);
+                UnityBackends.get("hud").clearAction(actionName);
             },
 
-            removeActions: function() {
+            clearActions: function() {
                 if (!initialized)
                     return;
                 // hud remove all action
-                UnityBackends.get("hud").removeActions();
+                UnityBackends.get("hud").clearActions();
             },
 
             Notification: {
@@ -418,12 +493,6 @@ Item {
                 addAction: function (name, onActionInvoked) {
                     console.debug('MessagingIndicator.addAction not implemented yet');
                 },
-                removeAction: function (name) {
-                    console.debug('MessagingIndicator.removeAction not implemented yet');
-                },
-                removeActions: function () {
-                    console.debug('MessagingIndicator.removeActions not implemented yet');
-                }
             },
 
             MediaPlayer: {

@@ -33,6 +33,7 @@ class UnityWebappsMessagingMenu: public QObject, public QQmlParserStatus
     Q_INTERFACES(QQmlParserStatus)
 
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(QString displayName READ displayName WRITE setDisplayName NOTIFY displayNameChanged)
     Q_PROPERTY(UnityWebappsAppModel* model READ model WRITE setModel NOTIFY modelChanged)
 
 
@@ -48,17 +49,11 @@ public:
     Q_INVOKABLE void clearIndicator(const QString& indicatorName);
     Q_INVOKABLE void clearIndicators();
 
-    /*!
-     * \brief setName
-     * \param name
-     */
     void setName(const QString& name);
-
-    /*!
-     * \brief name
-     * \return
-     */
     QString name() const;
+
+    void setDisplayName(const QString& name);
+    QString displayName() const;
 
     UnityWebappsAppModel* model() const;
     void setModel(UnityWebappsAppModel *);
@@ -70,6 +65,7 @@ public:
 Q_SIGNALS:
 
     void nameChanged(const QString& name);
+    void displayNameChanged(const QString& name);
     void modelChanged(UnityWebappsAppModel * model);
 
 

@@ -19,7 +19,7 @@
 #ifndef __UNITY_WEBAPPS_DESKTOP_INFOS_H__
 #define __UNITY_WEBAPPS_DESKTOP_INFOS_H__
 
-namespace UnityWebapps {
+namespace UnityWebappsQML {
 
 QString
 buildDesktopInfoFileForWebapp (const QString& name, const QString& domain);

@@ -44,7 +44,6 @@ Window {
     property alias url: webView.url
     property string webappName: ""
     property string webappSearchPath: ""
-    property string testUserScript: ""
 
     UnityActions.ActionManager {
         localContexts: [webappsActionsContext]
@@ -66,9 +65,7 @@ Window {
         experimental.preferences.navigatorQtObjectEnabled: true
         experimental.preferences.developerExtrasEnabled: true
 
-        experimental.userAgent: {
-            return "Mozilla/5.0 (iPad; CPU OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3"
-        }
+        onLoadingChanged: console.debug('onLoadingChanged: loading changed: ' + loadRequest.url + ', status: ' + loadRequest.status)
 
         function getUnityWebappsProxies() {
             return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
@@ -80,6 +77,7 @@ Window {
             actionsContext: webappsActionsContext
             name: root.webappName
             bindee: webView
+            //searchPath: '/home/alex/dev/work/webapps/branches/webapps-qml/latest/examples/data/userscripts'
             model: UnityWebappsAppModel { }
         }
     }

@@ -23,38 +23,46 @@
 #include <QVariant>
 #include <QQmlParserStatus>
 
+
 class UnityWebapps : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
-
-//    Q_PROPERTY(QString applicationName READ applicationName WRITE setApplicationName NOTIFY nameChanged)
-
 
 public:
     UnityWebapps(QObject *parent = 0);
     ~UnityWebapps();
 
     // TODO: really need it?
-    void classBegin();
     void componentComplete();
+    void classBegin();
+
 
 public Q_SLOTS:
 
     // API functions
-    void init(const QVariant& args);
-    void addAction(const QString& name, QVariant callback);
-    void removeAction(const QString& name);
-    void removeActions();
+    void init(const QString& name, const QVariant& args);
+
 
 Q_SIGNALS:
 
-    void initCompleted();
+    void initCompleted(bool success);
 
 
 private:
 
-    void _init(const QString& name, const QString& iconUrl);
+    bool ensureDesktopExists(const QString& webappName,
+                             const QString& domain,
+                             const QString& iconName);
+
+    bool init(const QString& name,
+              const QString& domain,
+              const QString& iconUrl);
+
+    bool createDefaultDesktopFileFor (const QString& desktopId,
+                                      const QString& webappName,
+                                      const QString& domain,
+                                      const QString& iconName);
 };
 
 #endif // __UNITY_WEBAPPS_API_H__

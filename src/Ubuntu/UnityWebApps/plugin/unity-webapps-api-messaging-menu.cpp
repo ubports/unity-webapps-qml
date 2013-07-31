@@ -21,6 +21,7 @@
 #include <gio/gio.h>
 
 #include <messaging-menu.h>
+#include <glib-object.h>
 
 #include <QString>
 #include <QUrl>
@@ -31,6 +32,11 @@
 #include "unity-webapps-desktop-infos.h"
 #include "unity-webapps-api-messaging-menu.h"
 
+#define API_CALL_HEADER() do { \
+        d->init(); \
+        if (!d->_mmapp) \
+            return; \
+    } while(0)
 
 namespace {
 
@@ -85,6 +91,7 @@ struct UnityWebappsMessagingMenuPrivate
                                          const QString & domain);
 
     QString _name;
+    QString _displayName;
     UnityWebappsAppModel *_model;
     MessagingMenuApp *_mmapp;
     QStringList _sources;
@@ -95,12 +102,13 @@ QString
 UnityWebappsMessagingMenuPrivate::getDesktopFilenameFor(const QString & name,
                                                         const QString & domain)
 {
-    return QString("%1.desktop").arg(UnityWebapps::buildDesktopInfoFileForWebapp(name, domain));
+    return QString("%1.desktop").arg(UnityWebappsQML::buildDesktopInfoFileForWebapp(name, domain));
 }
 
 UnityWebappsMessagingMenuPrivate::UnityWebappsMessagingMenuPrivate()
     :_model(0), _mmapp(0), _callback(0)
-{}
+{
+}
 
 UnityWebappsMessagingMenuPrivate::~UnityWebappsMessagingMenuPrivate()
 {
@@ -111,11 +119,9 @@ void UnityWebappsMessagingMenuPrivate::clear()
 {
     if (_mmapp && G_IS_OBJECT(_mmapp))
     {
-        //FIXME:
-/*        g_signal_handlers_disconnect_by_func(_mmapp,
-                                             G_CALLBACK(unity_webapps_messaging_menu_source_activated));*/
-
-        messaging_menu_app_unregister(_mmapp);
+        g_signal_handlers_disconnect_by_func(_mmapp,
+                                             (gpointer)unity_webapps_messaging_menu_source_activated,
+                                             this);
 
         g_object_unref(_mmapp);
 
@@ -146,26 +152,24 @@ unity_webapps_messaging_menu_source_activated (
 
 void UnityWebappsMessagingMenuPrivate::init()
 {
-    if (Q_UNLIKELY(_model == NULL || _name.isEmpty())) {
+    if (Q_UNLIKELY(_mmapp != NULL))
+        return;
+
+    if (Q_UNLIKELY(_model == NULL || _name.isEmpty() || _displayName.isEmpty()))
+    {
         qDebug() << "Trying to initialize the MessagingMenu binding with invalid context";
         return;
     }
 
     QString domain = _model->getDomainFor(_name);
-    if (domain.isEmpty()) {
+    if (domain.isEmpty())
+    {
         qDebug() << "Could not retrieve domain for WebApp: " << _name;
         return;
     }
 
-    QString displayName = _model->getDisplayNameFor(_name);
-    if (displayName.isEmpty()) {
-        qDebug() << "Could not retrieve a proper display name for WebApp: " << _name;
-        return;
-    }
+    _mmapp = messaging_menu_app_new (getDesktopFilenameFor(_displayName, domain).toStdString().c_str());
 
-    qDebug() << displayName << ", " << getDesktopFilenameFor(displayName, domain);
-
-    _mmapp = messaging_menu_app_new (getDesktopFilenameFor(displayName, domain).toStdString().c_str());
     messaging_menu_app_register (_mmapp);
 
     g_signal_connect (_mmapp,
@@ -207,7 +211,6 @@ void UnityWebappsMessagingMenu::setModel(UnityWebappsAppModel * model)
 void UnityWebappsMessagingMenu::setName(const QString &name)
 {
     Q_D(UnityWebappsMessagingMenu);
-    d->clear();
     d->_name = name;
 
     Q_EMIT nameChanged(name);
@@ -219,14 +222,30 @@ QString UnityWebappsMessagingMenu::name() const
     return d->_name;
 }
 
-void UnityWebappsMessagingMenu::showIndicator(const QString& indicatorName)
+void UnityWebappsMessagingMenu::setDisplayName(const QString &name)
 {
     Q_D(UnityWebappsMessagingMenu);
+    d->_displayName = name;
 
-    if (!d->_mmapp)
-        return;
+    Q_EMIT displayNameChanged(name);
+}
 
-    if (indicatorName.isEmpty()) {
+QString UnityWebappsMessagingMenu::displayName() const
+{
+    Q_D(const UnityWebappsMessagingMenu);
+    return d->_displayName;
+}
+
+void UnityWebappsMessagingMenu::showIndicator(const QString& indicatorName)
+{
+    qDebug() << "showIndicator: " << indicatorName;
+
+    Q_D(UnityWebappsMessagingMenu);
+
+    API_CALL_HEADER();
+
+    if (indicatorName.isEmpty())
+    {
         qDebug() << "Invalid indicator label name: " << indicatorName;
         return;
     }
@@ -249,8 +268,7 @@ void UnityWebappsMessagingMenu::clearIndicator(const QString& indicatorName)
 {
     Q_D(UnityWebappsMessagingMenu);
 
-    if (!d->_mmapp)
-        return;
+    API_CALL_HEADER();
 
     QByteArray content = indicatorName.toUtf8();
     const gchar *indicatorName_cstr = content.data();
@@ -267,8 +285,7 @@ void UnityWebappsMessagingMenu::clearIndicators()
 {
     Q_D(UnityWebappsMessagingMenu);
 
-    if (!d->_mmapp)
-        return;
+    API_CALL_HEADER();
 
     QStringList indicators = d->_sources;
     Q_FOREACH(QString indicator, indicators)
@@ -283,8 +300,7 @@ void UnityWebappsMessagingMenu::setProperty(const QString& indicatorName,
 {
     Q_D(UnityWebappsMessagingMenu);
 
-    if (!d->_mmapp)
-        return;
+    API_CALL_HEADER();
 
     if (indicatorName.isEmpty())
     {
@@ -351,8 +367,6 @@ void UnityWebappsMessagingMenu::classBegin()
 
 void UnityWebappsMessagingMenu::componentComplete()
 {
-    Q_D(UnityWebappsMessagingMenu);
-    d->init();
 }
 
 
