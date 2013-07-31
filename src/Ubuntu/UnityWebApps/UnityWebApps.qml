@@ -357,6 +357,9 @@ Item {
             if (! params)
                 return false;
 
+            if (params.__unity_webapps_hidden && params.__unity_webapps_hidden.local)
+                return true;
+
             if (! params.__unity_webapps_hidden || ! params.__unity_webapps_hidden.hostname) {
                 console.debug('Cannot find hidden initialization param');
                 return false;

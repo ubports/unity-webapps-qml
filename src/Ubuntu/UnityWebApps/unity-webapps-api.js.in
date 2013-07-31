@@ -292,7 +292,10 @@
           if (props.homepage && !/^(http|https|file):\/\//.test(props.homepage)) {
             throw new TypeError("incorrect argument");
           }
-          props.__unity_webapps_hidden = {hostname: window.location.hostname};
+          if (window.location.protocol !== 'file:')
+              props.__unity_webapps_hidden = {hostname: window.location.hostname};
+          else
+              props.__unity_webapps_hidden = {local: true};
           backend("init", [props]);
         }
         ,
