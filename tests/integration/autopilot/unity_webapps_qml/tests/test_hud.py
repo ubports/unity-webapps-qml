@@ -7,6 +7,7 @@
 
 import os
 import time
+import sys
 
 from testtools.matchers import Equals, GreaterThan, NotEquals
 from autopilot.matchers import Eventually
@@ -31,7 +32,7 @@ class UnityWebappsHudTestCase(UnityWebappsTestCaseBase):
         try:
             ensure_unity_is_running()
         except RuntimeError:
-            log.error("Unity doesn't appear to be running, exiting.")
+            sys.stderr.write("Unity doesn't appear to be running, exiting.")
             sys.exit(1)
 
         self.launch_with_html_filepath(self.get_html_test_file())
