@@ -15,13 +15,13 @@ import json
 
 from testtools.matchers import Contains, Equals, GreaterThan
 from autopilot.matchers import Eventually
-from autopilot.testcase import AutopilotTestCase
 from autopilot.input import Mouse, Touch, Pointer
 
 from unity.emulators.unity import Unity
 
+from unity.tests import UnityTestCase
 
-class UnityWebappsTestCaseBase(AutopilotTestCase):
+class UnityWebappsTestCaseBase(UnityTestCase):
     LOCAL_QML_LAUNCHER_APP_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../../../../tools/qml-launcher/unity-webapps-qml-launcher')
     INSTALLED_QML_LAUNCHER_APP_PATH = 'unity-webapps-qml-launcher'
 
