@@ -31,10 +31,6 @@ class UnityWebappsTestCaseBase(UnityTestCase):
 
     BASE_URL = ''
 
-    @property
-    def unity(self):
-        return Unity.get_root_instance()
-
     def create_file_url(self, path):
         return 'file://' + path
 
