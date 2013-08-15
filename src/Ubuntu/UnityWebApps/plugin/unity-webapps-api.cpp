@@ -128,8 +128,16 @@ bool UnityWebapps::createDefaultDesktopFileFor (const QString& desktopId,
     }
 
     QDir home(userhomeList.at(0));
-    QString desktopFilePath =
-            QDir::cleanPath(home.absolutePath() + QDir::separator() + ".local/share/applications/" + desktopId);
+    QString shareDirPath(home.absolutePath() + QDir::separator() + ".local/share/applications/");
+
+    // Create the directory if it doesn't exist
+    QDir shareDir(shareDirPath);
+    if (!shareDir.exists())
+    {
+        shareDir.mkpath(".");
+    }
+
+    QString desktopFilePath = QDir::cleanPath(shareDirPath + desktopId);
 
     // Should not happen
     if (QFile::exists(desktopFilePath))
