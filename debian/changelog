@@ -1,3 +1,26 @@
+unity-webapps-qml (0.1+13.10.20130816.1-0ubuntu1) saucy; urgency=low
+
+  [ Víctor R. Ruiz ]
+  * Create ./local/share/applications when not available. (LP: #1211352)
+
+  [ Alexandre Abreu ]
+  * Fix race condition in webapps bridge creation Fix issues in
+    messaging menu Add facebookmessenger full example Fix initialization
+    of backends Only inject API in top frame Fix issue with absence of
+    'unsafeWindow'.
+  * Add unitytestcase base class, seems to fix some dbus setup issues
+    that some had
+  * Remove unecessary unity property (already provided)
+
+  [ Łukasz 'sil2100' Zemczak ]
+  * Revert back to using Arch: any instead of explicitly listing out all
+    architectures.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 36
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 16 Aug 2013 10:04:26 +0000
+
 unity-webapps-qml (0.1+13.10.20130731-0ubuntu1) saucy; urgency=low
 
   [ Alexandre Abreu ]
