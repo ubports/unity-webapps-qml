@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
 
     loadQtTestability(app.arguments());
 
+    const QString QML_MAXIMIZED_ARG = "--maximized";
     const QString QML_FILE_ARG_HEADER = "--qml=";
     const QString QML_FILE_IMPORT_ARG_HEADER = "--import=";
     const QString QML_APP_ID_ARG_HEADER = "--app-id=";
@@ -74,6 +75,7 @@ int main(int argc, char *argv[])
     QString appid;
     QString importPath;
     QString inspector;
+    bool maximized = false;
 
     Q_FOREACH(QString argument, app.arguments())
     {
@@ -95,6 +97,11 @@ int main(int argc, char *argv[])
         if (argument.contains(QML_INSPECTOR_ARG_HEADER))
         {
             inspector = argument.right(argument.count() - QML_INSPECTOR_ARG_HEADER.count());
+        }
+        else
+        if (argument.contains(QML_MAXIMIZED_ARG))
+        {
+            maximized = true;
         }
         else
         if (argument.startsWith(ARG_HEADER)
@@ -183,7 +190,12 @@ int main(int argc, char *argv[])
     }
 
     if (window)
-        window->show();
+    {
+        if (maximized)
+            window->showMaximized();
+        else
+            window->show();
+    }
 
     return app.exec();
 }
