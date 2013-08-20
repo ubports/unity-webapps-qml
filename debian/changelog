@@ -1,3 +1,18 @@
+unity-webapps-qml (0.1+13.10.20130820.3-0ubuntu1) saucy; urgency=low
+
+  [ Alexandre Abreu ]
+  * Fix hud autopilot script.
+  * Add maximized launch to facebook example & caps to qml-launcher.
+  * fix facebook example useragent, when using the mobile safari one
+    (ipad/iphone) it seems that facebook does not update its messages
+    asyncrhonously anymore which render the webapp messaging menu
+    binding quite moot.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 40
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 20 Aug 2013 14:04:22 +0000
+
 unity-webapps-qml (0.1+13.10.20130816.1-0ubuntu1) saucy; urgency=low
 
   [ Víctor R. Ruiz ]
