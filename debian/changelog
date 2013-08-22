@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+13.10.20130822.2-0ubuntu1) saucy; urgency=low
+
+  [ Alexandre Abreu ]
+  * Fix typo in desktop file Exec.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 42
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 22 Aug 2013 14:04:21 +0000
+
 unity-webapps-qml (0.1+13.10.20130820.3-0ubuntu1) saucy; urgency=low
 
   [ Alexandre Abreu ]
