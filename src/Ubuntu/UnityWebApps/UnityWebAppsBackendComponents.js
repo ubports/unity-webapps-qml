@@ -142,16 +142,32 @@ function createAllWithAsync(parentItem, params) {
     __onBackendReady("notify");
 
 
+    // launcher
+    result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; \
+                                Backends.UnityWebappsLauncherBinding { ' + extracted + ' }',
+                      parentItem,
+                      params);
+    if (result.error != null) {
+        console.debug('Could not create launcher backend: ' + result.error);
+        clearAll();
+        return false;
+    }
+    result.object.model = parentItem.model;
+    __set("launcher", result.object);
+    __onBackendReady("launcher");
+
+
     // messaging menu
     result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; \
                                 Backends.UnityWebappsMessagingBinding { ' + extracted + ' }',
                       parentItem,
                       params);
     if (result.error != null) {
-        console.debug('Could not create notifications backend: ' + result.error);
+        console.debug('Could not create messaging menu backend: ' + result.error);
         clearAll();
         return false;
     }
+    // model have to be manuall set
     result.object.model = parentItem.model;
     __set("messaging", result.object);
     __onBackendReady("messaging");
@@ -222,6 +238,11 @@ function clearAll () {
     if (_backends.notify) {
         _backends.notify.destroy();
         _backends['notify'] = null;
+    }
+
+    if (_backends.launcher) {
+        _backends.launcher.destroy();
+        _backends['launcher'] = null;
     }
 
     if (_backends.messaging) {

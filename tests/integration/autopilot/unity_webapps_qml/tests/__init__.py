@@ -45,7 +45,7 @@ class UnityWebappsTestCaseBase(UnityTestCase):
         return self.INSTALLED_QML_LAUNCHER_APP_PATH
 
     def get_launch_params(self, url):
-        base_params = ['--qml=' + self.get_qml_browser_container_path(), '--url=' + url, '--app-id=unity-webapps-qml-launcher', '--webappName=AutopilotTest']
+        base_params = ['--qml=' + self.get_qml_browser_container_path(), '--url=' + url, '--app-id=unity-webapps-qml-launcher', '--webappName=unity-webapps-qml-launcher']
         if os.path.exists(self.LOCAL_QML_LAUNCHER_APP_PATH):
             # we are local
             base_params.append('--import=' + os.path.join (os.path.dirname(os.path.realpath(__file__)), '../../../../../src'))

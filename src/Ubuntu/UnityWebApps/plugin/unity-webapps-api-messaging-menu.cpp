@@ -142,6 +142,8 @@ unity_webapps_messaging_menu_source_activated (
     UnityWebappsMessagingMenuPrivate* self =
             static_cast<UnityWebappsMessagingMenuPrivate*>(user_data);
 
+    qDebug() << "activated";
+
     // FIXME make sure that we have a proper qobject (still alive)
 //    if ( ! qobject_cast(self))
 //        return;

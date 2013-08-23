@@ -109,6 +109,7 @@ var UnityWebApps = (function () {
                 // TODO add validation higher
                 if (!sendToPage || !(sendToPage instanceof Function))
                     return;
+                console.debug(JSON.stringify(UnityWebAppsUtils.formatUnityWebappsCallbackCall(callbackid, Array.prototype.slice.call(arguments))))
                 sendToPage(JSON.stringify(UnityWebAppsUtils.formatUnityWebappsCallbackCall(callbackid, Array.prototype.slice.call(arguments))));
             };
         },

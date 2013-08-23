@@ -460,6 +460,14 @@
                                                      backend('Launcher.removeActions', []);
                                                    }
                                                   )
+          ,
+          // private/internal
+          __get: createArgumentsSanitaizer(null,
+                                          [{ str: true }],
+                                          function (prop, callback) {
+                                            backend('Launcher.__get', [prop, callback]);
+                                          }
+                                         )
         },
         MessagingIndicator: {
           addAction: createArgumentsSanitaizer(null,

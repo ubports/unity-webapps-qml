@@ -495,6 +495,9 @@ Item {
             },
 
             MediaPlayer: {
+                init: function () {
+                    console.debug('MediaPlayer.init is deprecated');
+                },
                 setTrack: function (infos) {
                     console.debug('MediaPlayer.setTrack not implemented yet');
                 },
@@ -538,29 +541,64 @@ Item {
 
             Launcher: {
                 setCount: function (count) {
-                    console.debug('Launcher.setCount not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").setCount(count);
                 },
                 clearCount: function () {
-                    console.debug('Launcher.clearCount not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").clearCount();
                 },
                 setProgress: function (progress) {
-                    console.debug('Launcher.setProgress not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").setProgress(progress);
                 },
                 clearProgress: function () {
-                    console.debug('Launcher.clearProgress not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").clearProgress();
                 },
-                setUrgent: function (urgent) {
-                    console.debug('Launcher.setUrgent not implemented yet');
+                setUrgent: function () {
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").setUrgent();
                 },
-                addAction: function (name, onInvoked) {
-                    console.debug('Launcher.addAction not implemented yet');
+                addAction: function (name, ontriggered) {
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").addAction(name, ontriggered);
                 },
                 removeAction: function (name) {
-                    console.debug('Launcher.removeAction not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").removeAction(name);
                 },
                 removeActions: function () {
-                    console.debug('Launcher.removeActions not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").removeActions();
                 },
+                __get: function (prop, callback) {
+                    if (!initialized)
+                        return;
+
+                    if (prop === "progress") {
+                        callback(UnityBackends.get("launcher").getProgress());
+                    }
+                    else if (prop === "count") {
+                        callback(UnityBackends.get("launcher").getCount());
+                    }
+                }
             }
         };
     }

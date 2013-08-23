@@ -8,7 +8,8 @@ unix {
     PKGCONFIG += libnotify \
                 messaging-menu \
                 glib-2.0 \
-                gio-2.0
+                gio-2.0 \
+                unity
 }
 
 TEMPLATE = lib
@@ -29,6 +30,7 @@ SOURCES += \
     unity-webapps-api.cpp \
     unity-webapps-api-notifications.cpp \
     unity-webapps-api-messaging-menu.cpp \
+    unity-webapps-api-launcher.cpp \
     unity-webapps-app-model.cpp \
     unity-webapps-app-manifest-parser.cpp \
     unity-webapps-app-model-filter-proxy.cpp \
@@ -40,6 +42,7 @@ HEADERS += \
     unity-webapps-api.h \
     unity-webapps-api-notifications.h \
     unity-webapps-api-messaging-menu.h \
+    unity-webapps-api-launcher.h \
     unity-webapps-app-model.h \
     unity-webapps-app-manifest-parser.h \
     unity-webapps-common-priv.h \
