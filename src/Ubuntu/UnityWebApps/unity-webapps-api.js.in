@@ -243,7 +243,7 @@
                 if (desc.argAsCallbackId !== undefined) {
                   id = realArgs[desc.argAsCallbackId];
                 }
-                return function (user_data) { arg(); };
+                return function (user_data) { arg(user_data); };
               }
               return arg;
             } else {
@@ -396,6 +396,14 @@
                                                      )
           ,
           PlaybackState: {PLAYING: 0, PAUSED:1}
+          ,
+          // private/internal
+          __get: createArgumentsSanitaizer(null,
+                                          [{ str: true }],
+                                          function (prop, callback) {
+                                            backend('MediaPlayer.__get', [prop, callback]);
+                                          }
+                                         )
         },
 
         Notification: {

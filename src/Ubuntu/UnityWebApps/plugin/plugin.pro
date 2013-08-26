@@ -31,9 +31,11 @@ SOURCES += \
     unity-webapps-api-notifications.cpp \
     unity-webapps-api-messaging-menu.cpp \
     unity-webapps-api-launcher.cpp \
+    unity-webapps-api-mediaplayer.cpp \
     unity-webapps-app-model.cpp \
     unity-webapps-app-manifest-parser.cpp \
     unity-webapps-app-model-filter-proxy.cpp \
+    unity-webapps-app-infos.cpp \
     unity-webapps-desktop-infos.cpp \
     callback.cpp
 
@@ -43,10 +45,12 @@ HEADERS += \
     unity-webapps-api-notifications.h \
     unity-webapps-api-messaging-menu.h \
     unity-webapps-api-launcher.h \
+    unity-webapps-api-mediaplayer.h \
     unity-webapps-app-model.h \
     unity-webapps-app-manifest-parser.h \
     unity-webapps-common-priv.h \
     unity-webapps-app-model-filter-proxy.h \
+    unity-webapps-app-infos.h \
     unity-webapps-desktop-infos.h \
     callback.h
 

@@ -23,6 +23,7 @@
 #include <QQmlParserStatus>
 
 #include "unity-webapps-app-model.h"
+#include "unity-webapps-app-infos.h"
 
 
 class UnityWebappsLauncherPrivate;
@@ -32,15 +33,12 @@ class UnityWebappsLauncher: public QObject, public QQmlParserStatus
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
 
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(QString displayName READ displayName WRITE setDisplayName NOTIFY displayNameChanged)
-    Q_PROPERTY(UnityWebappsAppModel* model READ model WRITE setModel NOTIFY modelChanged)
-
 
 public:
     UnityWebappsLauncher(QObject * parent = 0);
     virtual ~UnityWebappsLauncher();
 
+    // API functions
     Q_INVOKABLE void setCount(int count);
     Q_INVOKABLE int getCount();
     Q_INVOKABLE void clearCount();
@@ -55,24 +53,15 @@ public:
     Q_INVOKABLE void removeAction(const QString & actionName);
     Q_INVOKABLE void removeActions();
 
-    void setName(const QString& name);
-    QString name() const;
 
-    void setDisplayName(const QString& name);
-    QString displayName() const;
-
-    UnityWebappsAppModel* model() const;
-    void setModel(UnityWebappsAppModel *);
-
+    // Class functions
     void classBegin();
     void componentComplete();
 
 
-Q_SIGNALS:
+public Q_SLOTS:
 
-    void nameChanged(const QString& name);
-    void displayNameChanged(const QString& name);
-    void modelChanged(UnityWebappsAppModel * model);
+    void onAppInfosChanged(UnityWebappsAppInfos *appInfos);
 
 
 private:

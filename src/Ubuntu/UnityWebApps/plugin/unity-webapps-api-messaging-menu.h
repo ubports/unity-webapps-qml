@@ -22,7 +22,7 @@
 #include <QObject>
 #include <QQmlParserStatus>
 
-#include "unity-webapps-app-model.h"
+#include "unity-webapps-app-infos.h"
 
 
 class UnityWebappsMessagingMenuPrivate;
@@ -31,10 +31,6 @@ class UnityWebappsMessagingMenu: public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
-
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(QString displayName READ displayName WRITE setDisplayName NOTIFY displayNameChanged)
-    Q_PROPERTY(UnityWebappsAppModel* model READ model WRITE setModel NOTIFY modelChanged)
 
 
 public:
@@ -49,24 +45,16 @@ public:
     Q_INVOKABLE void clearIndicator(const QString& indicatorName);
     Q_INVOKABLE void clearIndicators();
 
-    void setName(const QString& name);
-    QString name() const;
 
-    void setDisplayName(const QString& name);
-    QString displayName() const;
-
-    UnityWebappsAppModel* model() const;
-    void setModel(UnityWebappsAppModel *);
-
+    // Class functions
     void classBegin();
     void componentComplete();
 
 
-Q_SIGNALS:
 
-    void nameChanged(const QString& name);
-    void displayNameChanged(const QString& name);
-    void modelChanged(UnityWebappsAppModel * model);
+public Q_SLOTS:
+
+    void onAppInfosChanged(UnityWebappsAppInfos *appInfos);
 
 
 private:

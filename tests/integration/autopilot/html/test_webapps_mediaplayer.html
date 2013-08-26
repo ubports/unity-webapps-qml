@@ -1,16 +1,23 @@
 <html>
 
 <head>
-<title>Unity Webapps QML test: Launcher</title>
+<title>Unity Webapps QML test: MediaPlayer</title>
 
 <script>
 
+var MEDIAPLAYER_STATE_PLAYING = 0;
+var MEDIAPLAYER_STATE_PAUSED = 1;
+
 var unity;
 function onInit() {
-  unity.Launcher.setCount(42);
-  unity.Launcher.setProgress(0.09375);
+  unity.MediaPlayer.setCanGoNext(true);
+  unity.MediaPlayer.setCanGoPrevious(true);
+  unity.MediaPlayer.setCanPlay(true);
+  unity.MediaPlayer.setPlaybackState(MEDIAPLAYER_STATE_PAUSED);
 
-  document.getElementById('status').innerHTML = 'launcher-updated';
+  unity.MediaPlayer.setTrack({ album: "MyAlbum", title: "MyTitle", artist: "MyArtist" });
+
+  document.getElementById('status').innerHTML = 'mediaplayer-updated';
 }
 
 document.addEventListener('ubuntu-webapps-api-ready', function () {

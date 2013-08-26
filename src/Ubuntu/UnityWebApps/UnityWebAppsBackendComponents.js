@@ -125,7 +125,9 @@ function createAllWithAsync(parentItem, params) {
         clearAll();
         return false;
     }
-    __set("base", result.object);
+    var apiBase = result.object;
+    apiBase.model = parentItem.model;
+    __set("base", apiBase);
     __onBackendReady("base");
 
 
@@ -144,7 +146,7 @@ function createAllWithAsync(parentItem, params) {
 
     // launcher
     result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; \
-                                Backends.UnityWebappsLauncherBinding { ' + extracted + ' }',
+                                Backends.UnityWebappsLauncherBinding { }',
                       parentItem,
                       params);
     if (result.error != null) {
@@ -152,14 +154,33 @@ function createAllWithAsync(parentItem, params) {
         clearAll();
         return false;
     }
-    result.object.model = parentItem.model;
-    __set("launcher", result.object);
+    var launcher = result.object;
+    apiBase.appInfosChanged.connect(function(appInfos) {
+        launcher.onAppInfosChanged(appInfos);
+    });
+    __set("launcher", launcher);
     __onBackendReady("launcher");
+
+
+    // media player
+    result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; \
+                                Backends.UnityWebappsMediaPlayerBinding { }',
+                      parentItem,
+                      params);
+    if (result.error != null) {
+        console.debug('Could not create MediaPlayer backend: ' + result.error);
+        clearAll();
+        return false;
+    }
+    var mediaplayer = result.object;
+    apiBase.appInfosChanged.connect(function(appInfos) { mediaplayer.onAppInfosChanged(appInfos); });
+    __set("mediaplayer", mediaplayer);
+    __onBackendReady("mediaplayer");
 
 
     // messaging menu
     result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; \
-                                Backends.UnityWebappsMessagingBinding { ' + extracted + ' }',
+                                Backends.UnityWebappsMessagingBinding { }',
                       parentItem,
                       params);
     if (result.error != null) {
@@ -168,8 +189,9 @@ function createAllWithAsync(parentItem, params) {
         return false;
     }
     // model have to be manuall set
-    result.object.model = parentItem.model;
-    __set("messaging", result.object);
+    var messagingmenu = result.object;
+    apiBase.appInfosChanged.connect(function(appInfos) { messagingmenu.onAppInfosChanged(appInfos); });
+    __set("messaging", messagingmenu);
     __onBackendReady("messaging");
 
 
@@ -243,6 +265,11 @@ function clearAll () {
     if (_backends.launcher) {
         _backends.launcher.destroy();
         _backends['launcher'] = null;
+    }
+
+    if (_backends.mediaplayer) {
+        _backends.mediaplayer.destroy();
+        _backends['mediaplayer'] = null;
     }
 
     if (_backends.messaging) {

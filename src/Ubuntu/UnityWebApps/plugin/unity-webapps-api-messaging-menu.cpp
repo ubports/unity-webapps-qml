@@ -30,7 +30,10 @@
 #include <QByteArray>
 
 #include "unity-webapps-desktop-infos.h"
+#include "unity-webapps-app-infos.h"
+
 #include "unity-webapps-api-messaging-menu.h"
+
 
 #define API_CALL_HEADER() do { \
         d->init(); \
@@ -87,26 +90,16 @@ struct UnityWebappsMessagingMenuPrivate
     void clear();
     void init();
 
-    static QString getDesktopFilenameFor(const QString & name,
-                                         const QString & domain);
+    UnityWebappsAppInfos *_appInfos;
 
-    QString _name;
-    QString _displayName;
-    UnityWebappsAppModel *_model;
     MessagingMenuApp *_mmapp;
     QStringList _sources;
     QObject* _callback;
 };
 
-QString
-UnityWebappsMessagingMenuPrivate::getDesktopFilenameFor(const QString & name,
-                                                        const QString & domain)
-{
-    return QString("%1.desktop").arg(UnityWebappsQML::buildDesktopInfoFileForWebapp(name, domain));
-}
 
 UnityWebappsMessagingMenuPrivate::UnityWebappsMessagingMenuPrivate()
-    :_model(0), _mmapp(0), _callback(0)
+    : _appInfos(0), _mmapp(0), _callback(0)
 {
 }
 
@@ -127,7 +120,9 @@ void UnityWebappsMessagingMenuPrivate::clear()
 
         _mmapp = 0;
     }
-    _name.clear();
+    _appInfos = 0;
+    _callback = 0;
+    _sources.clear();
 }
 
 static void
@@ -157,20 +152,20 @@ void UnityWebappsMessagingMenuPrivate::init()
     if (Q_UNLIKELY(_mmapp != NULL))
         return;
 
-    if (Q_UNLIKELY(_model == NULL || _name.isEmpty() || _displayName.isEmpty()))
+    if (Q_UNLIKELY(_appInfos == NULL))
     {
         qDebug() << "Trying to initialize the MessagingMenu binding with invalid context";
         return;
     }
 
-    QString domain = _model->getDomainFor(_name);
-    if (domain.isEmpty())
+    QString desktopId = _appInfos->desktopId();
+    if (desktopId.isEmpty())
     {
-        qDebug() << "Could not retrieve domain for WebApp: " << _name;
+        qDebug() << "MessagingMenu backend: invalid desktop id (empty)";
         return;
     }
 
-    _mmapp = messaging_menu_app_new (getDesktopFilenameFor(_displayName, domain).toStdString().c_str());
+    _mmapp = messaging_menu_app_new (desktopId.toUtf8().data());
 
     messaging_menu_app_register (_mmapp);
 
@@ -192,50 +187,21 @@ UnityWebappsMessagingMenu::~UnityWebappsMessagingMenu()
     delete d_ptr;
 }
 
-UnityWebappsAppModel* UnityWebappsMessagingMenu::model() const
-{
-    Q_D(const UnityWebappsMessagingMenu);
-
-    return d->_model;
-}
-
-void UnityWebappsMessagingMenu::setModel(UnityWebappsAppModel * model)
+void UnityWebappsMessagingMenu::onAppInfosChanged(UnityWebappsAppInfos *appInfos)
 {
     Q_D(UnityWebappsMessagingMenu);
 
-    d->_model = model;
+    qDebug() << "onAppInfosChanged called for messaging menu";
 
-    Q_EMIT modelChanged(model);
+    bool wasInit = false;
+    if (d->_mmapp)
+    {
+        wasInit = true;
+        d->clear();
+    }
+    d->_appInfos = appInfos;
 
-    d->init();
-}
-
-void UnityWebappsMessagingMenu::setName(const QString &name)
-{
-    Q_D(UnityWebappsMessagingMenu);
-    d->_name = name;
-
-    Q_EMIT nameChanged(name);
-}
-
-QString UnityWebappsMessagingMenu::name() const
-{
-    Q_D(const UnityWebappsMessagingMenu);
-    return d->_name;
-}
-
-void UnityWebappsMessagingMenu::setDisplayName(const QString &name)
-{
-    Q_D(UnityWebappsMessagingMenu);
-    d->_displayName = name;
-
-    Q_EMIT displayNameChanged(name);
-}
-
-QString UnityWebappsMessagingMenu::displayName() const
-{
-    Q_D(const UnityWebappsMessagingMenu);
-    return d->_displayName;
+    if (wasInit) d->init();
 }
 
 void UnityWebappsMessagingMenu::showIndicator(const QString& indicatorName)
