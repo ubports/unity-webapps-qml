@@ -203,12 +203,17 @@ function createAllWithAsync(parentItem, params) {
     HUDBackendAdaptor.prototype.destroy = function () {
         this.clearActions();
     }
+    HUDBackendAdaptor.prototype.__normalizeName = function (actionName) {
+        return actionName.replace(/^\/+/, '');
+    }
     HUDBackendAdaptor.prototype.__actionExists = function (actionName) {
         if (!actionName || typeof(actionName) != 'string' || actionName.lenght === 0)
             return false;
         return this._actions[actionName] != null && this._actions[actionName].action != null;
     };
-    HUDBackendAdaptor.prototype.addAction = function (actionName, callback) {
+    HUDBackendAdaptor.prototype.addAction = function (_actionName, callback) {
+        var actionName = this.__normalizeName(_actionName);
+
         if (this.__actionExists(actionName))
             this.clearAction(actionName);
         var action = __createQmlObject('import Ubuntu.Unity.Action 1.0 as UnityActions; UnityActions.Action { text: "' + actionName + '"; enabled: true; }',
@@ -219,7 +224,9 @@ function createAllWithAsync(parentItem, params) {
 
         this._actions[actionName] = { action: action, callback: callback};
     }
-    HUDBackendAdaptor.prototype.clearAction = function (actionName) {
+    HUDBackendAdaptor.prototype.clearAction = function (_actionName) {
+        var actionName = this.__normalizeName(_actionName);
+
         if ( ! this.__actionExists(actionName))
             return;
         try {
