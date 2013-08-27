@@ -40,6 +40,7 @@ class UnityWebappsAppModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString searchPath READ searchPath WRITE setSearchPath NOTIFY searchPathChanged)
+    Q_PROPERTY(bool doSearchHomeFolder READ doSearchHomeFolder WRITE setDoSearchHomeFolder)
 
     Q_ENUMS(WebAppsRoles)
     
@@ -68,6 +69,8 @@ public:
     QString searchPath() const;
     void setSearchPath (const QString& path);
 
+    bool doSearchHomeFolder() const;
+    void setDoSearchHomeFolder (bool searchLocalHome);
 
     // Exposed to QML
     /*!
@@ -216,6 +219,7 @@ private:
     QList<InstalledWebApp> _webapps;
 
     QString _searchPath;
+    bool _doSearchLocalHome;
 
     static QString _commonScriptsDirName;
     static QString _webappDirPrefix;

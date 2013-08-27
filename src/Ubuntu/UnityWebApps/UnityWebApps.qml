@@ -419,7 +419,9 @@ Item {
 
                         base.initCompleted.connect(onInitCompleted);
 
-                        base.init(webappName, params);
+                        var url = params.__unity_webapps_hidden && params.__unity_webapps_hidden.url
+                                ? params.__unity_webapps_hidden.url : "";
+                        base.init(webappName, url, params);
                     });
                 }
                 else {

@@ -78,6 +78,7 @@ UnityWebappsAppModel::getDefaultWebappsInstallationSearchPath()
 UnityWebappsAppModel::UnityWebappsAppModel(QObject* parent)
     : QAbstractListModel(parent)
     , _searchPath(getDefaultWebappsInstallationSearchPath())
+    , _doSearchLocalHome(false)
 {
     load();
 
@@ -90,6 +91,21 @@ UnityWebappsAppModel::~UnityWebappsAppModel()
 QString UnityWebappsAppModel::searchPath() const
 {
     return _searchPath;
+}
+
+bool UnityWebappsAppModel::doSearchHomeFolder() const
+{
+    return _doSearchLocalHome;
+}
+
+void UnityWebappsAppModel::setDoSearchHomeFolder (bool searchLocalHome)
+{
+    bool reload = (searchLocalHome != _doSearchLocalHome);
+
+    _doSearchLocalHome = searchLocalHome;
+
+    if (reload)
+        load();
 }
 
 void UnityWebappsAppModel::setSearchPath(const QString& path)
