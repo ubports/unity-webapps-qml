@@ -211,7 +211,6 @@ function createAllWithAsync(parentItem, params) {
     HUDBackendAdaptor.prototype.addAction = function (actionName, callback) {
         if (this.__actionExists(actionName))
             this.clearAction(actionName);
-
         var action = __createQmlObject('import Ubuntu.Unity.Action 1.0 as UnityActions; UnityActions.Action { text: "' + actionName + '"; enabled: true; }',
                                        this._actionsContext).object;
         this._actionsContext.addAction(action);

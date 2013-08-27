@@ -120,8 +120,6 @@ void UnityWebappsLauncher::onAppInfosChanged(UnityWebappsAppInfos *appInfos)
 {
     Q_D(UnityWebappsLauncher);
 
-    qDebug() << "onAppInfosChanged called for launcher: " << appInfos;
-
     bool wasInit = false;
     if (d->_launcher)
     {
