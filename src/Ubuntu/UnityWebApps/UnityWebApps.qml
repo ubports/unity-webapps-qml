@@ -549,7 +549,6 @@ Item {
                         callback(UnityBackends.get("mediaplayer").getCanGoPrevious());
                     }
                     else if (prop === "can-go-next") {
-                        console.debug('can do next')
                         callback(UnityBackends.get("mediaplayer").getCanGoNext());
                     }
                     else if (prop === "can-play") {
