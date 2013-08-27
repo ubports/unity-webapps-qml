@@ -35,7 +35,7 @@ class UnityWebappsLauncherTestCase(UnityWebappsTestCaseBase):
     def test_checkCounts(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('launcher-updated')))
 
-        launcher_icon = self.unity.launcher.model.get_icon(desktop_id='unity-webapps-qml-launcher.desktop')
+        launcher_icon = self.unity.launcher.model.get_icon(desktop_id='unitywebappsqmllauncher.desktop')
         self.assertThat(launcher_icon, NotEquals(None))
 
         expr = """
@@ -57,7 +57,7 @@ class UnityWebappsLauncherTestCase(UnityWebappsTestCaseBase):
     def test_checkProgress(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('launcher-updated')))
 
-        launcher_icon = self.unity.launcher.model.get_icon(desktop_id='unity-webapps-qml-launcher.desktop')
+        launcher_icon = self.unity.launcher.model.get_icon(desktop_id='unitywebappsqmllauncher.desktop')
         self.assertThat(launcher_icon, NotEquals(None))
 
         expr = """
