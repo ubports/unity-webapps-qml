@@ -42,7 +42,6 @@ WebappsAppModelTest::WebappsAppModelTest()
 
 void WebappsAppModelTest::initTestCase()
 {
-//    qputenv("QML2_IMPORT_PATH", "../../../bin");
 }
 
 void WebappsAppModelTest::testEmptyWebappsModel()
@@ -116,3 +115,37 @@ void WebappsAppModelTest::testWebappsContentWithRequiresModel()
 
     QVERIFY(requiresFound);
 }
+
+void WebappsAppModelTest::testWebappsModelUrlMatch()
+{
+    const int VALID_INSTALLED_WEBAPPS_COUNT =
+            QDir(VALID_INSTALLED_WEBAPPS_SEARCH_PATH)
+             .entryInfoList (QStringList("*-valid"), QDir::Dirs)
+             .count();
+
+    UnityWebappsAppModel
+            model;
+    model.setSearchPath(VALID_INSTALLED_WEBAPPS_SEARCH_PATH);
+
+    const int FOUND_COUNT = model.rowCount();
+    QCOMPARE(FOUND_COUNT, VALID_INSTALLED_WEBAPPS_COUNT);
+
+    int i = 0;
+    for (; i < FOUND_COUNT; ++i)
+    {
+        QString name = model.data(model.index(i), UnityWebappsAppModel::Name).toString();
+
+        if (name.compare("BBCNews-valid") != 0)
+            continue;
+
+        QVERIFY(model.doesUrlMatchesWebapp(name, "http://www.bbc.co.uk/news"));
+        QVERIFY(model.doesUrlMatchesWebapp(name, "http://www.bbc.co.uk/news/extra/e"));
+        QVERIFY(model.doesUrlMatchesWebapp(name, "http://www.bbc.com/news/extra/e"));
+        QVERIFY( ! model.doesUrlMatchesWebapp(name, "http://www.bbc.com/sports/extra/e"));
+
+        break;
+    }
+
+    QVERIFY(i != FOUND_COUNT);
+}
+

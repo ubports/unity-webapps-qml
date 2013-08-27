@@ -95,6 +95,12 @@ public:
     /*!
      * \brief
      */
+    Q_INVOKABLE bool doesUrlMatchesWebapp(const QString & webappName, const QString & url) const;
+
+
+    /*!
+     * \brief
+     */
     Q_INVOKABLE QString getDisplayNameFor(const QString & webappName) const;
 
 

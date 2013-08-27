@@ -279,6 +279,34 @@ QString UnityWebappsAppModel::getDomainFor(const QString & webappName) const
     return data(idx, Domain).toString();
 }
 
+bool UnityWebappsAppModel::doesUrlMatchesWebapp(const QString & webappName, const QString & url) const
+{
+    if (!exists(webappName))
+        return false;
+
+    int idx = getWebappIndex(webappName);
+    if (Q_UNLIKELY(idx == -1))
+    {
+        qDebug() << "Invalid index for a supposedly existing webapp: " << webappName;
+        return false;
+    }
+
+    // TODO: very very inefficient
+    QStringList urls = data(idx, Urls).toStringList();
+
+    bool matches = false;
+    Q_FOREACH(const QString& urlCandidate, urls)
+    {
+        QRegExp pattern(urlCandidate, Qt::CaseInsensitive, QRegExp::Wildcard);
+        if (pattern.indexIn(url) != -1)
+        {
+            matches = true;
+            break;
+        }
+    }
+
+    return matches;
+}
 
 QString UnityWebappsAppModel::getDisplayNameFor(const QString & webappName) const
 {

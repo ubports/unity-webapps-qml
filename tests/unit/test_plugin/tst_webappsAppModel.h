@@ -38,6 +38,7 @@ private Q_SLOTS:
     void testEmptyWebappsModel();
     void testWebappsModel();
     void testWebappsContentWithRequiresModel();
+    void testWebappsModelUrlMatch();
 
 
 private:
