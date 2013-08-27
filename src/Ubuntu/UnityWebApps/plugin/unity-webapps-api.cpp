@@ -287,7 +287,7 @@ bool UnityWebapps::createDefaultDesktopFileFor (const QString& desktopId,
             .arg(webappName)
             .arg(iconName)
             .arg(appId)
-            .arg(QString(QUrl::toPercentEncoding(webappName)));
+            .arg(QString(webappName.toUtf8().toBase64().data()));
 
     QFile f(desktopFilePath);
     if ( ! f.open(QIODevice::WriteOnly))
