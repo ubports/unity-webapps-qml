@@ -16,40 +16,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __UNITY_WEBAPPS_MESSAGING_MENU_H__
-#define __UNITY_WEBAPPS_MESSAGING_MENU_H__
+#ifndef __UNITY_WEBAPPS_LAUNCHER_H__
+#define __UNITY_WEBAPPS_LAUNCHER_H__
 
 #include <QObject>
 #include <QQmlParserStatus>
 
+#include "unity-webapps-app-model.h"
 #include "unity-webapps-app-infos.h"
 
 
-class UnityWebappsMessagingMenuPrivate;
+class UnityWebappsLauncherPrivate;
 
-class UnityWebappsMessagingMenu: public QObject, public QQmlParserStatus
+class UnityWebappsLauncher: public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
 
 
 public:
-    UnityWebappsMessagingMenu(QObject * parent = 0);
-    virtual ~UnityWebappsMessagingMenu();
+    UnityWebappsLauncher(QObject * parent = 0);
+    virtual ~UnityWebappsLauncher();
 
-    // Supported WebApps APIs
-    Q_INVOKABLE void showIndicator(const QString& indicatorName);
-    Q_INVOKABLE void setProperty(const QString& indicatorName,
-                                 const QString& propertyName,
-                                 const QVariant& value);
-    Q_INVOKABLE void clearIndicator(const QString& indicatorName);
-    Q_INVOKABLE void clearIndicators();
+    // API functions
+    Q_INVOKABLE void setCount(int count);
+    Q_INVOKABLE int getCount();
+    Q_INVOKABLE void clearCount();
+
+    Q_INVOKABLE void setProgress(double progress);
+    Q_INVOKABLE double getProgress();
+    Q_INVOKABLE void clearProgress();
+
+    Q_INVOKABLE void setUrgent();
+
+    Q_INVOKABLE void addAction(const QString & actionName, const QString & action);
+    Q_INVOKABLE void removeAction(const QString & actionName);
+    Q_INVOKABLE void removeActions();
 
 
     // Class functions
     void classBegin();
     void componentComplete();
-
 
 
 public Q_SLOTS:
@@ -59,10 +66,9 @@ public Q_SLOTS:
 
 private:
 
-    UnityWebappsMessagingMenuPrivate *d_ptr;
-    Q_DECLARE_PRIVATE(UnityWebappsMessagingMenu)
+    UnityWebappsLauncherPrivate *d_ptr;
+    Q_DECLARE_PRIVATE(UnityWebappsLauncher)
 };
 
-#endif // __UNITY_WEBAPPS_MESSAGING_MENU_H__
-
+#endif // __UNITY_WEBAPPS_LAUNCHER_H__
 

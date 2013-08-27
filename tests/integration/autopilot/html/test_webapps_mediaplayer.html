@@ -1,0 +1,69 @@
+<html>
+
+<head>
+<title>Unity Webapps QML test: MediaPlayer</title>
+
+<script>
+
+var MEDIAPLAYER_STATE_PLAYING = 0;
+var MEDIAPLAYER_STATE_PAUSED = 1;
+
+var unity;
+function onInit() {
+  unity.MediaPlayer.setCanGoNext(true);
+  unity.MediaPlayer.setCanGoPrevious(true);
+  unity.MediaPlayer.setCanPlay(true);
+  unity.MediaPlayer.setPlaybackState(MEDIAPLAYER_STATE_PAUSED);
+
+  unity.MediaPlayer.setTrack({ album: "MyAlbum", title: "MyTitle", artist: "MyArtist" });
+
+  document.getElementById('status').innerHTML = 'mediaplayer-updated';
+}
+
+document.addEventListener('ubuntu-webapps-api-ready', function () {
+  console.log('ubuntu-webapps-api-ready received');
+
+  unity = window.external.getUnityObject('1.0');
+
+  unity.init({name: 'unity-webapps-qml-', domain: 'launcher', onInit: onInit, iconUrl: 'icon://myicon'});
+}, false);
+
+function dispatchApiCall (target, name, args) {
+  var names = name.split('.');
+  names.reduce (
+    function (prev, cur) {
+        return (typeof prev[cur] == "function") ? (function(prev, cur) { return prev[cur].bind(prev); })(prev, cur) : prev[cur];
+    }, target).apply (null, args);
+};
+
+document.addEventListener('unity-webapps-do-call', function(e) {
+  var action = JSON.parse(e.detail);
+  var callback = null;
+  if (action.with_callback) {
+    callback = function (response) {
+      var e = new CustomEvent ("unity-webapps-do-call-response", {"detail": response});
+      document.dispatchEvent (e);
+    };
+    action.args.push(callback);
+  }
+  dispatchApiCall(unity, action.name, action.args);
+}, false);
+
+</script>
+
+</head>
+
+<body>
+
+HELLO WORLD
+
+<div id="content">
+  <h1>THE CONTENT IS VISIBLE</h1>
+</div>
+
+<!-- Used as a communication status (to avoid races) between the app & the test -->
+<div id="status"></div>
+
+</body>
+
+</html>

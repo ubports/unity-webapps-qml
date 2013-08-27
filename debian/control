@@ -16,6 +16,7 @@ Build-Depends: debhelper (>= 9),
                qtdeclarative5-dev,
                qtdeclarative5-qtmultimedia-plugin,
                qtdeclarative5-test-plugin,
+	       libunity-dev,
 Standards-Version: 3.9.4
 Homepage: https://launchpad.net/unity-webapp-qml
 # If you aren't a member of ~webapps but need to upload packaging changes,

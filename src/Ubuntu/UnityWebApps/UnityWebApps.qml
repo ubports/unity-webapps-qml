@@ -353,6 +353,12 @@ Item {
     function __makeBackendProxies () {
         var initialized = false;
 
+        function getWrappedJsCallback(jscallback) {
+            var callback = Qt.createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; Backends.UnityWebappsCallback { }', bindee);
+            callback.onTriggered.connect(jscallback);
+            return callback;
+        };
+
         function isValidInitCall(params) {
             if (! params)
                 return false;
@@ -370,7 +376,7 @@ Item {
             }
 
             return params.__unity_webapps_hidden.hostname.indexOf(params.domain) !== -1;
-        }
+        };
 
         return {
             init: function (params) {
@@ -469,10 +475,7 @@ Item {
                             UnityBackends.get("messaging").setProperty(String(name), i, String(Number(properties[i])));
                         }
                         else if (i === "callback") {
-                            var callback = Qt.createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; Backends.UnityWebappsCallback { }', bindee);
-                            callback.onTriggered.connect(properties[i])
-
-                            UnityBackends.get("messaging").setProperty(String(name), i, callback);
+                            UnityBackends.get("messaging").setProperty(String(name), i, getWrappedJsCallback (properties[i]));
                         }
                         else {
                             UnityBackends.get("messaging").setProperty(String(name), i, properties[i]);
@@ -495,72 +498,129 @@ Item {
             },
 
             MediaPlayer: {
+                init: function () {
+                    console.debug('MediaPlayer.init is deprecated');
+                },
                 setTrack: function (infos) {
-                    console.debug('MediaPlayer.setTrack not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    var album = infos.album || '';
+                    var artist = infos.artist || '';
+                    var title = infos.title || '';
+                    var artLocation = "";
+
+                    UnityBackends.get("mediaplayer").setTrack(artist, album, title, artLocation);
                 },
                 onPrevious: function (callback) {
-                    console.debug('MediaPlayer.onPrevious not implemented yet');
+                    UnityBackends.get("mediaplayer").onPrevious(getWrappedJsCallback (callback));
                 },
                 onNext: function (callback) {
-                    console.debug('MediaPlayer.onNext not implemented yet');
+                    UnityBackends.get("mediaplayer").onNext(getWrappedJsCallback (callback));
                 },
                 onPlayPause: function (callback) {
-                    console.debug('MediaPlayer.onPlayPause not implemented yet');
+                    UnityBackends.get("mediaplayer").onPlayPause(getWrappedJsCallback (callback));
                 },
-                onPrevious: function (callback) {
-                    console.debug('MediaPlayer.onPrevious not implemented yet');
+                getPlaybackCtate: function (callback) {
+                    callback (UnityBackends.get("mediaplayer").getPlaybackState());
                 },
-                onNext: function (callback) {
-                    console.debug('MediaPlayer.onNext not implemented yet');
-                },
-                onPlayPause: function (callback) {
-                    console.debug('MediaPlayer.onPlayPause not implemented yet');
-                },
-                getPlaybackstate: function () {
-                    console.debug('MediaPlayer.getPlaybackstate not implemented yet');
-                },
-                setPlaybackstate: function (state) {
-                    console.debug('MediaPlayer.setPlaybackstate not implemented yet');
+                setPlaybackState: function (state) {
+                    UnityBackends.get("mediaplayer").setPlaybackState(state);
                 },
                 setCanGoNext: function (cango) {
-                    console.debug('MediaPlayer.setCanGoNext not implemented yet');
+                    UnityBackends.get("mediaplayer").setCanGoNext(cango);
                 },
-                setCanGoPrev: function (cango) {
-                    console.debug('MediaPlayer.setCanGoPrev not implemented yet');
+                setCanGoPrevious: function (cango) {
+                    UnityBackends.get("mediaplayer").setCanGoPrevious(cango);
                 },
-                setCanPlay: function (cango) {
-                    console.debug('MediaPlayer.setCanPlay not implemented yet');
+                setCanPlay: function (canplay) {
+                    UnityBackends.get("mediaplayer").setCanPlay(canplay);
                 },
-                setCanPause: function (cango) {
-                    console.debug('MediaPlayer.setCanPause not implemented yet');
+                setCanPause: function (canpause) {
+                    UnityBackends.get("mediaplayer").setCanPause(canpause);
                 },
+                __get: function (prop, callback) {
+                    if (!initialized)
+                        return;
+
+                    if (prop === "can-go-previous") {
+                        callback(UnityBackends.get("mediaplayer").getCanGoPrevious());
+                    }
+                    else if (prop === "can-go-next") {
+                        callback(UnityBackends.get("mediaplayer").getCanGoNext());
+                    }
+                    else if (prop === "can-play") {
+                        callback(UnityBackends.get("mediaplayer").getCanPlay());
+                    }
+                    else if (prop === "can-pause") {
+                        callback(UnityBackends.get("mediaplayer").getCanPause());
+                    }
+                    else if (prop === "track") {
+                        callback(UnityBackends.get("mediaplayer").getTrack());
+                    }
+                }
             },
 
             Launcher: {
                 setCount: function (count) {
-                    console.debug('Launcher.setCount not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").setCount(count);
                 },
                 clearCount: function () {
-                    console.debug('Launcher.clearCount not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").clearCount();
                 },
                 setProgress: function (progress) {
-                    console.debug('Launcher.setProgress not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").setProgress(progress);
                 },
                 clearProgress: function () {
-                    console.debug('Launcher.clearProgress not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").clearProgress();
                 },
-                setUrgent: function (urgent) {
-                    console.debug('Launcher.setUrgent not implemented yet');
+                setUrgent: function () {
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").setUrgent();
                 },
-                addAction: function (name, onInvoked) {
-                    console.debug('Launcher.addAction not implemented yet');
+                addAction: function (name, ontriggered) {
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").addAction(name, ontriggered);
                 },
                 removeAction: function (name) {
-                    console.debug('Launcher.removeAction not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").removeAction(name);
                 },
                 removeActions: function () {
-                    console.debug('Launcher.removeActions not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    UnityBackends.get("launcher").removeActions();
                 },
+                __get: function (prop, callback) {
+                    if (!initialized)
+                        return;
+
+                    if (prop === "progress") {
+                        callback(UnityBackends.get("launcher").getProgress());
+                    }
+                    else if (prop === "count") {
+                        callback(UnityBackends.get("launcher").getCount());
+                    }
+                }
             }
         };
     }
