@@ -51,7 +51,7 @@ public:
 public Q_SLOTS:
 
     // API functions
-    void init(const QString& name, const QVariant& args);
+    void init(const QString& name, const QString& url, const QVariant& args);
 
     // class functions
     UnityWebappsAppInfos *appInfos();
@@ -76,7 +76,8 @@ private:
     bool initInternal(const QString& name,
               const QString& domain,
               const QString& displayName,
-              const QString& iconUrl);
+              const QString& iconUrl,
+              const QString& url);
     void cleanup();
 
     void buildAppInfos(const QString & name,

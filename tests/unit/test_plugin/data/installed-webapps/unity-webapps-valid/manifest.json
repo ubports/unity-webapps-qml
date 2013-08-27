@@ -1,5 +1,5 @@
 {
-    "includes": ["http://www.bbc.co.uk/news/", "http://www.bbc.com/news/"],
+    "includes": ["http://www.bbc.co.uk/news", "http://www.bbc.*/news/*"],
     "requires": ["utils.js"],
     "name": "BBCNews-valid",
     "scripts": ["valid.user.js"],

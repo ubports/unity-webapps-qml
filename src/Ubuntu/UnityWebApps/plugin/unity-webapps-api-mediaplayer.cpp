@@ -267,8 +267,6 @@ void UnityWebappsMediaPlayer::setTrack (const QString & artist,
     if (! d->_metadata)
         d->_metadata = unity_track_metadata_new ();
 
-    qDebug() << "settrack " << artist;
-
     unity_track_metadata_set_artist (d->_metadata, artist.toUtf8().data());
     unity_track_metadata_set_album (d->_metadata, album.toUtf8().data());
     unity_track_metadata_set_title (d->_metadata, title.toUtf8().data());
