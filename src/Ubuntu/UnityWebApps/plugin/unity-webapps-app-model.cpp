@@ -278,6 +278,22 @@ UnityWebappsAppModel::loadUserScript(const QDir& userscriptPath,
     return script;
 }
 
+QStringList
+UnityWebappsAppModel::getChromeOptionsFor(const QString & webappName) const
+{
+    if (!exists(webappName))
+        return QStringList();
+
+    int idx = getWebappIndex(webappName);
+    if (Q_UNLIKELY(idx == -1))
+    {
+        qDebug() << "Invalid index for a supposedly existing webapp: " << webappName;
+        return QStringList();
+    }
+
+    return data(idx, Chrome).toStringList();
+}
+
 QString UnityWebappsAppModel::getDomainFor(const QString & webappName) const
 {
     //FIXME: very inefficient
@@ -432,6 +448,9 @@ QVariant UnityWebappsAppModel::data(int row, int role) const
 
     case Urls:
         return webapp.data.manifest.includes;
+
+    case Chrome:
+        return webapp.data.manifest.chromeOptions;
 
     case Scripts:
         {

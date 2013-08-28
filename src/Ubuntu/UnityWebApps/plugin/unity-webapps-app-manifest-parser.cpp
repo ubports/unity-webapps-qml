@@ -104,7 +104,53 @@ bool UnityWebappsAppManifestParser::parseContent(const QString& content, Manifes
     infos->requires = parseArray(object, QLatin1String("requires"));
     infos->includes = parseArray(object, QLatin1String("includes"));
 
+    QString chromeOption;
+    if (object.contains("chrome") && object.value("chrome").isString())
+    {
+        chromeOption = object.value("chrome").toString();
+    }
+    infos->chromeOptions = parseChromeOptions(chromeOption);
+
     return true;
+}
+
+QStringList
+UnityWebappsAppManifestParser::parseChromeOptions(const QString& options)
+{
+    static const QStringList DEFAULT_OPTIONS("no-chrome");
+
+    if (options.isNull() || options.isEmpty())
+        return DEFAULT_OPTIONS;
+
+    static const QStringList VALID_CHROME_OPTIONS =
+            (QStringList() << "no-chrome" << "back-forward-buttons" << "reload-button");
+
+    QStringList result;
+
+    // strip unvalid options
+    QStringList splittedOptions = options.split(";");
+    Q_FOREACH(QString option, splittedOptions)
+    {
+        if (VALID_CHROME_OPTIONS.contains(option.trimmed()))
+        {
+            result.append(option.trimmed());
+        }
+    }
+
+    // no-chrome has precedence
+    if (result.contains("no-chrome"))
+    {
+        result.clear();
+        result.append("no-chrome");
+    }
+
+    if (result.isEmpty())
+    {
+        qDebug() << "Chrome display selection defaulting to no-chrome since no option was found";
+        result.append("no-chrome");
+    }
+
+    return result;
 }
 
 QStringList UnityWebappsAppManifestParser::parseArray(const QJsonObject& parent
