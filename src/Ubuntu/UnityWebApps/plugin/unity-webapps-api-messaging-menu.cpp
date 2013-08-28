@@ -191,8 +191,6 @@ void UnityWebappsMessagingMenu::onAppInfosChanged(UnityWebappsAppInfos *appInfos
 {
     Q_D(UnityWebappsMessagingMenu);
 
-    qDebug() << "onAppInfosChanged called for messaging menu";
-
     bool wasInit = false;
     if (d->_mmapp)
     {

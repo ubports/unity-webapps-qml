@@ -293,7 +293,7 @@
             throw new TypeError("incorrect argument");
           }
           if (window.location.protocol !== 'file:')
-              props.__unity_webapps_hidden = {hostname: window.location.hostname};
+              props.__unity_webapps_hidden = {hostname: window.location.hostname, url: window.location.href};
           else
               props.__unity_webapps_hidden = {local: true};
           backend("init", [props]);
@@ -399,7 +399,7 @@
           ,
           // private/internal
           __get: createArgumentsSanitaizer(null,
-                                          [{ str: true }],
+                                          [{ str: true }, { type: Function, argAsCallbackId: 0 }],
                                           function (prop, callback) {
                                             backend('MediaPlayer.__get', [prop, callback]);
                                           }
@@ -471,7 +471,7 @@
           ,
           // private/internal
           __get: createArgumentsSanitaizer(null,
-                                          [{ str: true }],
+                                          [{ str: true }, { type: Function, argAsCallbackId: 0 }],
                                           function (prop, callback) {
                                             backend('Launcher.__get', [prop, callback]);
                                           }
