@@ -42,7 +42,7 @@ class UnityWebappsAppModel : public QAbstractListModel
     Q_PROPERTY(QString searchPath READ searchPath WRITE setSearchPath NOTIFY searchPathChanged)
 
     Q_ENUMS(WebAppsRoles)
-    
+
 
 public:
 
@@ -55,7 +55,8 @@ public:
         Urls,
         Homepage,
         Scripts,
-        ScriptsContent
+        ScriptsContent,
+        Chrome
     };
 
     // QAbstractListModel implementation
@@ -90,6 +91,12 @@ public:
      * \brief
      */
     Q_INVOKABLE QString getDomainFor(const QString & webappName) const;
+
+
+    /*!
+     * \brief
+     */
+    Q_INVOKABLE QStringList getChromeOptionsFor(const QString & webappName) const;
 
 
     /*!

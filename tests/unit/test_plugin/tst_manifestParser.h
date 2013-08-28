@@ -36,6 +36,7 @@ private Q_SLOTS:
 
     // tests
     void testParseManifest();
+    void testParseChromeOptions();
 
 
 private:
