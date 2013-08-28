@@ -283,7 +283,7 @@ bool UnityWebapps::createDefaultDesktopFileFor (const QString& desktopId,
                                "Type=Application\n"
                                "Icon=%2\n"
                                "Actions=S0;S1;S2;S3;S4;S5;S6;S7;S8;S9;S10;\n"
-                               "Exec=webbrowser-app --chromeless --fullscreen --app-id='%3' --webapp='%4' %u")
+                               "Exec=webbrowser-app --fullscreen --app-id='%3' --webapp='%4' %u")
             .arg(webappName)
             .arg(iconName)
             .arg(appId)
