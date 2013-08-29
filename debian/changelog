@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+13.10.20130829.2-0ubuntu1) saucy; urgency=low
+
+  [ Alexandre Abreu ]
+  * Add webapp chrome selection from the manifest file.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 50
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 29 Aug 2013 10:04:20 +0000
+
 unity-webapps-qml (0.1+13.10.20130828-0ubuntu1) saucy; urgency=low
 
   [ Alexandre Abreu ]
