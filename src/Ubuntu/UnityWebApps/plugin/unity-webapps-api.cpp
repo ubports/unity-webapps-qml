@@ -437,7 +437,6 @@ QString UnityWebapps::getDesktopFileContent()
             .arg( ! webappName.isEmpty()
                  ? generateActionsEntry(webappName)
                  : QString(""));
-
     return content;
 }
 
