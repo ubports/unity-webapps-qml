@@ -21,7 +21,10 @@
 
 #include <QObject>
 #include <QVariant>
+#include <QMap>
 #include <QQmlParserStatus>
+
+#include "callback.h"
 
 
 class UnityWebappsAppInfos;
@@ -32,6 +35,7 @@ class UnityWebapps : public QObject, public QQmlParserStatus
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
     Q_PROPERTY(UnityWebappsAppModel* model READ model WRITE setAppModel)
+    Q_PROPERTY(bool handleDesktopFileUpdates READ handleDesktopFileUpdates WRITE setHandleDesktopFileUpdates)
     Q_PROPERTY(UnityWebappsAppInfos* appInfos READ appInfos NOTIFY appInfosChanged)
 
 
@@ -39,13 +43,21 @@ public:
     UnityWebapps(QObject *parent = 0);
     ~UnityWebapps();
 
-
     UnityWebappsAppModel* model() const;
     void setAppModel(UnityWebappsAppModel *);
+
+    bool handleDesktopFileUpdates() const;
+    void setHandleDesktopFileUpdates (bool);
 
     // TODO: really need it?
     void componentComplete();
     void classBegin();
+
+    Q_INVOKABLE QString addIndicatorAction (const QString& name);
+    Q_INVOKABLE QString addStaticAction (const QString& name, const QString& url);
+    Q_INVOKABLE QString addLauncherAction (const QString& name);
+    Q_INVOKABLE void removeLauncherAction (const QString& name);
+    Q_INVOKABLE void removeLauncherActions ();
 
 
 public Q_SLOTS:
@@ -56,6 +68,8 @@ public Q_SLOTS:
     // class functions
     UnityWebappsAppInfos *appInfos();
 
+    QString getDesktopFileContent();
+
 
 Q_SIGNALS:
 
@@ -65,9 +79,37 @@ Q_SIGNALS:
 
 private:
 
+    enum ActionTypeFlags
+    {
+        STATIC_ACTION = 0x1,
+        INDICATOR_ACTION = 0x2,
+        LAUNCHER_ACTION = 0x4,
+    };
+
+    QStringList collectActionNames() const;
+    QString getUrlLaunchExec (const QString & webappName,
+                              const QString & url);
+
+    QString addAction (const QString& name,
+                    ActionTypeFlags type,
+                    const QString & url = QString());
+    void removeAction (const QString& name);
+
+    void ensureLocalApplicationsPathExists();
+
+    QString getLocalDesktopFilepath(const QString & desktopId);
+
     bool ensureDesktopExists(const QString& webappName,
                              const QString& domain,
                              const QString& iconName);
+
+    void updateDesktopFileContent();
+
+    QString generateActionEntryFor(const QString& actionName,
+                                   const QString & webappName,
+                                   const QString& showIn,
+                                   const QString& exec);
+    QString generateActionsEntry(const QString & webappName);
 
     bool isValidInitForWebappAndModel (const QString & name,
                                        const QString& domain,
@@ -83,20 +125,39 @@ private:
     void buildAppInfos(const QString & name,
                        const QString & displayName,
                        const QString & domain,
-                       const QString & desktopId);
+                       const QString & desktopId,
+                       const QString & iconName);
 
-    bool createDefaultDesktopFileFor (const QString& desktopId,
-                                      const QString& webappName,
-                                      const QString& domain,
-                                      const QString& iconName);
+    bool createLocalDesktopFileFor (const QString& desktopId,
+                                    const QString& webappName,
+                                    const QString& domain,
+                                    const QString& iconName);
 
     static QString getUserSharePath();
 
 
 private:
 
+    struct ActionInfos
+    {
+        ActionInfos() {}
+        ActionInfos(const QString & n, size_t t, size_t i, const QString & u = QString())
+            : name(n), type(t), url(u), idx(i)
+        {}
+        QString name;
+        size_t type;
+        QString url;
+        size_t idx;
+    };
+
+    QMap<size_t, ActionInfos> collectActionIndexes();
+    int findNextAvailableActionIndex(const QMap<size_t, ActionInfos> & indexes);
+
+    QMap<QString, ActionInfos>  _actions;
+
     UnityWebappsAppModel *_model;
     UnityWebappsAppInfos *_appInfos;
+    bool _handleDesktopFileUpdates;
 };
 
 #endif // __UNITY_WEBAPPS_API_H__

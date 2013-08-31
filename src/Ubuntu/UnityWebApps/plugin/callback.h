@@ -27,8 +27,6 @@ class UnityWebappsCallback : public QObject
 {
     Q_OBJECT
 
-//    Q_PROPERTY(QString applicationName READ applicationName WRITE setApplicationName NOTIFY nameChanged)
-
 
 public:
     UnityWebappsCallback(QObject *parent = 0);
@@ -37,12 +35,12 @@ public:
 
 public Q_SLOTS:
 
-    Q_INVOKABLE void trigger ();
+    Q_INVOKABLE void trigger (QVariant user_data = QVariant());
 
 
 Q_SIGNALS:
 
-    void triggered();
+    void triggered(QVariant user_data = QVariant());
 };
 
 #endif // __UNITY_WEBAPPS_CALLBACK_H__

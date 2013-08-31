@@ -9,7 +9,8 @@ unix {
                 messaging-menu \
                 glib-2.0 \
                 gio-2.0 \
-                unity
+                unity \
+                unity-action-qt-1
 }
 
 TEMPLATE = lib

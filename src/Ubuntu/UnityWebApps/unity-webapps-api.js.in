@@ -452,7 +452,10 @@
                                               )
           ,
           addAction: function(arg1, arg2) {
-            backend('Launcher.addAction', [arg1, arg2]);
+            if (typeof(arg2) === 'string')
+                backend('Launcher.addStaticAction', [arg1, arg2]);
+            else
+                backend('Launcher.addAction', [arg1, arg2]);
           }
           ,
           removeAction: createArgumentsSanitaizer(null,
