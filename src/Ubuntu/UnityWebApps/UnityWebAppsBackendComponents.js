@@ -78,6 +78,61 @@ function signalOnBackendReady(name, func) {
     _backendReadyListeners[name].push(func);
 }
 
+function UnityActionsBackendAdaptor(parentItem, actionsContext) {
+    this._actions = {};
+    this._actionsContext = actionsContext;
+};
+UnityActionsBackendAdaptor.prototype.destroy = function () {
+    this.clearActions();
+}
+UnityActionsBackendAdaptor.prototype.__normalizeName = function (actionName) {
+    return actionName.replace(/^\/+/, '');
+}
+UnityActionsBackendAdaptor.prototype.__actionExists = function (actionName) {
+    if (!actionName || typeof(actionName) != 'string' || actionName.lenght === 0)
+        return false;
+    return this._actions[actionName] != null && this._actions[actionName].action != null;
+};
+UnityActionsBackendAdaptor.prototype.addAction = function (_actionText, callback, id) {
+    var actionText = this.__normalizeName(_actionText);
+
+    if (this.__actionExists(actionText))
+        this.clearAction(actionText);
+
+    var params = ' text: "' + actionText + '";'
+            + ' enabled: true; ' +
+            (id ? ('name: ' + '"' + id + '"') : '');
+
+    var action = __createQmlObject('import Ubuntu.Unity.Action 1.0 as UnityActions; \
+                                    UnityActions.Action { ' + params + ' }',
+                                   this._actionsContext).object;
+    this._actionsContext.addAction(action);
+
+    action.triggered.connect(callback);
+
+    this._actions[actionText] = { action: action, callback: callback};
+}
+UnityActionsBackendAdaptor.prototype.clearAction = function (_actionName) {
+    var actionName = this.__normalizeName(_actionName);
+
+    if ( ! this.__actionExists(actionName))
+        return;
+    try {
+        this._actionsContext.removeAction(this._actions[actionName].action);
+        this._actions[actionName].action.enabled = false;
+        this._actions[actionName].action.triggered.disconnect(this._actions[actionName].callback);
+        this._actions[actionName] = null;
+    } catch(e) {
+        console.debug('Error while removing an action: ' + e);
+    }
+}
+UnityActionsBackendAdaptor.prototype.clearActions = function () {
+    for(var action in this._actions) {
+        if (this._actions.hasOwnProperty(action) && this._actions[action] != null)
+            this.clearAction(action);
+    }
+}
+
 /*!
   \internal
 
@@ -132,7 +187,8 @@ function createAllWithAsync(parentItem, params) {
 
 
     // notifications
-    result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends;  Backends.UnityWebappsNotificationsBinding { name: "' + params.name + '"; }',
+    result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; \
+                                Backends.UnityWebappsNotificationsBinding { name: "' + params.name + '"; }',
                       parentItem,
                       params);
     if (result.error != null) {
@@ -160,6 +216,7 @@ function createAllWithAsync(parentItem, params) {
     });
     __set("launcher", launcher);
     __onBackendReady("launcher");
+
 
 
     // media player
@@ -195,59 +252,17 @@ function createAllWithAsync(parentItem, params) {
     __onBackendReady("messaging");
 
 
-    // hud
-    function HUDBackendAdaptor(parentItem, actionsContext) {
-        this._actions = {};
-        this._actionsContext = actionsContext;
-    };
-    HUDBackendAdaptor.prototype.destroy = function () {
-        this.clearActions();
-    }
-    HUDBackendAdaptor.prototype.__normalizeName = function (actionName) {
-        return actionName.replace(/^\/+/, '');
-    }
-    HUDBackendAdaptor.prototype.__actionExists = function (actionName) {
-        if (!actionName || typeof(actionName) != 'string' || actionName.lenght === 0)
-            return false;
-        return this._actions[actionName] != null && this._actions[actionName].action != null;
-    };
-    HUDBackendAdaptor.prototype.addAction = function (_actionName, callback) {
-        var actionName = this.__normalizeName(_actionName);
-
-        if (this.__actionExists(actionName))
-            this.clearAction(actionName);
-        var action = __createQmlObject('import Ubuntu.Unity.Action 1.0 as UnityActions; UnityActions.Action { text: "' + actionName + '"; enabled: true; }',
-                                       this._actionsContext).object;
-        this._actionsContext.addAction(action);
-
-        action.triggered.connect(callback);
-
-        this._actions[actionName] = { action: action, callback: callback};
-    }
-    HUDBackendAdaptor.prototype.clearAction = function (_actionName) {
-        var actionName = this.__normalizeName(_actionName);
-
-        if ( ! this.__actionExists(actionName))
-            return;
-        try {
-            this._actionsContext.removeAction(this._actions[actionName].action);
-            this._actions[actionName].action.enabled = false;
-            this._actions[actionName].action.triggered.disconnect(this._actions[actionName].callback);
-            this._actions[actionName] = null;
-        } catch(e) {
-            console.debug('Error while removing an action: ' + e);
-        }
-    }
-    HUDBackendAdaptor.prototype.clearActions = function () {
-        for(var action in this._actions) {
-            if (this._actions.hasOwnProperty(action) && this._actions[action] != null)
-                this.clearAction(action);
-        }
+    // extra actions set for the launcher/messaging-menu
+    if (parentItem.actionsContext) {
+        __set("indicator-actions", new UnityActionsBackendAdaptor(parentItem, parentItem.actionsContext));
+        __onBackendReady("indicator-actions");
     }
 
+
+    // Unity actions/HUD
     //FIXME: find a better way to access parentItem.actionsContext
     if (parentItem.actionsContext) {
-        __set("hud", new HUDBackendAdaptor(parentItem, parentItem.actionsContext));
+        __set("hud", new UnityActionsBackendAdaptor(parentItem, parentItem.actionsContext));
         __onBackendReady("hud");
     }
 }
@@ -271,6 +286,11 @@ function clearAll () {
     if (_backends.launcher) {
         _backends.launcher.destroy();
         _backends['launcher'] = null;
+    }
+
+    if (_backends['indicator-actions']) {
+        _backends['indicator-actions'].destroy();
+        _backends['indicator-actions'] = null;
     }
 
     if (_backends.mediaplayer) {

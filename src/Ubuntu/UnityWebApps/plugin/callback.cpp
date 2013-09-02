@@ -30,7 +30,7 @@ UnityWebappsCallback::UnityWebappsCallback(QObject *parent)
 UnityWebappsCallback::~UnityWebappsCallback()
 {}
 
-void UnityWebappsCallback::trigger ()
+void UnityWebappsCallback::trigger (QVariant user_data)
 {
-    Q_EMIT triggered();
+    Q_EMIT triggered(user_data);
 }

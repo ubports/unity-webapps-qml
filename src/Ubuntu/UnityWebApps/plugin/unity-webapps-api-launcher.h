@@ -64,6 +64,12 @@ public Q_SLOTS:
     void onAppInfosChanged(UnityWebappsAppInfos *appInfos);
 
 
+Q_SIGNALS:
+
+    void onActionAdded(const QString& name, const QString& action);
+    void onActionRemoved(const QString& name);
+
+
 private:
 
     UnityWebappsLauncherPrivate *d_ptr;

@@ -6,9 +6,22 @@
 #include <QQmlEngine>
 #include <QSignalSpy>
 #include <QJsonDocument>
+#include <QVariantMap>
 
 #include "plugin/unity-webapps-api.h"
 
+
+const QString webappName = "MyWebapp";
+const QString url = "http://MyWebapp.com";
+
+QVariantMap getParams()
+{
+    QVariantMap params;
+    params["domain"] = QVariant("MyWebapp.com");
+    params["name"] = QVariant("MyWebapp");
+    params["iconUrl"] = QVariant("icon://MyWebappcom");
+    return params;
+}
 
 PluginTest::PluginTest()
     :QObject(0)
@@ -32,17 +45,12 @@ void PluginTest::testLoadPlugin()
 
 void PluginTest::testInit()
 {
-/*    QQmlEngine engine;
-    QQmlComponent component(&engine);
-    component.setData("import QtQuick 2.0\nimport Ubuntu.UnityWebApps 0.1\n"
-                      "Item { function call() { var binding = new UnityWebAppsJs.UnityWebApps(); binding.init(); } }\n", QUrl());
-*/
-//    UnityWebapps *binding = new UnityWebapps(NULL);
-//    QSignalSpy initCompleted(binding, SIGNAL(initCompleted()));
+#if 0
+    UnityWebapps * p = new UnityWebapps();
 
-    // TODO dont need onInit since it will be called via signal and routed to js onInit()
+    p->setHandleDesktopFileUpdates(false);
+    p->init(webappName, url, getParams());
 
-//    const QString initargs = "{\"name\": \"name\", \"iconUrl\": \"icon://\"}";
-//    binding->init(QJsonDocument::fromJson(initargs.toUtf8()).toVariant());
-//    QCOMPARE(initCompleted.count(), 1);
+    QVERIFY( ! p->getDesktopFileContent().isEmpty());
+#endif
 }
