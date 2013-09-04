@@ -38,6 +38,7 @@ SOURCES += \
     unity-webapps-app-model-filter-proxy.cpp \
     unity-webapps-app-infos.cpp \
     unity-webapps-desktop-infos.cpp \
+    unity-webapps-icon-utils.cpp \
     callback.cpp
 
 HEADERS += \
@@ -53,6 +54,7 @@ HEADERS += \
     unity-webapps-app-model-filter-proxy.h \
     unity-webapps-app-infos.h \
     unity-webapps-desktop-infos.h \
+    unity-webapps-icon-utils.h \
     callback.h
 
 DEFINES += \

@@ -28,6 +28,7 @@
 
 #include <gio/gdesktopappinfo.h>
 
+#include "unity-webapps-icon-utils.h"
 #include "unity-webapps-desktop-infos.h"
 
 
@@ -431,7 +432,7 @@ QString UnityWebapps::getDesktopFileContent()
                                "Exec=webbrowser-app --app-id='%4' --webapp='%5' %u\n\n"
                                "%6")
             .arg(webappName)
-            .arg(iconName)
+            .arg(UnityWebappsQML::getIconPathFor(iconName))
             .arg(appId)
             .arg(QString(webappName.toUtf8().toBase64().data()))
             .arg( ! webappName.isEmpty()
