@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+13.10.20130904.2-0ubuntu1) saucy; urgency=low
+
+  [ Alexandre Abreu ]
+  * Fix static actions.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 52
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 04 Sep 2013 15:58:42 +0000
+
 unity-webapps-qml (0.1+13.10.20130829.2-0ubuntu1) saucy; urgency=low
 
   [ Alexandre Abreu ]
