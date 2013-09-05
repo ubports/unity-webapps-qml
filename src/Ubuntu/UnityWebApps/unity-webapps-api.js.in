@@ -283,6 +283,7 @@
       };
       var api = {
         init: function(props) {
+        console.log('initiddd');
           checkString(props.name, false);
           checkString(props.iconUrl, true);
           checkString(props.domain, true);
@@ -296,6 +297,7 @@
               props.__unity_webapps_hidden = {hostname: window.location.hostname, url: window.location.href};
           else
               props.__unity_webapps_hidden = {local: true};
+              console.log('initiddd');
           backend("init", [props]);
         }
         ,

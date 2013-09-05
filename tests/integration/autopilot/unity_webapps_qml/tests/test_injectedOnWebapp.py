@@ -33,6 +33,8 @@ class UnityWebappsApiInjectedTestCaseBase(UnityWebappsTestCaseBase):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject(1.0) != null;'), Eventually(NotEquals(None)))
 
     def test_actionsApiFound(self):
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject(1.0) != null;'), Eventually(NotEquals(None)))
+
         expression = """
             var unity = window.external.getUnityObject(1.0);
             return unity.addAction != null && unity.clearAction && unity.clearActions != null;
@@ -40,6 +42,8 @@ class UnityWebappsApiInjectedTestCaseBase(UnityWebappsTestCaseBase):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(NotEquals(None)))
 
     def test_notificationApiFound(self):
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject(1.0) != null;'), Eventually(NotEquals(None)))
+
         expression = """
             var unity = window.external.getUnityObject(1.0);
             return unity.Notification != null && unity.Notification.showNotification != null;
@@ -47,6 +51,8 @@ class UnityWebappsApiInjectedTestCaseBase(UnityWebappsTestCaseBase):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(NotEquals(None)))
 
     def test_messagingIndicatorApiFound(self):
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject(1.0) != null;'), Eventually(NotEquals(None)))
+
         expression = """
             var unity = window.external.getUnityObject(1.0);
             return unity.MessagingIndicator != null &&
@@ -58,6 +64,8 @@ class UnityWebappsApiInjectedTestCaseBase(UnityWebappsTestCaseBase):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(NotEquals(None)))
 
     def test_ubuntuReadyEventSent(self):
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject(1.0) != null;'), Eventually(NotEquals(None)))
+
         expression = """
             var api_ready_count = window.localStorage['ubuntu-webapps-api-ready-key'];
             return api_ready_count != null && api_ready_count > 0;

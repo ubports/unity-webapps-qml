@@ -63,6 +63,7 @@ void UnityWebapps::cleanup()
 
 void UnityWebapps::init(const QString& name,
                         const QString& url,
+                        bool isLocal,
                         const QVariant& args)
 {
     Q_UNUSED(name);
@@ -70,53 +71,63 @@ void UnityWebapps::init(const QString& name,
     if (_appInfos != NULL)
         cleanup();
 
-    qDebug() << "init";
-
     if (QString(args.typeName()).compare("QVariantMap") != 0)
     {
         qDebug() << "Invalid init() parameter types: " << args.typeName();
-
         Q_EMIT initCompleted(false);
-
         return;
     }
+
+#define UNITY_WEBAPPS_IS_VALID(name,type) \
+    ( initArgs.contains(name) && initArgs.value(name).canConvert<type>() )
 
     QVariantMap initArgs =
         qvariant_cast<QVariantMap>(args);
-    if ( ! initArgs.contains("name") ||
-         ! initArgs.contains("domain") ||
-         ! initArgs.contains("iconUrl")
-         )
+    if ( ! UNITY_WEBAPPS_IS_VALID("name", QString))
     {
-        qDebug() << "Invalid init() parameter content (not found): name, domain and iconUrl are mandatory";
-
+        qDebug() << "Invalid init() parameter content (not found or invalid): name is mandatory";
         Q_EMIT initCompleted(false);
-
         return;
     }
-    if ( ! initArgs.value("name").canConvert<QString>() ||
-         ! initArgs.value("domain").canConvert<QString>() ||
-         ! initArgs.value("iconUrl").canConvert<QString>()
-         )
-    {
-        qDebug() << "Invalid init() parameter value types.";
-
-        Q_EMIT initCompleted(false);
-
-        return;
-    }
-
     QString displayName = initArgs.value("name").toString();
-    QString iconUrl = initArgs.value("iconUrl").toString();
-    QString domain = initArgs.value("domain").toString();
 
-    bool success = initInternal(name, displayName, domain, iconUrl, url);
+    QString iconUrl =
+            initArgs.contains("iconUrl")
+                && UNITY_WEBAPPS_IS_VALID("iconUrl",QString)
+            ? initArgs.value("iconUrl").toString() : "";
+    QString domain =
+            initArgs.contains("domain")
+                && UNITY_WEBAPPS_IS_VALID("domain",QString)
+            ? initArgs.value("domain").toString() : "";
 
+    if ( ! isLocal && (iconUrl.isEmpty() || domain.isEmpty()))
+    {
+        qDebug() << "Invalid init() parameter content "
+                    "(not found or invalid): domain and iconUrl are mandatory for nonlocal apps";
+        Q_EMIT initCompleted(false);
+        return;
+    }
+
+    QString desktopId;
+    if (qgetenv("APP_ID").isEmpty()) {
+        desktopId = getDesktopFilenameFor(displayName, domain);
+    }
+    else {
+        desktopId = qgetenv("APP_ID");
+    }
+
+    qDebug() << "UnityWebapps initialized with desktop id: " << desktopId;
+
+    bool success = initInternal(name,
+                                displayName,
+                                domain,
+                                iconUrl,
+                                url);
     if (success)
         buildAppInfos(name,
                       displayName,
                       domain,
-                      getDesktopFilenameFor(displayName, domain),
+                      desktopId,
                       iconUrl);
 
     Q_EMIT initCompleted(success);
@@ -244,6 +255,11 @@ bool UnityWebapps::ensureDesktopExists(const QString& displayName,
                                        const QString& domain,
                                        const QString& iconName)
 {
+    //FIXME: think of a better way to handle desktop/phone specifics
+#if ! defined(Q_OS_LINUX) || ! defined(Q_PROCESSOR_X86)
+    return true;
+#endif
+
     if ( ! handleDesktopFileUpdates())
         return true;
 
@@ -375,31 +391,48 @@ QString UnityWebapps::addAction (const QString& name,
 
 QString UnityWebapps::addLauncherAction(const QString& name)
 {
+    //FIXME: think of a better way to handle desktop/phone specifics
+#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86)
     return addAction(name, LAUNCHER_ACTION);
+#endif
+    return QString();
 }
 
 QString UnityWebapps::addIndicatorAction (const QString& name)
 {
+    //FIXME: think of a better way to handle desktop/phone specifics
+#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86)
     return addAction(name, INDICATOR_ACTION);
+#endif
+    return QString();
 }
 
 QString UnityWebapps::addStaticAction (const QString& name, const QString& url)
 {
+    //FIXME: think of a better way to handle desktop/phone specifics
+#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86)
     return addAction(name, STATIC_ACTION, url);
+#endif
+    return QString();
 }
 
 void UnityWebapps::removeLauncherAction(const QString& name)
 {
+    //FIXME: think of a better way to handle desktop/phone specifics
+#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86)
     if (_actions.contains(name) && (_actions[name].type & LAUNCHER_ACTION))
     {
         _actions[name].type &= ~LAUNCHER_ACTION;
 
         updateDesktopFileContent();
     }
+#endif
 }
 
 void UnityWebapps::removeLauncherActions()
 {
+    //FIXME: think of a better way to handle desktop/phone specifics
+#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86)
     bool found = false;
     Q_FOREACH(const QString & actionName, _actions.keys())
     {
@@ -411,6 +444,7 @@ void UnityWebapps::removeLauncherActions()
     }
     if (found)
         updateDesktopFileContent();
+#endif
 }
 
 QString UnityWebapps::getDesktopFileContent()
@@ -442,6 +476,11 @@ QString UnityWebapps::getDesktopFileContent()
 
 void UnityWebapps::updateDesktopFileContent ()
 {
+    //FIXME: think of a better way to handle desktop/phone specifics
+#if ! defined(Q_OS_LINUX) || !defined(Q_PROCESSOR_X86)
+    return;
+#endif
+
     if ( ! handleDesktopFileUpdates())
         return;
 
@@ -466,6 +505,11 @@ void UnityWebapps::updateDesktopFileContent ()
 
 void UnityWebapps::ensureLocalApplicationsPathExists()
 {
+    //FIXME: think of a better way to handle desktop/phone specifics
+#if ! defined(Q_OS_LINUX) || !defined(Q_PROCESSOR_X86)
+    return;
+#endif
+
     QString shareDirPath (getUserSharePath());
     if (shareDirPath.isEmpty())
     {

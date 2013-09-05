@@ -63,7 +63,7 @@ public:
 public Q_SLOTS:
 
     // API functions
-    void init(const QString& name, const QString& url, const QVariant& args);
+    void init(const QString& name, const QString& url, bool isLocal, const QVariant& args);
 
     // class functions
     UnityWebappsAppInfos *appInfos();

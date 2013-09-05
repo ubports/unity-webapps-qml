@@ -380,9 +380,7 @@ Item {
 
         return {
             init: function (params) {
-                console.debug('initi called')
                 if (! isValidInitCall(params)) {
-                    console.debug('Invalid init call');
                     return;
                 }
 
@@ -410,18 +408,16 @@ Item {
                             base.initCompleted.disconnect(onInitCompleted);
                             if (success) {
                                 initialized = true;
-
-                                console.debug(JSON.stringify(params));
-
                                 callOnInitScriptFunc();
                             }
                         };
 
                         base.initCompleted.connect(onInitCompleted);
 
+                        var isLocal = params.__unity_webapps_hidden && params.__unity_webapps_hidden.local;
                         var url = params.__unity_webapps_hidden && params.__unity_webapps_hidden.url
                                 ? params.__unity_webapps_hidden.url : "";
-                        base.init(webappName, url, params);
+                        base.init(webappName, url, isLocal, params);
                     });
                 }
                 else {
