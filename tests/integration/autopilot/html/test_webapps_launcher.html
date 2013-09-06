@@ -17,8 +17,7 @@ document.addEventListener('ubuntu-webapps-api-ready', function () {
   console.log('ubuntu-webapps-api-ready received');
 
   unity = window.external.getUnityObject('1.0');
-
-  unity.init({name: 'unity-webapps-qml-', domain: 'launcher', onInit: onInit, iconUrl: 'icon://myicon'});
+  unity.init({name: 'unity-webapps-qml-launcher', onInit: onInit});
 }, false);
 
 function dispatchApiCall (target, name, args) {
