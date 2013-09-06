@@ -122,6 +122,8 @@ private:
               const QString& url);
     void cleanup();
 
+    bool isConfined() const;
+
     void buildAppInfos(const QString & name,
                        const QString & displayName,
                        const QString & domain,

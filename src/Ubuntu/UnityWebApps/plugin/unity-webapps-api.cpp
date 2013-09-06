@@ -150,6 +150,17 @@ void UnityWebapps::setAppModel(UnityWebappsAppModel * model)
     _model = model;
 }
 
+bool UnityWebapps::isConfined() const
+{
+    //Cheap way to know if we work in a confined environment
+    //FIXME: think of a better way to handle desktop/phone specifics
+#if defined(Q_OS_LINUX) && ! defined(Q_PROCESSOR_X86)
+    return true;
+#else
+    return false;
+#endif
+}
+
 void UnityWebapps::buildAppInfos(const QString & name,
                                  const QString & displayName,
                                  const QString & domain,
@@ -255,10 +266,10 @@ bool UnityWebapps::ensureDesktopExists(const QString& displayName,
                                        const QString& domain,
                                        const QString& iconName)
 {
-    //FIXME: think of a better way to handle desktop/phone specifics
-#if ! defined(Q_OS_LINUX) || ! defined(Q_PROCESSOR_X86)
-    return true;
-#endif
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return true;
 
     if ( ! handleDesktopFileUpdates())
         return true;
@@ -391,48 +402,53 @@ QString UnityWebapps::addAction (const QString& name,
 
 QString UnityWebapps::addLauncherAction(const QString& name)
 {
-    //FIXME: think of a better way to handle desktop/phone specifics
-#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86)
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return QString();
+
     return addAction(name, LAUNCHER_ACTION);
-#endif
-    return QString();
 }
 
 QString UnityWebapps::addIndicatorAction (const QString& name)
 {
-    //FIXME: think of a better way to handle desktop/phone specifics
-#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86)
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return QString();
     return addAction(name, INDICATOR_ACTION);
-#endif
-    return QString();
 }
 
 QString UnityWebapps::addStaticAction (const QString& name, const QString& url)
 {
-    //FIXME: think of a better way to handle desktop/phone specifics
-#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86)
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return QString();
     return addAction(name, STATIC_ACTION, url);
-#endif
-    return QString();
 }
 
 void UnityWebapps::removeLauncherAction(const QString& name)
 {
-    //FIXME: think of a better way to handle desktop/phone specifics
-#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86)
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return;
     if (_actions.contains(name) && (_actions[name].type & LAUNCHER_ACTION))
     {
         _actions[name].type &= ~LAUNCHER_ACTION;
 
         updateDesktopFileContent();
     }
-#endif
 }
 
 void UnityWebapps::removeLauncherActions()
 {
-    //FIXME: think of a better way to handle desktop/phone specifics
-#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86)
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return;
+
     bool found = false;
     Q_FOREACH(const QString & actionName, _actions.keys())
     {
@@ -444,7 +460,6 @@ void UnityWebapps::removeLauncherActions()
     }
     if (found)
         updateDesktopFileContent();
-#endif
 }
 
 QString UnityWebapps::getDesktopFileContent()
@@ -476,10 +491,10 @@ QString UnityWebapps::getDesktopFileContent()
 
 void UnityWebapps::updateDesktopFileContent ()
 {
-    //FIXME: think of a better way to handle desktop/phone specifics
-#if ! defined(Q_OS_LINUX) || !defined(Q_PROCESSOR_X86)
-    return;
-#endif
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return;
 
     if ( ! handleDesktopFileUpdates())
         return;
@@ -505,10 +520,10 @@ void UnityWebapps::updateDesktopFileContent ()
 
 void UnityWebapps::ensureLocalApplicationsPathExists()
 {
-    //FIXME: think of a better way to handle desktop/phone specifics
-#if ! defined(Q_OS_LINUX) || !defined(Q_PROCESSOR_X86)
-    return;
-#endif
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return;
 
     QString shareDirPath (getUserSharePath());
     if (shareDirPath.isEmpty())
