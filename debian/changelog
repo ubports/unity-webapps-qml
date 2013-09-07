@@ -1,3 +1,15 @@
+unity-webapps-qml (0.1+13.10.20130907-0ubuntu1) saucy; urgency=low
+
+  [ Alexandre Abreu ]
+  * Simplify/fix autopilot tests; Handle better local usage of webapps
+    component (for local apps).
+  * Fix icon name generation.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 55
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Sat, 07 Sep 2013 02:04:08 +0000
+
 unity-webapps-qml (0.1+13.10.20130904.2-0ubuntu1) saucy; urgency=low
 
   [ Alexandre Abreu ]
