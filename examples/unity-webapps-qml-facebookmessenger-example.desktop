@@ -1,9 +1,9 @@
 [Desktop Entry]
+Name=FacebookMessengerWebappsQMLExample
 Encoding=UTF-8
 Type=Application
-Exec=/usr/bin/unity-webapps-qml-launcher --maximized --qml=/usr/share/unity-webapps-qml/examples/unity-webapps-example-facebookmessenger/main.qml --app-id=unity-webapps-qml-facebookmessenger-example
+Exec=/usr/bin/unity-webapps-qml-launcher --qml=/usr/share/unity-webapps-qml/examples/unity-webapps-example-facebookmessenger/main.qml --app-id=unity-webapps-qml-facebookmessenger-example
 Path=/usr/share/unity-webapps-qml/examples/unity-webapps-example-facebookmessenger
-Name=FacebookMessengerWebContainerExample
 GenericName=FacebookMessenger WebBrowser Container Example
-Icon=facebook-facebook.com
+Icon=qmlscene
 Terminal=false
