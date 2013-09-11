@@ -15,7 +15,6 @@ Build-Depends: debhelper (>= 9),
                qt5-qmake,
                qtbase5-dev,
                qtdeclarative5-dev,
-               qtdeclarative5-qtmultimedia-plugin,
                qtdeclarative5-test-plugin,
 	       libunity-dev,
 Standards-Version: 3.9.4
