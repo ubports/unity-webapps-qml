@@ -51,7 +51,6 @@ public:
     void componentComplete();
 
 
-
 public Q_SLOTS:
 
     void onAppInfosChanged(UnityWebappsAppInfos *appInfos);
@@ -59,6 +58,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
+    void raised();
     void onActionAdded(const QString& name, const QString& action);
     void onActionRemoved(const QString& name);
 

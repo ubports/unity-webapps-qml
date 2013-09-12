@@ -162,12 +162,23 @@ function get(id) {
     return _backends[id];
 };
 
-function createAllWithAsync(parentItem, params) {
+
+/**
+ * \brief creates all the backends
+ *
+ * \param
+ */
+function createAllWithAsync(parentItem, params, eventHandlers) {
     if (!__areValidParams(params)) {
         //TODO: error reporting
         throw new Error("Invalid creation parameters");
     }
     var extracted = __extractParams(params);
+
+    function connectAppRaisedEvent(target) {
+        if (target && eventHandlers && eventHandlers.onAppRaised)
+            target.raised.connect(function() { try { eventHandlers.onAppRaised(); } catch(e){} });
+    }
 
     //FIXME:!!! lots of duplicated stuff
 
@@ -234,6 +245,8 @@ function createAllWithAsync(parentItem, params) {
     __set("mediaplayer", mediaplayer);
     __onBackendReady("mediaplayer");
 
+    connectAppRaisedEvent(mediaplayer);
+
 
     // messaging menu
     result = __createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; \
@@ -251,6 +264,7 @@ function createAllWithAsync(parentItem, params) {
     __set("messaging", messagingmenu);
     __onBackendReady("messaging");
 
+    connectAppRaisedEvent(messagingmenu);
 
     // extra actions set for the launcher/messaging-menu
     if (parentItem.actionsContext) {

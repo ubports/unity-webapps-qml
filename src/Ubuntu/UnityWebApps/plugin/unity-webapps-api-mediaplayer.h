@@ -85,6 +85,11 @@ public Q_SLOTS:
     void onAppInfosChanged(UnityWebappsAppInfos *appInfos);
 
 
+Q_SIGNALS:
+
+    void raised();
+
+
 private:
 
     UnityWebappsMediaPlayerPrivate *d_ptr;

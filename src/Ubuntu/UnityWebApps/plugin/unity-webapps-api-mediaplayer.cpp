@@ -45,11 +45,12 @@
 
 struct UnityWebappsMediaPlayerPrivate
 {
-    UnityWebappsMediaPlayerPrivate();
-    ~UnityWebappsMediaPlayerPrivate();
+    UnityWebappsMediaPlayerPrivate (UnityWebappsMediaPlayer * qq);
+    ~UnityWebappsMediaPlayerPrivate ();
 
     void clear();
     void init();
+    void onRaised();
 
     UnityWebappsAppInfos *_appInfos;
 
@@ -61,6 +62,10 @@ struct UnityWebappsMediaPlayerPrivate
     QObject* _playpause_callback;
     QObject* _next_callback;
     QObject* _previous_callback;
+
+    UnityWebappsMediaPlayer* const q_ptr;
+
+    Q_DECLARE_PUBLIC(UnityWebappsMediaPlayer)
 };
 
 
@@ -72,8 +77,8 @@ _uwq_media_callback_raised (UnityMusicPlayer *player, gpointer user_data)
     UnityWebappsMediaPlayerPrivate* self =
             static_cast<UnityWebappsMediaPlayerPrivate*>(user_data);
 
-    if (self->_raise_callback)
-        QMetaObject::invokeMethod(self->_raise_callback, "trigger");
+    if(self)
+        self->onRaised();
 }
 
 static void
@@ -84,7 +89,7 @@ _uwq_media_callback_play_pause (UnityMusicPlayer *player, gpointer user_data)
     UnityWebappsMediaPlayerPrivate* self =
             static_cast<UnityWebappsMediaPlayerPrivate*>(user_data);
 
-    if (self->_playpause_callback)
+    if (self && self->_playpause_callback)
         QMetaObject::invokeMethod(self->_playpause_callback, "trigger");
 }
 
@@ -96,7 +101,7 @@ _uwq_media_callback_next (UnityMusicPlayer *player, gpointer user_data)
     UnityWebappsMediaPlayerPrivate* self =
             static_cast<UnityWebappsMediaPlayerPrivate*>(user_data);
 
-    if (self->_next_callback)
+    if (self && self->_next_callback)
         QMetaObject::invokeMethod(self->_next_callback, "trigger");
 }
 
@@ -108,18 +113,19 @@ _uwq_media_callback_previous (UnityMusicPlayer *player, gpointer user_data)
     UnityWebappsMediaPlayerPrivate* self =
             static_cast<UnityWebappsMediaPlayerPrivate*>(user_data);
 
-    if (self->_previous_callback)
+    if (self && self->_previous_callback)
         QMetaObject::invokeMethod(self->_previous_callback, "trigger");
 }
 
-UnityWebappsMediaPlayerPrivate::UnityWebappsMediaPlayerPrivate()
-    :_appInfos(0)
+UnityWebappsMediaPlayerPrivate::UnityWebappsMediaPlayerPrivate (UnityWebappsMediaPlayer * qq)
+    : _appInfos(0)
     , _player(0)
     , _metadata(0)
     , _raise_callback (0)
     , _playpause_callback (0)
     , _next_callback (0)
     , _previous_callback (0)
+    , q_ptr(qq)
 {}
 
 UnityWebappsMediaPlayerPrivate::~UnityWebappsMediaPlayerPrivate()
@@ -127,14 +133,20 @@ UnityWebappsMediaPlayerPrivate::~UnityWebappsMediaPlayerPrivate()
     clear();
 }
 
+void UnityWebappsMediaPlayerPrivate::onRaised()
+{
+    Q_Q(UnityWebappsMediaPlayer);
+
+    Q_EMIT q->raised();
+
+    if (_raise_callback)
+        QMetaObject::invokeMethod(_raise_callback, "trigger");
+}
+
 void UnityWebappsMediaPlayerPrivate::clear()
 {
     if (_player && G_IS_OBJECT(_player))
     {
-/*        g_signal_handlers_disconnect_by_func(_player,
-                                             (gpointer)unity_webapps_messaging_menu_source_activated,
-                                             this);
-*/
         unity_music_player_set_is_blacklisted (_player, TRUE);
 
         g_object_unref(_player);
@@ -205,7 +217,7 @@ void UnityWebappsMediaPlayerPrivate::init()
 
 UnityWebappsMediaPlayer::UnityWebappsMediaPlayer(QObject *parent)
     : QObject(parent),
-      d_ptr(new UnityWebappsMediaPlayerPrivate())
+      d_ptr(new UnityWebappsMediaPlayerPrivate(this))
 {}
 
 UnityWebappsMediaPlayer::~UnityWebappsMediaPlayer()

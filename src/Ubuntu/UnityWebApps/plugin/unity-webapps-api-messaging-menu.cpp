@@ -74,28 +74,42 @@ unity_webapps_messaging_menu_source_activated (
 
 struct UnityWebappsMessagingMenuPrivate
 {
-    UnityWebappsMessagingMenuPrivate();
-    ~UnityWebappsMessagingMenuPrivate();
+    UnityWebappsMessagingMenuPrivate (UnityWebappsMessagingMenu * qq);
+    ~UnityWebappsMessagingMenuPrivate ();
 
     void clear();
     void init();
+    void sourceActivated();
 
     UnityWebappsAppInfos *_appInfos;
 
     MessagingMenuApp *_mmapp;
     QStringList _sources;
     QObject* _callback;
+    UnityWebappsMessagingMenu * const q_ptr;
+
+    Q_DECLARE_PUBLIC(UnityWebappsMessagingMenu)
 };
 
 
-UnityWebappsMessagingMenuPrivate::UnityWebappsMessagingMenuPrivate()
-    : _appInfos(0), _mmapp(0), _callback(0)
+UnityWebappsMessagingMenuPrivate::UnityWebappsMessagingMenuPrivate (UnityWebappsMessagingMenu * qq)
+    : _appInfos(0), _mmapp(0), _callback(0), q_ptr(qq)
 {
 }
 
 UnityWebappsMessagingMenuPrivate::~UnityWebappsMessagingMenuPrivate()
 {
     clear();
+}
+
+void UnityWebappsMessagingMenuPrivate::sourceActivated()
+{
+    Q_Q(UnityWebappsMessagingMenu);
+
+    Q_EMIT q->raised();
+
+    if (_callback)
+        QMetaObject::invokeMethod(_callback, "trigger");
 }
 
 void UnityWebappsMessagingMenuPrivate::clear()
@@ -127,14 +141,12 @@ unity_webapps_messaging_menu_source_activated (
     UnityWebappsMessagingMenuPrivate* self =
             static_cast<UnityWebappsMessagingMenuPrivate*>(user_data);
 
-    qDebug() << "activated";
-
     // FIXME make sure that we have a proper qobject (still alive)
 //    if ( ! qobject_cast(self))
 //        return;
 
-    if (self->_callback)
-        QMetaObject::invokeMethod(self->_callback, "trigger");
+    if (self)
+        self->sourceActivated();
 }
 
 void UnityWebappsMessagingMenuPrivate::init()
@@ -169,7 +181,7 @@ void UnityWebappsMessagingMenuPrivate::init()
 
 UnityWebappsMessagingMenu::UnityWebappsMessagingMenu(QObject *parent)
     : QObject(parent),
-      d_ptr(new UnityWebappsMessagingMenuPrivate())
+      d_ptr(new UnityWebappsMessagingMenuPrivate(this))
 {}
 
 UnityWebappsMessagingMenu::~UnityWebappsMessagingMenu()
@@ -294,7 +306,6 @@ void UnityWebappsMessagingMenu::setProperty(const QString& indicatorName,
             qDebug() << "Invalid callback type: no trigger method";
             return;
         }
-
         d->_callback = callback;
     }
     else if (propertyName.compare("label", Qt::CaseInsensitive) == 0)

@@ -397,7 +397,9 @@ Item {
 
                     // We should be all set & ready for the backends
                     UnityBackends.clearAll();
-                    UnityBackends.createAllWithAsync(webapps, {name: webappName, displayName: params.name});
+                    UnityBackends.createAllWithAsync(webapps,
+                                                     {name: webappName, displayName: params.name},
+                                                     bindee);
 
                     UnityBackends.signalOnBackendReady("base", function () {
 
