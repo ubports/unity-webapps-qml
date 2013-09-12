@@ -25,7 +25,6 @@
 
 #include "unity-webapps-common-priv.h"
 
-
 /*!
  * \brief Data view of a given WebApp manifest
  *
@@ -45,6 +44,8 @@ struct ManifestFileInfo
     QStringList scripts;
     // List of javascript files required by the WebApp (but not included)
     QStringList requires;
+    // The currently selected chrome option for this WebApp
+    QStringList chromeOptions;
 };
 
 /*!
@@ -85,6 +86,9 @@ private:
      */
     QStringList parseArray(const QJsonObject& parent,
                            const QString& name);
+
+    QStringList
+    parseChromeOptions(const QString& options);
 
     /*!
      * \brief parseContent

@@ -23,7 +23,7 @@ document.addEventListener('ubuntu-webapps-api-ready', function () {
   console.log('ubuntu-webapps-api-ready received');
 
   unity = window.external.getUnityObject('1.0');
-  unity.init({name: 'MessagingIndicator TEST', domain: 'localhost', onInit: onInit, iconUrl: 'icon://myicon'});
+  unity.init({name: 'unity-webapps-qml-launcher', onInit: onInit});
 }, false);
 
 

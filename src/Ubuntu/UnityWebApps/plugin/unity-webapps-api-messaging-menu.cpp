@@ -31,6 +31,7 @@
 
 #include "unity-webapps-desktop-infos.h"
 #include "unity-webapps-app-infos.h"
+#include "unity-webapps-icon-utils.h"
 
 #include "unity-webapps-api-messaging-menu.h"
 
@@ -41,19 +42,8 @@
             return; \
     } while(0)
 
-namespace {
 
-QString
-getIconPathFor(const QString& iconURI)
-{
-    static const QString ICON_URI_SCHEME = "icon://";
-    if (!iconURI.startsWith(ICON_URI_SCHEME))
-    {
-        qDebug() << QString("%1 does not start with a proper icon uri scheme").arg(iconURI);
-        return QString();
-    }
-    return QString();
-}
+namespace {
 
 GIcon * requestImage(const QString &iconId)
 {
@@ -295,7 +285,7 @@ void UnityWebappsMessagingMenu::setProperty(const QString& indicatorName,
 
     if (propertyName.compare("icon", Qt::CaseInsensitive) == 0)
     {
-        GIcon *icon = requestImage(getIconPathFor(value.toString()));
+        GIcon *icon = requestImage(UnityWebappsQML::getIconPathFor(value.toString()));
 
         messaging_menu_app_set_source_icon (d->_mmapp, indicatorName_cstr, icon);
 

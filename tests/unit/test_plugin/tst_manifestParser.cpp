@@ -33,6 +33,35 @@ namespace {
 
 const QString manifestsDataPath = "./data/manifests";
 
+void verifyChrome(const QString & filename,
+                  const ManifestFileInfoOption & option)
+{
+    if (! filename.contains("chrome"))
+    {
+        // regular validation, should default to no-chrome
+        QVERIFY(option.value().chromeOptions.contains("no-chrome") && option.value().chromeOptions.count() == 1);
+        return;
+    }
+
+    bool noChromePresent = filename.contains("no-chrome");
+    if (noChromePresent)
+    {
+        // no-chrome should override any other value
+        QVERIFY(option.value().chromeOptions.contains("no-chrome") && option.value().chromeOptions.count() == 1);
+        return;
+    }
+
+    if (filename.contains("backfw"))
+    {
+        QVERIFY(option.value().chromeOptions.contains("back-forward-buttons") && ! option.value().chromeOptions.contains("no-chrome"));
+    }
+
+    if (filename.contains("reload"))
+    {
+        QVERIFY(option.value().chromeOptions.contains("reload-button") && ! option.value().chromeOptions.contains("no-chrome"));
+    }
+}
+
 } // namespace {
 
 
@@ -54,7 +83,6 @@ ManifestParserTest::shouldManifestSucceed(const QString& filename)
 
 void ManifestParserTest::initTestCase()
 {
-//    qputenv("QML2_IMPORT_PATH", "../../../bin");
 }
 
 void ManifestParserTest::testParseManifest()
@@ -73,3 +101,20 @@ void ManifestParserTest::testParseManifest()
     }
 }
 
+void ManifestParserTest::testParseChromeOptions()
+{
+    UnityWebappsAppManifestParser parser;
+
+    QFileInfoList manifests = listManifests(manifestsDataPath);
+    Q_FOREACH(QFileInfo manifest, manifests)
+    {
+        QVERIFY(manifest.isFile());
+        ManifestFileInfoOption result =
+                parser.parse(manifest);
+
+        QString filename = manifest.fileName();
+        QVERIFY(result.isvalid() == shouldManifestSucceed(filename));
+
+        verifyChrome(filename, result);
+    }
+}

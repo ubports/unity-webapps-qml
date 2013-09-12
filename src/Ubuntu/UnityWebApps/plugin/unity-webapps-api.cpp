@@ -28,6 +28,7 @@
 
 #include <gio/gdesktopappinfo.h>
 
+#include "unity-webapps-icon-utils.h"
 #include "unity-webapps-desktop-infos.h"
 
 
@@ -47,6 +48,7 @@ UnityWebapps::UnityWebapps(QObject *parent)
     : QObject(parent)
     , _model(0)
     , _appInfos(0)
+    , _handleDesktopFileUpdates(true)
 {}
 
 UnityWebapps::~UnityWebapps()
@@ -62,6 +64,7 @@ void UnityWebapps::cleanup()
 
 void UnityWebapps::init(const QString& name,
                         const QString& url,
+                        bool isLocal,
                         const QVariant& args)
 {
     Q_UNUSED(name);
@@ -72,45 +75,61 @@ void UnityWebapps::init(const QString& name,
     if (QString(args.typeName()).compare("QVariantMap") != 0)
     {
         qDebug() << "Invalid init() parameter types: " << args.typeName();
-
         Q_EMIT initCompleted(false);
-
         return;
     }
+
+#define UNITY_WEBAPPS_IS_VALID(name,type) \
+    ( initArgs.contains(name) && initArgs.value(name).canConvert<type>() )
 
     QVariantMap initArgs =
         qvariant_cast<QVariantMap>(args);
-    if ( ! initArgs.contains("name") ||
-         ! initArgs.contains("domain") ||
-         ! initArgs.contains("iconUrl")
-         )
+    if ( ! UNITY_WEBAPPS_IS_VALID("name", QString))
     {
-        qDebug() << "Invalid init() parameter content (not found): name, domain and iconUrl are mandatory";
-
+        qDebug() << "Invalid init() parameter content (not found or invalid): name is mandatory";
         Q_EMIT initCompleted(false);
-
         return;
     }
-    if ( ! initArgs.value("name").canConvert<QString>() ||
-         ! initArgs.value("domain").canConvert<QString>() ||
-         ! initArgs.value("iconUrl").canConvert<QString>()
-         )
-    {
-        qDebug() << "Invalid init() parameter value types.";
-
-        Q_EMIT initCompleted(false);
-
-        return;
-    }
-
     QString displayName = initArgs.value("name").toString();
-    QString iconUrl = initArgs.value("iconUrl").toString();
-    QString domain = initArgs.value("domain").toString();
 
-    bool success = initInternal(name, displayName, domain, iconUrl, url);
+    QString iconUrl =
+            initArgs.contains("iconUrl")
+                && UNITY_WEBAPPS_IS_VALID("iconUrl",QString)
+            ? initArgs.value("iconUrl").toString() : "";
+    QString domain =
+            initArgs.contains("domain")
+                && UNITY_WEBAPPS_IS_VALID("domain",QString)
+            ? initArgs.value("domain").toString() : "";
 
+    if ( ! isLocal && (iconUrl.isEmpty() || domain.isEmpty()))
+    {
+        qDebug() << "Invalid init() parameter content "
+                    "(not found or invalid): domain and iconUrl are mandatory for nonlocal apps";
+        Q_EMIT initCompleted(false);
+        return;
+    }
+
+    QString desktopId;
+    if (qgetenv("APP_ID").isEmpty()) {
+        desktopId = getDesktopFilenameFor(displayName, domain);
+    }
+    else {
+        desktopId = qgetenv("APP_ID");
+    }
+
+    qDebug() << "UnityWebapps initialized with desktop id: " << desktopId;
+
+    bool success = initInternal(name,
+                                displayName,
+                                domain,
+                                iconUrl,
+                                url);
     if (success)
-        buildAppInfos(name, displayName, domain, getDesktopFilenameFor(displayName, domain));
+        buildAppInfos(name,
+                      displayName,
+                      domain,
+                      desktopId,
+                      iconUrl);
 
     Q_EMIT initCompleted(success);
 }
@@ -132,10 +151,22 @@ void UnityWebapps::setAppModel(UnityWebappsAppModel * model)
     _model = model;
 }
 
+bool UnityWebapps::isConfined() const
+{
+    //Cheap way to know if we work in a confined environment
+    //FIXME: think of a better way to handle desktop/phone specifics
+#if defined(Q_OS_LINUX) && ! defined(Q_PROCESSOR_X86)
+    return true;
+#else
+    return false;
+#endif
+}
+
 void UnityWebapps::buildAppInfos(const QString & name,
                                  const QString & displayName,
                                  const QString & domain,
-                                 const QString & desktopId)
+                                 const QString & desktopId,
+                                 const QString & iconName)
 {
     Q_UNUSED(domain);
 
@@ -149,7 +180,7 @@ void UnityWebapps::buildAppInfos(const QString & name,
     _appInfos->setAppName(name);
     _appInfos->setDisplayName(displayName);
     _appInfos->setDesktopId(desktopId);
-
+    _appInfos->setIconName(iconName);
     _appInfos->setModel(_model);
 
     Q_EMIT appInfosChanged(_appInfos);
@@ -174,6 +205,16 @@ bool UnityWebapps::initInternal(const QString& name,
     successful = ensureDesktopExists(displayName, domain, iconUrl);
 
     return successful;
+}
+
+bool UnityWebapps::handleDesktopFileUpdates() const
+{
+    return _handleDesktopFileUpdates;
+}
+
+void UnityWebapps::setHandleDesktopFileUpdates (bool handle)
+{
+    _handleDesktopFileUpdates = handle;
 }
 
 bool UnityWebapps::isValidInitForWebappAndModel (const QString & domain,
@@ -214,17 +255,29 @@ QString UnityWebapps::getUserSharePath()
     return home.absolutePath() + QDir::separator() + ".local/share";
 }
 
+QString UnityWebapps::getLocalDesktopFilepath(const QString & desktopId)
+{
+    return getUserSharePath()
+            + QDir::separator()
+            + "applications/"
+            + desktopId;
+}
+
 bool UnityWebapps::ensureDesktopExists(const QString& displayName,
                                        const QString& domain,
                                        const QString& iconName)
 {
-    QString desktopId =
-            QString("%1.desktop").arg(UnityWebappsQML::buildDesktopInfoFileForWebapp(displayName, domain));
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return true;
 
-    QDir localDesktopFile(getUserSharePath()
-                          + QDir::separator()
-                          + "applications/"
-                          + desktopId);
+    if ( ! handleDesktopFileUpdates())
+        return true;
+
+    QString desktopId = getDesktopFilenameFor(displayName, domain);
+
+    QDir localDesktopFile (getLocalDesktopFilepath (desktopId));
     if (localDesktopFile.exists())
     {
         return true;
@@ -232,32 +285,254 @@ bool UnityWebapps::ensureDesktopExists(const QString& displayName,
 
     GDesktopAppInfo *appinfo =
             g_desktop_app_info_new(desktopId.toLatin1());
+
     bool success = true;
     if ( ! appinfo)
     {
-        success = createDefaultDesktopFileFor(desktopId, displayName, domain, iconName);
+        success = createLocalDesktopFileFor(desktopId, displayName, domain, iconName);
     }
-
-//    g_object_unref(appinfo);
 
     return success;
 }
 
-bool UnityWebapps::createDefaultDesktopFileFor (const QString& desktopId,
-                                                const QString& webappName,
-                                                const QString& domain,
-                                                const QString& iconName)
+QString UnityWebapps::generateActionEntryFor(const QString& actionName,
+                                             const QString& name,
+                                             const QString& showIn,
+                                             const QString& exec)
 {
-    Q_UNUSED(domain);
+    return QString("[Desktop Action %1]\n"
+                   "Name=%2\n"
+                   "OnlyShowIn=%3\n"
+                   "Exec=%4\n\n")
+            .arg(actionName)
+            .arg(name)
+            .arg(showIn)
+            .arg(exec);
+}
 
-    bool success = false;
+QString UnityWebapps::getUrlLaunchExec(const QString & webappName,
+                                       const QString & url)
+{
+    return QString("webbrowser-app --webapp='%1' %2")
+            .arg(webappName.toUtf8().toBase64().data())
+            .arg(url);
+}
+
+QString UnityWebapps::generateActionsEntry(const QString & webappName)
+{
+    const size_t MAX_ACTIONS_INDEX = 9;
+
+    QString content;
+    Q_FOREACH(const QString& actionName, _actions.keys())
+    {
+        if (_actions[actionName].idx > MAX_ACTIONS_INDEX)
+            continue;
+
+        QStringList showIn;
+        QString exec;
+        if (_actions[actionName].type & STATIC_ACTION)
+        {
+            exec = getUrlLaunchExec(webappName, _actions[actionName].url);
+            showIn.append("Unity");
+        }
+        if (_actions[actionName].type & LAUNCHER_ACTION)
+        {
+            showIn.append("Unity");
+        }
+        if (_actions[actionName].type & INDICATOR_ACTION)
+        {
+            showIn.append("Messaging Menu");
+        }
+
+        content.append (generateActionEntryFor (QString("S%1").arg(_actions[actionName].idx),
+                                                actionName,
+                                                showIn.join(";"),
+                                                exec));
+    }
+    return content;
+}
+
+QMap<size_t, UnityWebapps::ActionInfos>
+UnityWebapps::collectActionIndexes()
+{
+    QMap<size_t, UnityWebapps::ActionInfos>
+            indexes;
+    Q_FOREACH(const QString& name, _actions.keys())
+    {
+        indexes[_actions[name].idx] = _actions[name];
+    }
+    return indexes;
+}
+
+int
+UnityWebapps::findNextAvailableActionIndex(const QMap<size_t, UnityWebapps::ActionInfos> & indexes)
+{
+    int idx = 1;
+    while (1) {
+        if ( ! indexes.contains(idx))
+            break;
+        idx++;
+    }
+    return idx;
+}
+
+QString UnityWebapps::addAction (const QString& name,
+                              UnityWebapps::ActionTypeFlags type,
+                              const QString& url)
+{
+    if (_actions.contains(name))
+    {
+        if ((_actions[name].type & type) && (0 == _actions[name].url.compare(url)))
+            return QString();
+
+        _actions[name].type |= type;
+        _actions[name].url = url;
+    }
+    else
+    {
+        _actions[name] = ActionInfos(name,
+                                     type,
+                                     findNextAvailableActionIndex(collectActionIndexes()),
+                                     url);
+    }
+
+    updateDesktopFileContent();
+
+    return QString("S%1").arg(_actions[name].idx);
+}
+
+QString UnityWebapps::addLauncherAction(const QString& name)
+{
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return QString();
+
+    return addAction(name, LAUNCHER_ACTION);
+}
+
+QString UnityWebapps::addIndicatorAction (const QString& name)
+{
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return QString();
+    return addAction(name, INDICATOR_ACTION);
+}
+
+QString UnityWebapps::addStaticAction (const QString& name, const QString& url)
+{
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return QString();
+    return addAction(name, STATIC_ACTION, url);
+}
+
+void UnityWebapps::removeLauncherAction(const QString& name)
+{
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return;
+    if (_actions.contains(name) && (_actions[name].type & LAUNCHER_ACTION))
+    {
+        _actions[name].type &= ~LAUNCHER_ACTION;
+
+        updateDesktopFileContent();
+    }
+}
+
+void UnityWebapps::removeLauncherActions()
+{
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return;
+
+    bool found = false;
+    Q_FOREACH(const QString & actionName, _actions.keys())
+    {
+        if (_actions[actionName].type & LAUNCHER_ACTION)
+        {
+            _actions[actionName].type &= ~LAUNCHER_ACTION;
+            found = true;
+        }
+    }
+    if (found)
+        updateDesktopFileContent();
+}
+
+QString UnityWebapps::getDesktopFileContent()
+{
+    if ( ! appInfos())
+        return QString();
+
+    QString webappName = appInfos()->displayName();
+    QString iconName = appInfos()->iconName();
+    QString desktopId = appInfos()->desktopId();
+
+    QString appId = QString(desktopId).replace(".desktop", "");
+    QString content = QString("[Desktop Entry]\n"
+                               "Name=%1\n"
+                               "Type=Application\n"
+                               "Icon=%2\n"
+                               "Actions=S1;S2;S3;S4;S5;S6;S7;S8;S9;S10;\n"
+                               "Exec=webbrowser-app --app-id='%4' --webapp='%5' %u\n\n"
+                               "%6")
+            .arg(webappName)
+            .arg(UnityWebappsQML::getIconPathFor(iconName))
+            .arg(appId)
+            .arg(QString(webappName.toUtf8().toBase64().data()))
+            .arg( ! webappName.isEmpty()
+                 ? generateActionsEntry(webappName)
+                 : QString(""));
+    return content;
+}
+
+void UnityWebapps::updateDesktopFileContent ()
+{
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return;
+
+    if ( ! handleDesktopFileUpdates())
+        return;
+
+    if ( ! appInfos() || appInfos()->desktopId().isEmpty())
+    {
+        qDebug() << "Cannot update local desktop file content";
+        return;
+    }
+
+    QString desktopFilePath =
+            QDir::cleanPath (getLocalDesktopFilepath (appInfos()->desktopId()));
+    QFile f(desktopFilePath);
+    if ( ! f.open(QIODevice::WriteOnly))
+    {
+        qWarning() << "Could not create/access desktop file: " << desktopFilePath;
+        return;
+    }
+
+    f.write(getDesktopFileContent().toUtf8());
+    f.close();
+}
+
+void UnityWebapps::ensureLocalApplicationsPathExists()
+{
+    // we bail out earlier (until we can do it w/ a builtin func) when
+    // in a confined environment.
+    if (isConfined ())
+        return;
 
     QString shareDirPath (getUserSharePath());
     if (shareDirPath.isEmpty())
     {
         qDebug() << "Error while trying to get current session home directory";
-        return success;
+        return;
     }
+
     shareDirPath += QDir::separator() + QString("applications/");
 
     // Create the directory if it doesn't exist
@@ -266,35 +541,29 @@ bool UnityWebapps::createDefaultDesktopFileFor (const QString& desktopId,
     {
         shareDir.mkpath(".");
     }
+}
 
-    QString desktopFilePath = QDir::cleanPath(shareDirPath + desktopId);
+bool UnityWebapps::createLocalDesktopFileFor (const QString& desktopId,
+                                              const QString& webappName,
+                                              const QString& domain,
+                                              const QString& iconName)
+{
+    Q_UNUSED(domain);
+    Q_UNUSED(webappName);
+    Q_UNUSED(iconName);
 
-    // Should not happen
-    if (QFile::exists(desktopFilePath))
-    {
-        qDebug() << "Desktop file found when it should not be there: " << desktopFilePath;
-        return true;
-    }
+    bool success = false;
 
-    //FIXME: encore webappName
-    QString contents = QString("[Desktop Entry]\n"
-                               "Name=%1\n"
-                               "Type=Application\n"
-                               "Icon=%2\n"
-                               "Actions=S0;S1;S2;S3;S4;S5;S6;S7;S8;S9;S10;\n"
-                               "Exec=webbrowser-app --chromeless --fullscreen --appid --webapp='%3' %u")
-            .arg(webappName)
-            .arg(iconName)
-            .arg(QString(QUrl::toPercentEncoding(webappName)));
+    ensureLocalApplicationsPathExists();
 
+    QString desktopFilePath = QDir::cleanPath(getLocalDesktopFilepath(desktopId));
     QFile f(desktopFilePath);
     if ( ! f.open(QIODevice::WriteOnly))
     {
         qCritical() << "Could not create desktop file: " << desktopFilePath;
         return success;
     }
-
-    f.write(contents.toUtf8());
+    f.write(getDesktopFileContent().toUtf8());
     f.close();
 
     success = true;

@@ -49,6 +49,11 @@
   If the WebApp whose name is specified as part of the "name" property is found in the
   specified model, its scripts (along with their dependancies) will be injected.
   Otherwise only the API will be made available.
+
+  The \l searchPath property can be use to alter the path where the model searches
+  for installed webapps. The default search path is set to /usr/share/unity-webapps.
+  The \l searchPath property should only be set to valid (existing and readable)
+  paths, all other "values" are ignored.
 */
 
 
@@ -110,7 +115,25 @@ void UnityWebappsAppModel::setDoSearchHomeFolder (bool searchLocalHome)
 
 void UnityWebappsAppModel::setSearchPath(const QString& path)
 {
-    _searchPath = doCorrectSearchPath(path);
+    if (_searchPath.compare(path, Qt::CaseInsensitive) == 0)
+        return;
+
+    if (path.isEmpty())
+    {
+        qDebug() << "Empty path in webapps model search path update request";
+        return;
+    }
+
+    QDir searchDir(path);
+    searchDir.makeAbsolute();
+    if (! searchDir.exists() || ! searchDir.isReadable())
+    {
+        qDebug() << "Invalid path in webapps "
+                    "model search path update request: " << path;
+        return;
+    }
+
+    _searchPath = doCorrectSearchPath(searchDir.path());
 
     qDebug() << "Using '"
              << _searchPath
@@ -278,6 +301,22 @@ UnityWebappsAppModel::loadUserScript(const QDir& userscriptPath,
     return script;
 }
 
+QStringList
+UnityWebappsAppModel::getChromeOptionsFor(const QString & webappName) const
+{
+    if (!exists(webappName))
+        return QStringList();
+
+    int idx = getWebappIndex(webappName);
+    if (Q_UNLIKELY(idx == -1))
+    {
+        qDebug() << "Invalid index for a supposedly existing webapp: " << webappName;
+        return QStringList();
+    }
+
+    return data(idx, Chrome).toStringList();
+}
+
 QString UnityWebappsAppModel::getDomainFor(const QString & webappName) const
 {
     //FIXME: very inefficient
@@ -432,6 +471,9 @@ QVariant UnityWebappsAppModel::data(int row, int role) const
 
     case Urls:
         return webapp.data.manifest.includes;
+
+    case Chrome:
+        return webapp.data.manifest.chromeOptions;
 
     case Scripts:
         {

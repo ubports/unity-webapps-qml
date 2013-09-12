@@ -43,7 +43,7 @@ class UnityWebappsAppModel : public QAbstractListModel
     Q_PROPERTY(bool doSearchHomeFolder READ doSearchHomeFolder WRITE setDoSearchHomeFolder)
 
     Q_ENUMS(WebAppsRoles)
-    
+
 
 public:
 
@@ -56,7 +56,8 @@ public:
         Urls,
         Homepage,
         Scripts,
-        ScriptsContent
+        ScriptsContent,
+        Chrome
     };
 
     // QAbstractListModel implementation
@@ -94,6 +95,11 @@ public:
      */
     Q_INVOKABLE QString getDomainFor(const QString & webappName) const;
 
+
+    /*!
+     * \brief
+     */
+    Q_INVOKABLE QStringList getChromeOptionsFor(const QString & webappName) const;
 
     /*!
      * \brief

@@ -1,0 +1,14 @@
+{
+    "includes": ["http://www.bbc.co.uk/news/", "http://www.bbc.com/news/"],
+    "requires": ["utils.js"],
+    "name": "BBCNews",
+    "scripts": ["BBCNews.user.js"],
+    "maintainer": "Webapps Team <webapps@lists.launchpad.net>",
+    "manifest-version": "1.0",
+    "integration-version": "2.3",
+    "package-name": "BBCNews",
+    "icons": {"128":"128/unity-webapps-bbc.png"},
+    "domain":"bbc.co.uk",
+    "homepage":"http://www.bbc.co.uk/news/",
+    "license":"GPL-3"
+}

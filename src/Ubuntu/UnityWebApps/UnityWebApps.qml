@@ -380,9 +380,7 @@ Item {
 
         return {
             init: function (params) {
-
                 if (! isValidInitCall(params)) {
-                    console.debug('Invalid init call');
                     return;
                 }
 
@@ -412,18 +410,16 @@ Item {
                             base.initCompleted.disconnect(onInitCompleted);
                             if (success) {
                                 initialized = true;
-
-                                console.debug(JSON.stringify(params));
-
                                 callOnInitScriptFunc();
                             }
                         };
 
                         base.initCompleted.connect(onInitCompleted);
 
+                        var isLocal = params.__unity_webapps_hidden && params.__unity_webapps_hidden.local;
                         var url = params.__unity_webapps_hidden && params.__unity_webapps_hidden.url
                                 ? params.__unity_webapps_hidden.url : "";
-                        base.init(webappName, url, params);
+                        base.init(webappName, url, isLocal, params);
                     });
                 }
                 else {
@@ -497,7 +493,11 @@ Item {
                     UnityBackends.get("messaging").clearIndicators();
                 },
                 addAction: function (name, onActionInvoked) {
-                    console.debug('MessagingIndicator.addAction not implemented yet');
+                    if (!initialized)
+                        return;
+
+                    var id = UnityBackends.get("base").addIndicatorAction(name);
+                    UnityBackends.get("indicator-actions").addAction(name, onActionInvoked, id);
                 },
             },
 
@@ -596,23 +596,52 @@ Item {
 
                     UnityBackends.get("launcher").setUrgent();
                 },
+                addStaticAction: function (name, url) {
+                    if (!initialized)
+                        return;
+
+                    if (this.__actionNames[name])
+                        this.removeAction(name);
+                    var id = UnityBackends.get("base").addStaticAction(name, url);
+                    this.__actionNames[name] = id;
+                },
                 addAction: function (name, ontriggered) {
                     if (!initialized)
                         return;
 
-                    UnityBackends.get("launcher").addAction(name, ontriggered);
+                    if (this.__actionNames[name])
+                        this.removeAction(name);
+
+                    var id = UnityBackends.get("base").addLauncherAction(name);
+                    UnityBackends.get("indicator-actions").addAction(name,
+                                                                     function () {
+                                                                         console.debug(name + " triggered");
+                                                                         ontriggered();
+                                                                     },
+                                                                     id);
+                    this.__actionNames[name] = id;
                 },
                 removeAction: function (name) {
                     if (!initialized)
                         return;
 
-                    UnityBackends.get("launcher").removeAction(name);
+                    if ( ! (name in this.__actionNames))
+                        return;
+
+                    UnityBackends.get("base").removeLauncherAction(name, this.__actionNames[name]);
+                    UnityBackends.get("indicator-actions").clearAction(name);
+
+                    delete this.__actionNames[name];
                 },
                 removeActions: function () {
                     if (!initialized)
                         return;
 
-                    UnityBackends.get("launcher").removeActions();
+                    UnityBackends.get("base").removeLauncherActions();
+                    for (var name in this.__actionNames)
+                    {
+                        this.removeActions(name);
+                    }
                 },
                 __get: function (prop, callback) {
                     if (!initialized)
@@ -624,7 +653,8 @@ Item {
                     else if (prop === "count") {
                         callback(UnityBackends.get("launcher").getCount());
                     }
-                }
+                },
+                __actionNames: {}
             }
         };
     }

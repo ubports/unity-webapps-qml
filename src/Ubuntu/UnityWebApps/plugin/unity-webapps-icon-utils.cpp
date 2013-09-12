@@ -16,21 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "callback.h"
+#include <QString>
+#include <QChar>
 
-#include <QJsonValue>
-#include <QDebug>
-#include <QFile>
+#include "unity-webapps-icon-utils.h"
 
 
-UnityWebappsCallback::UnityWebappsCallback(QObject *parent)
-    : QObject(parent)
-{}
-
-UnityWebappsCallback::~UnityWebappsCallback()
-{}
-
-void UnityWebappsCallback::trigger (QVariant user_data)
+QString
+UnityWebappsQML::getIconPathFor (const QString& iconURI)
 {
-    Q_EMIT triggered(user_data);
+    static const QString ICON_URI_SCHEME = "icon://";
+    if (iconURI.startsWith (ICON_URI_SCHEME))
+    {
+        return iconURI.right(iconURI.count() - ICON_URI_SCHEME.count());
+    }
+    return QString();
 }
+

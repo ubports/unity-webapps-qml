@@ -6,6 +6,9 @@ CONFIG += \
     debug \
     link_pkgconfig
 
+PKGCONFIG += glib-2.0 \
+        gio-2.0
+
 QT += \
     core \
     qml \

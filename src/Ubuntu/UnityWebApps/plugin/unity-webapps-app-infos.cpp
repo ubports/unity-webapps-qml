@@ -67,6 +67,20 @@ QString UnityWebappsAppInfos::desktopId() const
     return _desktopId;
 }
 
+void UnityWebappsAppInfos::setIconName(const QString& name)
+{
+    if (0 == _iconName.compare(name))
+        return;
+
+    _iconName = name;
+    Q_EMIT iconNameChanged(name);
+}
+
+QString UnityWebappsAppInfos::iconName() const
+{
+    return _iconName;
+}
+
 UnityWebappsAppModel* UnityWebappsAppInfos::model() const
 {
     return _model;
