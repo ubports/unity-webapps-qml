@@ -19,12 +19,20 @@
 .pragma library
 
 //
-// \brief For a given list of objects returns a function that validates the presence and validity of the
-//  specified properties.
+// \brief Creates a simple proxy object that bridges a UnityWebapps component with a given webview.
 //
-// \param props list of object properties to validate. Each property is an object w/ a 'name' and 'type' (as in typeof()).
+// The UnityWebApps component does not reach out directly to a webview but expects something that
+//  provides a simple interface of needed methods/functions. For the regular case though (binding
+//  to an existing webview) writing the interface manually is tedious, so this tool does it and creates
+//  the bridging object to a webview.
 //
-function makeProxiesForQtWebViewBindee(webViewId) {
+// \param webViewId
+// \param handlers (optional) map of handlers for UnityWebApps events to the external world, supported events:
+//                  {
+//                      onAppRaised: function () {}
+//                  }
+//
+function makeProxiesForQtWebViewBindee(webViewId, handlers) {
 
     function SignalConnectionDisposer() {
         this._signalConnectionDisposers = [];
@@ -43,6 +51,8 @@ function makeProxiesForQtWebViewBindee(webViewId) {
     };
 
     return (function (disposer) {
+
+        var _appRaisedHandlers = [];
 
         var makeSignalDisconnecter = function(sig, callback) {
             return function () {
@@ -85,6 +95,12 @@ function makeProxiesForQtWebViewBindee(webViewId) {
 
                 disposer.addDisposer(makeSignalDisconnecter(webViewId.experimental.messageReceived, handler));
             },
+            // called from the UnityWebApps side
+            onAppRaised: function () {
+                if (handlers && handlers.onAppRaised)
+                    handlers.onAppRaised();
+            },
+            // called from the UnityWebApps side
             cleanup: function() {
                 disposer.disposeAndCleanupAll();
             }

@@ -151,7 +151,7 @@ TestCase {
                     messageReceivedConnected();
 
                     connectedSlots.push({'target': mockedWebView.messageReceived, 'slot': onMessageReceived});
-                }
+                },
             };
         }
 

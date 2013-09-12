@@ -51,10 +51,14 @@ public:
     void componentComplete();
 
 
-
 public Q_SLOTS:
 
     void onAppInfosChanged(UnityWebappsAppInfos *appInfos);
+
+
+Q_SIGNALS:
+
+    void raised();
 
 
 private:
