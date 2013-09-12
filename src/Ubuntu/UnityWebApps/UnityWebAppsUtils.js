@@ -32,7 +32,9 @@
 //                      onAppRaised: function () {}
 //                  }
 //
-function makeProxiesForQtWebViewBindee(webViewId, handlers) {
+function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
+
+    var handlers = eventHandlers && typeof(eventHandlers) === 'object' ? eventHandlers : {};
 
     function SignalConnectionDisposer() {
         this._signalConnectionDisposers = [];

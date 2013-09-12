@@ -306,7 +306,6 @@ void UnityWebappsMessagingMenu::setProperty(const QString& indicatorName,
             qDebug() << "Invalid callback type: no trigger method";
             return;
         }
-        qDebug() << "callback set";
         d->_callback = callback;
     }
     else if (propertyName.compare("label", Qt::CaseInsensitive) == 0)
