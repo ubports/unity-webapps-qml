@@ -399,7 +399,7 @@ Item {
                     UnityBackends.clearAll();
                     UnityBackends.createAllWithAsync(webapps,
                                                      {name: webappName, displayName: params.name},
-                                                     bindee);
+                                                     internal.instance ? internal.instance.proxies() : null);
 
                     UnityBackends.signalOnBackendReady("base", function () {
 
