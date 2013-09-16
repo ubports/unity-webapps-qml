@@ -35,7 +35,6 @@
 function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
 
     var handlers = eventHandlers && typeof(eventHandlers) === 'object' ? eventHandlers : {};
-
     function SignalConnectionDisposer() {
         this._signalConnectionDisposers = [];
     }
@@ -53,8 +52,6 @@ function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
     };
 
     return (function (disposer) {
-
-        var _appRaisedHandlers = [];
 
         var makeSignalDisconnecter = function(sig, callback) {
             return function () {

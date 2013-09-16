@@ -52,6 +52,10 @@ var UnityWebApps = (function () {
                 this._bindeeProxies.cleanup();
         },
 
+        proxies: function() {
+            return this._bindeeProxies;
+        },
+
         _bind: function () {
             var self = this;
 
