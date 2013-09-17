@@ -1,3 +1,20 @@
+unity-webapps-qml (0.1+13.10.20130917.1-0ubuntu1) saucy; urgency=low
+
+  [ Alexandre Abreu ]
+  * Make sure that the qmllauncher desktop file is not discoverable thru
+    the dash. (LP: #1222956)
+  * Fix webapps search path set in the model instead of allowing all
+    paths to be set. Improve the documentation in this regard.
+  * Remove uneeded build dependency on qt5multimedia-plugin. (LP:
+    #1206268)
+  * fix application raising.
+  * small raise fix.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 61
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 17 Sep 2013 22:04:15 +0000
+
 unity-webapps-qml (0.1+13.10.20130907-0ubuntu1) saucy; urgency=low
 
   [ Alexandre Abreu ]
