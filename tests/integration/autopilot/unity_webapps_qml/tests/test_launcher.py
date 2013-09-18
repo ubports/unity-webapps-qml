@@ -11,6 +11,9 @@ import time
 from gi.repository import Unity, GObject
 
 from testtools.matchers import Equals, GreaterThan, NotEquals
+from testtools import skipUnless
+
+from autopilot import platform
 from autopilot.matchers import Eventually
 
 from unity.emulators.icons import HudLauncherIcon
@@ -32,6 +35,7 @@ class UnityWebappsLauncherTestCase(UnityWebappsTestCaseBase):
         ensure_unity_is_running()
         self.launch_with_html_filepath(self.get_html_test_file())
 
+    @skipUnless(platform.model() == 'Desktop', "Only runs on the Desktop")
     def test_checkCounts(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('launcher-updated')))
 
@@ -54,6 +58,7 @@ class UnityWebappsLauncherTestCase(UnityWebappsTestCaseBase):
 
         # self.assertThat(launcher.get_property('progress'), Equals(0.09375))
 
+    @skipUnless(platform.model() == 'Desktop', "Only runs on the Desktop")
     def test_checkProgress(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('launcher-updated')))
 

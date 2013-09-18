@@ -11,6 +11,9 @@ import time
 from gi.repository import Unity, GObject
 
 from testtools.matchers import Equals, GreaterThan, NotEquals
+from testtools import skipUnless
+
+from autopilot import platform
 from autopilot.matchers import Eventually
 
 from unity.emulators import ensure_unity_is_running
@@ -32,6 +35,7 @@ class UnityWebappsMediaplayerTestCase(UnityWebappsTestCaseBase):
         ensure_unity_is_running()
         self.launch_with_html_filepath(self.get_html_test_file())
 
+    @skipUnless(platform.model() == 'Desktop', "Only runs on the Desktop")
     def test_checkInitialSetTrack(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('mediaplayer-updated')))
 
@@ -49,6 +53,7 @@ class UnityWebappsMediaplayerTestCase(UnityWebappsTestCaseBase):
 
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('TXlBcnRpc3Q=;TXlUaXRsZQ==;TXlBbGJ1bQ==')))
 
+    @skipUnless(platform.model() == 'Desktop', "Only runs on the Desktop")
     def test_checkInitialSetCanGoNext(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('mediaplayer-updated')))
 
@@ -66,6 +71,7 @@ class UnityWebappsMediaplayerTestCase(UnityWebappsTestCaseBase):
 
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('true')))
 
+    @skipUnless(platform.model() == 'Desktop', "Only runs on the Desktop")
     def test_checkInitialSetCanGoPrevious(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('mediaplayer-updated')))
 
@@ -83,6 +89,7 @@ class UnityWebappsMediaplayerTestCase(UnityWebappsTestCaseBase):
 
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('true')))
 
+    @skipUnless(platform.model() == 'Desktop', "Only runs on the Desktop")
     def test_checkInitialSetCanPlay(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('mediaplayer-updated')))
 
