@@ -478,10 +478,12 @@ QString UnityWebapps::getDesktopFileContent()
                                "Type=Application\n"
                                "Icon=%2\n"
                                "Actions=S1;S2;S3;S4;S5;S6;S7;S8;S9;S10;\n"
-                               "Exec=webbrowser-app --app-id='%4' --webapp='%5' %u\n\n"
+                               "StartupWMClass=%3\n"
+                               "Exec=webbrowser-app --app-id='%4' --webapp='%5' --maximized --enable-back-forward %u\n\n"
                                "%6")
             .arg(webappName)
             .arg(UnityWebappsQML::getIconPathFor(iconName))
+            .arg(appId)
             .arg(appId)
             .arg(QString(webappName.toUtf8().toBase64().data()))
             .arg( ! webappName.isEmpty()
