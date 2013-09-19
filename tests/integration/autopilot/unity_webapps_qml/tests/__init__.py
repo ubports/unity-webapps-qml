@@ -15,7 +15,6 @@ import json
 
 from testtools.matchers import Contains, Equals, GreaterThan
 from autopilot.matchers import Eventually
-from autopilot.input import Mouse, Touch, Pointer
 
 from unity.emulators.unity import Unity
 
@@ -67,7 +66,6 @@ class UnityWebappsTestCaseBase(UnityTestCase):
         self.watcher = self.webviewContainer.watch_signal('resultUpdated(QString)')
 
     def setUp(self):
-        self.pointer = Pointer(Mouse.create())
         super(UnityWebappsTestCaseBase, self).setUp()
 
     def tearDown(self):
