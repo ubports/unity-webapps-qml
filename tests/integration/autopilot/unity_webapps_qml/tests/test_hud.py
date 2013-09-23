@@ -11,6 +11,8 @@ import time
 from testtools.matchers import Equals, GreaterThan, NotEquals
 from autopilot.matchers import Eventually
 
+from autopilot import platform
+
 from unity.emulators.icons import HudLauncherIcon
 from unity.emulators import ensure_unity_is_running
 
@@ -27,7 +29,9 @@ class UnityWebappsHudTestCase(UnityWebappsTestCaseBase):
 
     def setUp(self):
         super(UnityWebappsHudTestCase, self).setUp()
-        ensure_unity_is_running()
+        # On Touch the dbus unity if does is not exposed
+        if platform.model() == 'Desktop':
+            ensure_unity_is_running()
         self.launch_with_html_filepath(self.get_html_test_file())
 
     def test_addAction(self):
