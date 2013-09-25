@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+13.10.20130924.4-0ubuntu1) saucy; urgency=low
+
+  [ Alexandre Abreu ]
+  * ensure_unity_is_running should not be used on touch. (LP: #1228208)
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 67
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 24 Sep 2013 22:03:45 +0000
+
 unity-webapps-qml (0.1+13.10.20130919.4-0ubuntu1) saucy; urgency=low
 
   [ Alexandre Abreu ]
