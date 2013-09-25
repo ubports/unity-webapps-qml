@@ -114,7 +114,7 @@ void UnityWebapps::init(const QString& name,
         desktopId = getDesktopFilenameFor(displayName, domain);
     }
     else {
-        desktopId = qgetenv("APP_ID");
+        desktopId = QString("%1.desktop").arg(QString(qgetenv("APP_ID")));
     }
 
     qDebug() << "UnityWebapps initialized with desktop id: " << desktopId;
