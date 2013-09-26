@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+13.10.20130926.1-0ubuntu1) saucy; urgency=low
+
+  [ Alexandre Abreu ]
+  * Fix desktop id for containers w/ APP_ID. (LP: #1230376)
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 69
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 26 Sep 2013 18:03:50 +0000
+
 unity-webapps-qml (0.1+13.10.20130924.4-0ubuntu1) saucy; urgency=low
 
   [ Alexandre Abreu ]
