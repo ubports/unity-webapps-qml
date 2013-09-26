@@ -61,6 +61,7 @@ Architecture: all
 Depends: dpkg-dev,
          libautopilot-qt,
          libqt5test5,
+         python-gobject,
          qmlscene,
          qtdeclarative5-unity-action-plugin,
          qtdeclarative5-window-plugin,
