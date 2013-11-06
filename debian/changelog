@@ -1,3 +1,10 @@
+unity-webapps-qml (0.1+14.04.20131106-0ubuntu1) trusty; urgency=low
+
+  * New rebuild forced
+  * Automatic snapshot from revision 72
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 06 Nov 2013 14:26:02 +0000
+
 unity-webapps-qml (0.1+13.10.20130926.2-0ubuntu1) saucy; urgency=low
 
   [ Alexandre Abreu ]
