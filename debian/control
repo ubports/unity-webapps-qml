@@ -7,7 +7,8 @@ Build-Depends: debhelper (>= 9),
                libmessaging-menu-dev,
                libnotify-dev,
                libqt5webkit5-dev,
-	       libunity-action-qt1-dev,
+               libunity-action-qt1-dev,
+               libunity-dev,
                pkg-config,
                python (>= 2.7),
                python-setuptools,
@@ -16,19 +17,19 @@ Build-Depends: debhelper (>= 9),
                qtbase5-dev,
                qtdeclarative5-dev,
                qtdeclarative5-test-plugin,
-	       libunity-dev,
 Standards-Version: 3.9.4
 Homepage: https://launchpad.net/unity-webapp-qml
-# If you aren't a member of ~webapps but need to upload packaging changes,
-# just go ahead.  ~webapps will notice and sync up the code again.
-Vcs-Bzr: https://code.launchpad.net/~webapps/unity-webapps-qml/trunk
+# if you don't have have commit access to this branch but would like to upload
+# directly to Ubuntu, don't worry: your changes will be merged back into the
+# upstream branch
+Vcs-Bzr: lp:unity-webapps-qml
 
 Package: unity-webapps-qml
 Architecture: any
 Multi-Arch: same
 Depends: libqt5webkit5-qmlwebkitplugin,
-         qtdeclarative5-unity-action-plugin,
          qtdeclarative5-qtquick2-plugin,
+         qtdeclarative5-unity-action-plugin,
          ${misc:Depends},
          ${shlibs:Depends},
 Description: Unity Webapps QML component
@@ -38,8 +39,8 @@ Description: Unity Webapps QML component
 Package: unity-webapps-qml-examples
 Section: libs
 Architecture: any
-Depends: unity-webapps-qml (>= ${binary:Version}),
-         qtdeclarative5-window-plugin,
+Depends: qtdeclarative5-window-plugin,
+         unity-webapps-qml (>= ${binary:Version}),
          ${misc:Depends},
          ${shlibs:Depends},
 Description: Example usage of Unity Webapps QML component
@@ -61,6 +62,7 @@ Architecture: all
 Depends: dpkg-dev,
          libautopilot-qt,
          libqt5test5,
+         python-autopilot,
          python-gobject,
          qmlscene,
          qtdeclarative5-unity-action-plugin,
