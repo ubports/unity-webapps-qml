@@ -1,13 +1,13 @@
 /*
  * Copyright 2013 Canonical Ltd.
  *
- * This file is part of UnityWebappsQML.
+ * This file is part of unity-webapps-qml.
  *
- * UnityWebappsQML is free software; you can redistribute it and/or modify
+ * unity-webapps-qml is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; version 3.
  *
- * UnityWebappsQML is distributed in the hope that it will be useful,
+ * unity-webapps-qml is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -22,485 +22,274 @@
         return;
     }
 
-    //@include UnityWebAppsUtils.js
-
-    var callbackManager = makeCallbackManager();
-
-    //TODO(AAU) extract to a given backend
-    // Mostly handle callback atm
-    navigator.qt.onmessage = function (event) {
-        var message = JSON.parse(event.data);
-        if (!isUnityWebappsCallbackCall(message))
-            return;
-        var cbfunc = callbackManager.get(message.id);
-        //TODO: this should even happen in the first place
-        if (!cbfunc || !(cbfunc instanceof Function))
-            return;
-        cbfunc(message.args);
-    }
-
-    //
     // Acknowledge that the API has been fully injected
     var sendApiCreatedAcknowledgeEvent = function () {
-      var e = document.createEvent ("Events");
-      e.initEvent ("ubuntu-webapps-api-ready", false, false);
-      document.dispatchEvent (e);
+        var e = document.createEvent ("Events");
+        e.initEvent ("ubuntu-webapps-api-ready", false, false);
+        document.dispatchEvent (e);
     };
 
-    //
-    // Handles an API call, wraps all the data (callbacks etc.)
-    // and dispatches to 'backend'
-    // TODO should be split between backend & args related stuff
-    function sendToWebview(type, data) {
-        var callback = null;
+    //@include UnityWebAppsUtils.js
+    //@include ./bindings/alarm-api/client/alarm-api.js
+    //@include ./bindings/content-hub/client/content-hub.js
+    //@include ./bindings/online-accounts/client/online-accounts.js
+    //@include ./common/js/unity-binding-proxy.js
+    //@include ./common/js/unity-binding-bridge.js
 
-        function __transformToIdIfNecessary(obj) {
-            var ret = obj;
-            if (obj instanceof Function) {
-              var id = callbackManager.store(obj);
-              ret = {callbackid: id};
-            }
-            return ret;
-        }
-
-        // map function callback (not serializable to a different world)
-        //  to ids
-        function __transformCallbacksToIds (obj) {
-            if ( ! isIterableObject(obj)) {
-                return __transformToIdIfNecessary (obj);
-            }
-            var ret = (obj instanceof Array) ? [] : {};
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    if (obj[key] instanceof Function) {
-                        var id = callbackManager.store(obj[key]);
-                        ret[key] = {callbackid: id};
-                    }
-                    else if (isIterableObject (obj[key])) {
-                        ret[key] = __transformCallbacksToIds (obj[key]);
-                    }
-                    else {
-                        ret[key] = obj[key];
-                    }
-                }
-            } // for (var key
-            return ret;
-        };
-        var serialized_args = JSON.stringify (
-            data.map (
-                function (datum) {
-                    var d = __transformCallbacksToIds (datum);
-                    return d;
-                }
-            )
-        );
-        //TODO: use utils for arg formatting
-        navigator.qt.postMessage(JSON.stringify({target: "unity-webapps-call", name: type, args: serialized_args}));
-    }
-
-
-    // TODO to be extracted
     var apiBuilder = function(backend) {
-      var dummy = true;
 
-      function checkString(str, allowUndef) {
-        if (allowUndef && str == undefined) {
-          return;
-            }
-        if (!str || typeof(str) !== 'string') {
-          throw new TypeError("incorrect argument");
-        }
-      }
+        //@include ./common/js/api-sanitizer.js
 
-      var findName = function (func, prefix, obj) {
+        var api = {
+            init: function(props) {
+                checkString(props.name, false);
+                checkString(props.iconUrl, true);
+                checkString(props.domain, true);
+                checkString(props.login, true);
+                checkString(props.mimeTypes, true);
+                checkString(props.homepage, true);
 
-        if (!prefix) {
-          return findName(func, 'Unity.', api);
-        }
-        var keys = Object.keys(obj);
-        for (var i = 0; i < keys.length; i++) {
-          if (typeof(keys[i]) !== 'string') {
-            continue;
-          }
-          var descr = Object.getOwnPropertyDescriptor(obj, keys[i]);
-          if (descr.value === func) {
-            return prefix + keys[i];
-          }
-          if (descr.value instanceof Object) {
-            var res = findName(func, prefix + keys[i] + '.', obj[keys[i]]);
-            if (res)
-              return res;
-          }
-          if (obj.__lookupGetter__(keys[i]) === func) {
-            return prefix + keys[i];
-          }
-          if (obj.__lookupSetter__(keys[i]) === func) {
-            return prefix + keys[i];
-          }
-        }
-        return null;
-
-      };
-
-
-      var stringify = function (obj) {
-
-        if (obj === undefined)
-          return obj;
-        if (obj === null)
-          return obj;
-        if (typeof(obj) == 'string')
-          return obj;
-        if (typeof(obj) == 'number')
-          return obj;
-        if (typeof(obj) == 'function')
-          return String(obj);
-        var dump = {};
-        for (var i in obj) {
-          if (obj.hasOwnProperty(i))
-            dump[i] = stringify(obj[i]);
-        }
-        return dump;
-
-      };
-
-
-      var stringifyArgs = function (obj) {
-
-        var args = [];
-        for (var i = 0; i < obj.length; i++) {
-          args.push(stringify(obj[i]));
-        }
-        var res = JSON.stringify(args);
-        return res.substr(1, res.length - 2);
-      };
-
-      var createArgumentsSanitaizer = function (func, argsDesc, callback) {
-
-        return function () {
-          var realArgs = arguments;
-          var name = findName(arguments.callee);
-
-          var k = 0;
-          function argumentSanitaizer(desc, arg) {
-            if (!desc) {
-              throw new InternalError("argument description is null");
-            }
-            if (desc.dummy) {
-              k--;
-              return null;
-            }
-            if (desc.array) {
-              if (!(desc.array instanceof Object) || !(desc.array.element instanceof Object)) {
-                throw new InternalError("invalid argument description");
-              }
-
-              try {
-                for (var j = 0; j < arg.length; j++) {
-                  argumentSanitaizer(desc.array.element, arg[j]);
-                }
-              } catch (x) {
-                throw new TypeError("incorrect argument");
-              }
-
-              return arg;
-            }
-            if (desc.obj) {
-              if (!(desc.obj instanceof Object)) {
-                throw new InternalError("invalid argument description");
-              }
-              var res = {}, i;
-              for (i in desc.obj) {
-                if (desc.obj.hasOwnProperty(i)) {
-                  res[i] = argumentSanitaizer(desc.obj[i], arg[i]);
-                }
-              }
-              return res;
-            }
-            if (desc.str) {
-              if (desc.allowNull && !arg) {
-                return null;
-              }
-              checkString(arg, false);
-              return arg;
-            }
-            if (desc.number) {
-              if (typeof(arg) !== 'number' && typeof(arg) !== 'boolean')
-                throw new TypeError("incorrect argument");
-              return arg;
-            }
-            if (!desc.type) {
-              throw new InternalError("argument description miss required parameter");
-            }
-            if ((arg instanceof desc.type) || (desc.type === Function && ((typeof arg) === 'function'))
-                || (arg === null && desc.allowNull)) {
-              if (desc.type === Function) {
-                if (!arg) {
-                  return null;
+                if (props.homepage && !/^(http|https|file):\/\//.test(props.homepage)) {
+                    throw new TypeError("incorrect argument");
                 }
 
-                var id;
-                if (desc.argAsCallbackId !== undefined) {
-                  id = realArgs[desc.argAsCallbackId];
-                }
-                return function (user_data) { arg(user_data); };
-              }
-              return arg;
-            } else {
-              throw new TypeError("incorrect argument");
+                if (window.location.protocol !== 'file:')
+                    props.__unity_webapps_hidden = {
+                        hostname: window.location.hostname,
+                        url: window.location.href
+                    };
+                else
+                    props.__unity_webapps_hidden = {local: true};
+
+                backend.call("init", [props]);
             }
-            throw new InternalError("unreacheable");
-          }
-          var args = [], i;
-          for (i = 0; i < argsDesc.length; i++) {
-            if (k >= realArgs.length && k > 0 && !argsDesc[i].dummy) {
-              throw new Error("not enough arguments");
-            }
+            ,
 
-            var value = argumentSanitaizer(argsDesc[i], realArgs[k]);
-            k++;
+            /**
+             *
+             * @method acceptData
+             * @param mimeType {String}
+             * @param callback {Function}
+             */
+            acceptData: createArgumentsSanitizer ([{ array: { element: { str: true } } }, { type: Function, js: true }],
+                                                 'acceptData');
+            ,
+            /**
+             *
+             * @param name {String}
+             * @param callback {Function}
+             */
+            addAction: createArgumentsSanitizer ([{ str: true }, { type: Function, argAsCallbackId: 0 }]
+                                                , 'addAction')
 
-            if (argsDesc[i].obj) {
-              args = args.concat(value);
-            } else {
-              args.push(value);
-            }
-          }
+            ,
+            /**
+             *
+             * @param name {String}
+             */
+            clearAction: createArgumentsSanitizer ([{ str: true }], 'clearAction')
 
-          if (k < realArgs.length) {
-            throw new Error("too much arguments");
-          }
+            ,
+            /**
+             *
+             */
+            clearActions: createArgumentsSanitizer ([], 'clearActions')
+            ,
 
-          if (callback)
-            callback.apply(null, args);
+            /**
+             *
+             * MediaPlayer API
+             *
+             */
+            MediaPlayer: {
+                init: function() {},
 
-          if (func)
-            return Function.apply.apply([args]);
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                onPlayPause: createArgumentsSanitizer ([{ type: Function, allowNull: true }, { dummy: true }]
+                                                       , 'MediaPlayer.onPlayPause'),
 
-          return null;
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                onPrevious: createArgumentsSanitizer ([{ type: Function, allowNull: true }, { dummy: true }],
+                                                      , 'MediaPlayer.onPrevious'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                onNext: createArgumentsSanitizer ([{ type: Function, allowNull: true }, { dummy: true }]
+                                                  , 'MediaPlayer.onNext'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                setTrack: createArgumentsSanitizer([{ obj: { artist: { str: true, place: 0, allowNull: true },
+                                                              album: { str: true, place: 1, allowNull: true },
+                                                              title: { str: true, place: 2 },
+                                                              artLocation: { str: true, place: 3, allowNull: true } } }]
+                                                   , 'MediaPlayer.setTrack'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                setCanGoNext: createArgumentsSanitizer ([{ number: true }], 'MediaPlayer.setCanGoNext'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                setCanGoPrevious: createArgumentsSanitizer ([{ number: true }], 'MediaPlayer.setCanGoPrevious'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                setCanPlay: createArgumentsSanitizer ([{ number: true }], 'MediaPlayer.setCanPlay'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                setCanPause: createArgumentsSanitizer ([{ number: true }], 'MediaPlayer.setCanPause'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                setPlaybackState: createArgumentsSanitizer ([{ number: true }], 'MediaPlayer.setPlaybackState'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                getPlaybackState: createArgumentsSanitizer ([{ type: Function }], 'MediaPlayer.getPlaybackState'),
+
+                PlaybackState: {PLAYING: 0, PAUSED:1},
+
+                /**
+                 * @private
+                 */
+                __get: createArgumentsSanitizer([{ str: true }, { type: Function, argAsCallbackId: 0 }], 'MediaPlayer.__get')
+            },
+
+            Notification: {
+               /**
+                *
+                * @param callback {Function}
+                */
+                showNotification: createArgumentsSanitizer ([{ str: true }, { str: true }, { str: true, allowNull: true }]
+                                                           , 'Notification.showNotification')
+            },
+
+            Launcher: {
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                setCount: createArgumentsSanitizer ([{ number: true }], 'Launcher.setCount'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                clearCount: createArgumentsSanitizer ([], 'Launcher.clearCount'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                setProgress: createArgumentsSanitizer ([{ number: true }], 'Launcher.setProgress'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                clearProgress: createArgumentsSanitizer ([], 'Launcher.clearProgress'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                setUrgent: createArgumentsSanitizer ([], 'Launcher.setUrgent'),
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                addAction: function(arg1, arg2) {
+                    if (typeof(arg2) === 'string')
+                        backend.call('Launcher.addStaticAction', [arg1, arg2]);
+                    else
+                        backend.call('Launcher.addAction', [arg1, arg2]);
+                },
+
+                /**
+                 *
+                 * @param callback {Function}
+                 */
+                removeAction: createArgumentsSanitizer ([{ str: true }], 'Launcher.removeAction'),
+
+                /**
+                 *
+                 * @private
+                 */
+                removeActions: createArgumentsSanitizer ([], 'Launcher.removeActions'),
+
+                 /**
+                  *
+                  * @private
+                  */
+                __get: createArgumentsSanitizer ([{ str: true }, { type: Function, argAsCallbackId: 0 }]
+                                                , 'Launcher.__get')
+            },
+            MessagingIndicator: {
+                /**
+                 *
+                 * @private
+                 */
+                addAction: createArgumentsSanitizer ([{ str: true }, { type: Function, argAsCallbackId: 0 }, { dummy: true }]
+                                                    , 'MessagingIndicator.addAction'),
+
+                /**
+                 *
+                 * @private
+                 */
+                showIndicator: function(name, properties) {
+                    backend.call('MessagingIndicator.showIndicator', [name, properties]);
+                },
+
+                /**
+                 *
+                 * @private
+                 */
+                clearIndicator: createArgumentsSanitizer ([{ str: true }], 'MessagingIndicator.clearIndicator'),
+
+                /**
+                 *
+                 * @private
+                 */
+                clearIndicators: createArgumentsSanitizer ([], 'MessagingIndicator.clearIndicators'),
+            },
+
+            OnlineAccounts: createOnlineAccountsApi(backend),
+            Alarm: createAlarmApi(backend),
+            ContentHub: createContentHubApi(backend),
         };
 
-      };
-      var api = {
-        init: function(props) {
-          checkString(props.name, false);
-          checkString(props.iconUrl, true);
-          checkString(props.domain, true);
-          checkString(props.login, true);
-          checkString(props.mimeTypes, true);
-          checkString(props.homepage, true);
-          if (props.homepage && !/^(http|https|file):\/\//.test(props.homepage)) {
-            throw new TypeError("incorrect argument");
-          }
-          if (window.location.protocol !== 'file:')
-              props.__unity_webapps_hidden = {hostname: window.location.hostname, url: window.location.href};
-          else
-              props.__unity_webapps_hidden = {local: true};
-          backend("init", [props]);
-        }
-        ,
-        acceptData: createArgumentsSanitaizer(null,
-                                              [{ array: { element: { str: true } } }, { type: Function, js: true }],
-                                              function (mimeTypes, callback) {
-                                                backend('acceptData', [mimeTypes, callback]);
-                                              })
-        ,
-        addAction: createArgumentsSanitaizer(null,
-                                             [{ str: true }, { type: Function, argAsCallbackId: 0 }],
-                                             function (name, callback) {
-                                               backend('addAction', [name, callback]);
-                                             })
-        ,
-        clearAction: createArgumentsSanitaizer(null,
-                                               [{ str: true }],
-                                               function (name) {
-                                                 backend('clearAction', [name]);
-                                               })
-        ,
-        clearActions: createArgumentsSanitaizer(null,
-                                                [],
-                                                function () {
-                                                  backend('clearActions', []);
-                                                })
-        ,
-        MediaPlayer: {
-          init: createArgumentsSanitaizer(null,
-                                          [{ str: true }],
-                                          function () {
-                                            backend('MediaPlayer.init', []);
-                                          })
-          ,
-          onPlayPause: createArgumentsSanitaizer(null,
-                                                 [{ type: Function, allowNull: true }, { dummy: true }],
-                                                 function (callback) {
-                                                   backend('MediaPlayer.onPlayPause', [callback]);
-                                                 }
-                                                )
-          ,
-          onPrevious: createArgumentsSanitaizer(null,
-                                                [{ type: Function, allowNull: true }, { dummy: true }],
-                                               function (callback) {
-                                                 backend('MediaPlayer.onPrevious', [callback]);
-                                               })
-          ,
-          onNext: createArgumentsSanitaizer(null,
-                                            [{ type: Function, allowNull: true }, { dummy: true }],
-                                            function (callback) {
-                                              backend('MediaPlayer.onNext', [callback]);
-                                            }
-                                           )
-          ,
-          setTrack: createArgumentsSanitaizer(null,
-                                              [{ obj: { artist: { str: true, place: 0, allowNull: true },
-                                                        album: { str: true, place: 1, allowNull: true },
-                                                        title: { str: true, place: 2 },
-                                                        artLocation: { str: true, place: 3, allowNull: true } } }],
-                                             function (trackinfos) {
-                                               backend('MediaPlayer.setTrack', [trackinfos]);
-                                             })
-          ,
-          setCanGoNext: createArgumentsSanitaizer(null,
-                                                  [{ number: true }],
-                                                  function (v) {
-                                                    backend('MediaPlayer.setCanGoNext', [v]);
-                                                  }
-                                                 )
-          ,
-          setCanGoPrevious: createArgumentsSanitaizer(null,
-                                                      [{ number: true }],
-                                                      function (v) {
-                                                        backend('MediaPlayer.setCanGoPrevious', [v]);
-                                                      }
-                                                     )
-          ,
-          setCanPlay: createArgumentsSanitaizer(null,
-                                                [{ number: true }],
-                                                function (v) { backend('MediaPlayer.setCanPlay', [v]); }
-                                               )
-          ,
-          setCanPause: createArgumentsSanitaizer(null,
-                                                 [{ number: true }],
-                                                 function (v) { backend('MediaPlayer.setCanPause', [v]); }
-                                                )
-          ,
-          setPlaybackState: createArgumentsSanitaizer(null,
-                                                      [{ number: true }],
-                                                      function (v) { backend('MediaPlayer.setPlaybackState', [v]); }
-                                                     )
-          ,
-          getPlaybackState: createArgumentsSanitaizer(null
-                                                      , [{ type: Function }]
-                                                      , function (callback) {
-                                                        backend('MediaPlayer.getPlaybackState', [callback]);
-                                                      }
-                                                     )
-          ,
-          PlaybackState: {PLAYING: 0, PAUSED:1}
-          ,
-          // private/internal
-          __get: createArgumentsSanitaizer(null,
-                                          [{ str: true }, { type: Function, argAsCallbackId: 0 }],
-                                          function (prop, callback) {
-                                            backend('MediaPlayer.__get', [prop, callback]);
-                                          }
-                                         )
-        },
-
-        Notification: {
-          showNotification: createArgumentsSanitaizer(null,
-                                                      [{ str: true }, { str: true }, { str: true, allowNull: true }],
-                                                      function (title, name, iconUrl) {
-                                                          console.log(arguments);
-                                                          console.log(title + ', ' + name + ', ' + iconUrl);
-                                                        backend('Notification.showNotification', [title, name, dummy]);
-                                                      }
-                                                     )
-        },
-
-        Launcher: {
-          setCount: createArgumentsSanitaizer(null,
-                                              [{ number: true }],
-                                              function (count) {
-                                                backend('Launcher.setCount', [count]);
-                                              }
-                                             )
-          ,
-          clearCount: createArgumentsSanitaizer(null,
-                                                [],
-                                                function () {
-                                                  backend('Launcher.clearCount', []);
-                                                }),
-          setProgress: createArgumentsSanitaizer(null,
-                                                 [{ number: true }],
-                                                 function (progress) {
-                                                   backend('Launcher.setProgress', [progress]);
-                                                 }
-                                                )
-          ,
-          clearProgress: createArgumentsSanitaizer(null,
-                                                   [],
-                                                  function () {
-                                                    backend('Launcher.clearProgress', []);
-                                                  }
-                                                  )
-          ,
-          setUrgent: createArgumentsSanitaizer(null,
-                                               [],
-                                               function () {
-                                                 backend('Launcher.setUrgent', []);
-                                               }
-                                              )
-          ,
-          addAction: function(arg1, arg2) {
-            if (typeof(arg2) === 'string')
-                backend('Launcher.addStaticAction', [arg1, arg2]);
-            else
-                backend('Launcher.addAction', [arg1, arg2]);
-          }
-          ,
-          removeAction: createArgumentsSanitaizer(null,
-                                                  [{ str: true }],
-                                                  function (name) {
-                                                    backend('Launcher.removeAction', [name]);
-                                                  }
-                                                 )
-          ,
-          removeActions: createArgumentsSanitaizer(null,
-                                                   [],
-                                                   function () {
-                                                     backend('Launcher.removeActions', []);
-                                                   }
-                                                  )
-          ,
-          // private/internal
-          __get: createArgumentsSanitaizer(null,
-                                          [{ str: true }, { type: Function, argAsCallbackId: 0 }],
-                                          function (prop, callback) {
-                                            backend('Launcher.__get', [prop, callback]);
-                                          }
-                                         )
-        },
-        MessagingIndicator: {
-          addAction: createArgumentsSanitaizer(null,
-                                               [{ str: true }, { type: Function, argAsCallbackId: 0 }, { dummy: true }],
-                                               function (name, callback, dummy) {
-                                                 backend('MessagingIndicator.addAction', [name, callback, dummy]);
-                                               }
-                                              )
-          ,
-          showIndicator: function(name, properties) {
-            backend('MessagingIndicator.showIndicator', [name, properties]);
-          }
-          ,
-          clearIndicator: createArgumentsSanitaizer(null, [{ str: true }], function(name) { backend('MessagingIndicator.clearIndicator', [name]); }),
-          clearIndicators: createArgumentsSanitaizer(null, [], function () { backend('MessagingIndicator.clearIndicators', []); })
-        }
-      };
-      return api;
+        return api;
     };
 
-    // TODO: new api object
-    var api = apiBuilder(sendToWebview);
+    var apiBridge = new UnityBindingBridge();
+    var api = apiBuilder (apiBridge);
+
+    apiBridge.setBindingApi(api);
 
     if (!window.external)
         window.external = {};
@@ -508,11 +297,9 @@
     window.external.getUnityObject = function (version) {
         return api;
     };
+
     sendApiCreatedAcknowledgeEvent();
 
-    //FIXME: for backward compatibility only, unsafeWindow was defined in the old extensions (inherited from ufe)
-    //  and used in the utils.js
     unsafeWindow = window;
-
 }) ();
 

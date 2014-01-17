@@ -24,7 +24,19 @@ Homepage: https://launchpad.net/unity-webapp-qml
 # upstream branch
 Vcs-Bzr: lp:unity-webapps-qml
 
-Package: unity-webapps-qml
+Package: qtdeclarative5-ubuntu-webapps-common
+Architecture: any
+Multi-Arch: same
+Depends: libqt5webkit5-qmlwebkitplugin,
+         qtdeclarative5-qtquick2-plugin,
+         qtdeclarative5-unity-action-plugin,
+         ${misc:Depends},
+         ${shlibs:Depends},
+Description: Unity Webapps QML component
+ Unity Webapps QML is a QML component that binds to a QML WebView and allows
+ running javascript code to access Ubuntu stack components.
+
+Package: qtdeclarative5-ubuntu-webapps-plugins
 Architecture: any
 Multi-Arch: same
 Depends: libqt5webkit5-qmlwebkitplugin,

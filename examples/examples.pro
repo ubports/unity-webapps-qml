@@ -1,4 +1,5 @@
-TEMPLATE=subdirs
+TEMPLATE = subdirs
+SUBDIRS += api-bindings
 
 OTHER_FILES += \
     $$system(ls */*.qml)
