@@ -12,7 +12,7 @@ Item {
   WebView {
     id: webview
     anchors.fill: parent
-    url: "file://$$OUT_PWD/alarm/www/index.html"
+    url: \"file://$$OUT_PWD/alarm/www/index.html\"
 
     experimental.preferences.navigatorQtObjectEnabled: true
     experimental.preferences.developerExtrasEnabled: true

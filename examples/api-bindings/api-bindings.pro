@@ -1,4 +1,4 @@
-TEMPLATE = subdirs
+TEMPLATE = aux
 SUBDIRS=
 
 QML_IN_FILES = $$system(ls ./*/*.qml.in)
