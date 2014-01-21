@@ -39,6 +39,7 @@ public:
 
     Q_INVOKABLE QVariant itemAt(int index, const QString & role);
     Q_INVOKABLE QStringList roles();
+    Q_INVOKABLE int rowCount();
 
     QObject * itemModel();
     void setItemModel(QObject *);

@@ -17,7 +17,9 @@ TARGET = test_qml
 SOURCES += \
     test_qml.cpp
 
-OTHER_FILES += $$system(ls *.qml) $$system(ls *.sh)
+OTHER_FILES += \
+    $$system(ls *.qml) \
+    $$system(ls *.sh)
 
 
 # make check target
@@ -26,3 +28,5 @@ check.commands = "set -e;"
 for(TEST, TESTS) {
   check.commands += ./runtest.sh $${TARGET} $${TEST} ../../../src;
 }
+
+QMAKE_EXTRA_TARGETS += check

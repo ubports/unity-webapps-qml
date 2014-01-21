@@ -212,7 +212,6 @@ function createContentHubApi(backendDelegate) {
     return {
         defaultSourceForType: function(type, callback) {
             var source = new ContentPeer(_contenthub.defaultSourceForType(_nameToContentType(type)));
-            console.log('callback ' + callback);
             callback(source.serialize());
         },
 
@@ -229,8 +228,10 @@ function createContentHubApi(backendDelegate) {
         importContentForPeer: function(type, peerProxy, callback) {
             if (! backendDelegate.isObjectProxyInfo(peerProxy)) {
                 console.debug('importContentForPeer: invalid peer object proxy')
+                callback(null);
                 return;
             }
+
             var peer = backendDelegate.objectFromId(peerProxy.objectid);
             var transfer = new ContentTransfer(_contenthub.importContent(_nameToContentType(type), peer));
 

@@ -27,7 +27,8 @@ class AbstractItemModelAdaptorPrivate: public QObject
 
 public:
     AbstractItemModelAdaptorPrivate(QObject * parent)
-        : QObject(parent)
+        : QObject(parent),
+          _model(NULL)
     {}
 
     QAbstractItemModel * _model;
@@ -41,7 +42,9 @@ AbstractItemModelAdaptor::AbstractItemModelAdaptor(QObject *parent) :
 {}
 
 AbstractItemModelAdaptor::~AbstractItemModelAdaptor()
-{}
+{
+    delete d_ptr;
+}
 
 QVariant AbstractItemModelAdaptor::itemAt(int index
                                           , const QString & role)
@@ -108,14 +111,26 @@ QObject * AbstractItemModelAdaptor::itemModel()
     return d->_model;
 }
 
+int AbstractItemModelAdaptor::rowCount()
+{
+    Q_D(AbstractItemModelAdaptor);
+
+    if ( ! d->_model)
+        return -1;
+
+    return d->_model->rowCount();
+}
+
 void AbstractItemModelAdaptor::setItemModel(QObject * model)
 {
     Q_D(AbstractItemModelAdaptor);
 
     if ( ! qobject_cast<QAbstractItemModel*>(model)) {
-        qCritical() << "Cannot assign a QObject of type not QAbstractItemModel to itemModel";
+        qCritical() << "Cannot assign a QObject of "
+                       "type not QAbstractItemModel to itemModel";
         return;
     }
+
     QAbstractItemModel * abstractItemModel =
             qobject_cast<QAbstractItemModel*>(model);
 

@@ -123,8 +123,8 @@ public:
             return QVariant();
         QHash<int, QByteArray> namePerRow = roleNames();
         return QVariant(QString("%1-%2")
-                        .arg(_data.at(idx))
-                        .arg(QString(namePerRow[role])));
+                        .arg(QString(namePerRow[role]))
+                        .arg(_data.at(idx)));
     }
 
 private:
@@ -164,7 +164,6 @@ void PluginTest::testAbstractItemModelAdaptor()
 
             QVERIFY(item.isValid());
             QVERIFY(item.canConvert(QMetaType::QString));
-            qDebug() << item.toString();
             QVERIFY(0 == item.toString().compare(expected));
         }
     }

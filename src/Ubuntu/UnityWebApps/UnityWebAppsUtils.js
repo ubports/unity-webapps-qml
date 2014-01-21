@@ -114,12 +114,14 @@ function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
     })(new SignalConnectionDisposer());
 }
 
-//
-// \brief For a given list of objects returns a function that validates the presence and validity of the
-//  specified properties.
-//
-// \param props list of object properties to validate. Each property is an object w/ a 'name' and 'type' (as in typeof()).
-//
+
+/**
+ * For a given list of objects returns a function that validates the presence and validity of the
+ *  specified properties.
+ *
+ * \param props list of object properties to validate. Each
+ *   property is an object w/ a 'name' and 'type' (as in typeof()).
+ */
 function isIterableObject(obj) {
     if (obj === undefined || obj === null) {
         return false;
@@ -129,15 +131,17 @@ function isIterableObject(obj) {
     return types[t] === undefined;
 };
 
-//
-// \brief For a given list of objects returns a function that validates the presence and validity of the
-//  specified properties.
-//
-// \param props list of object properties to validate. Each property is an object w/ a 'name' and 'type' (as in typeof()).
-//
+
+/**
+ * Format a specific
+ *
+ * \param props list of object properties to validate. Each
+ *   property is an object w/ a 'name' and 'type' (as in typeof()).
+ */
 function formatUnityWebappsCall(type, serialized_args) {
     return {target: "unity-webapps-call", name: type, args: serialized_args};
 }
+
 
 //
 // \brief For a given list of objects returns a function that validates the presence and validity of the

@@ -1,7 +1,7 @@
-function UnityBindingBridge() {
+function UnityBindingBridge(callbackManager) {
     this._proxies = {};
     this._last_proxy = 0;
-    this._callbackManager = makeCallbackManager();
+    this._callbackManager = callbackManager;
     this._bindingApi = null;
     this._startMessagePump();
 };
@@ -26,6 +26,12 @@ UnityBindingBridge.prototype = {
                             : null}));
     },
 
+    /**
+     *
+     *
+     * @method setBindingApi
+     * @param
+     */
     setBindingApi: function(bindingApi) {
         this._bindingApi = bindingApi;
     },
@@ -33,7 +39,7 @@ UnityBindingBridge.prototype = {
     /**
      *
      *
-     * @method
+     * @method isObjectProxyInfo
      * @param
      */
     isObjectProxyInfo: function(info) {
@@ -131,6 +137,9 @@ UnityBindingBridge.prototype = {
         }
     },
 
+    /**
+     * @internal
+     */
     _dispatchCallbackCall: function(id, args) {
         if (! id || ! args)
             return;
@@ -149,6 +158,9 @@ UnityBindingBridge.prototype = {
         cbfunc.apply(null, targs);
     },
 
+    /**
+     * @internal
+     */
     _translateArgs: function(args) {
         var _args = args || [];
         var self = this;
@@ -156,7 +168,8 @@ UnityBindingBridge.prototype = {
             if (isUbuntuBindingObjectProxy(arg)) {
                 var narg = self._wrapObjectProxy(arg.apiid,
                                                  arg.objecttype,
-                                                 arg.objectid);
+                                                 arg.objectid,
+                                                 arg.content);
                 return narg;
             }
             return arg;
@@ -164,10 +177,13 @@ UnityBindingBridge.prototype = {
         return _args;
     },
 
-    _wrapObjectProxy: function(apiId, objectType, objectId) {
+    /**
+     * @internal
+     */
+    _wrapObjectProxy: function(apiId, objectType, objectId, content) {
         if (this._bindingApi && this._bindingApi[apiId] != null) {
             var wrapper = this._bindingApi[apiId]
-                .createObjectWrapper(objectType, objectId);
+                .createObjectWrapper(objectType, objectId, content);
             return wrapper;
         }
         return null;

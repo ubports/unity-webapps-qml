@@ -62,8 +62,7 @@
                     props.__unity_webapps_hidden = {local: true};
 
                 backend.call("init", [props]);
-            }
-            ,
+            },
 
             /**
              *
@@ -71,30 +70,29 @@
              * @param mimeType {String}
              * @param callback {Function}
              */
-            acceptData: createArgumentsSanitizer ([{ array: { element: { str: true } } }, { type: Function, js: true }],
-                                                 'acceptData');
-            ,
+            acceptData: createArgumentsSanitizer (backend,
+                                                 [{ array: { element: { str: true } } }, { type: Function, js: true }],
+                                                 'acceptData'),
+
             /**
              *
              * @param name {String}
              * @param callback {Function}
              */
-            addAction: createArgumentsSanitizer ([{ str: true }, { type: Function, argAsCallbackId: 0 }]
-                                                , 'addAction')
+            addAction: createArgumentsSanitizer (backend,
+                                                [{ str: true }, { type: Function, argAsCallbackId: 0 }]
+                                                , 'addAction'),
 
-            ,
             /**
              *
              * @param name {String}
              */
-            clearAction: createArgumentsSanitizer ([{ str: true }], 'clearAction')
+            clearAction: createArgumentsSanitizer (backend, [{ str: true }], 'clearAction'),
 
-            ,
             /**
              *
              */
-            clearActions: createArgumentsSanitizer ([], 'clearActions')
-            ,
+            clearActions: createArgumentsSanitizer (backend, [], 'clearActions'),
 
             /**
              *
@@ -108,28 +106,28 @@
                  *
                  * @param callback {Function}
                  */
-                onPlayPause: createArgumentsSanitizer ([{ type: Function, allowNull: true }, { dummy: true }]
+                onPlayPause: createArgumentsSanitizer (backend, [{ type: Function, allowNull: true }, { dummy: true }]
                                                        , 'MediaPlayer.onPlayPause'),
 
                 /**
                  *
                  * @param callback {Function}
                  */
-                onPrevious: createArgumentsSanitizer ([{ type: Function, allowNull: true }, { dummy: true }],
+                onPrevious: createArgumentsSanitizer (backend, [{ type: Function, allowNull: true }, { dummy: true }]
                                                       , 'MediaPlayer.onPrevious'),
 
                 /**
                  *
                  * @param callback {Function}
                  */
-                onNext: createArgumentsSanitizer ([{ type: Function, allowNull: true }, { dummy: true }]
+                onNext: createArgumentsSanitizer (backend, [{ type: Function, allowNull: true }, { dummy: true }]
                                                   , 'MediaPlayer.onNext'),
 
                 /**
                  *
                  * @param callback {Function}
                  */
-                setTrack: createArgumentsSanitizer([{ obj: { artist: { str: true, place: 0, allowNull: true },
+                setTrack: createArgumentsSanitizer(backend, [{ obj: { artist: { str: true, place: 0, allowNull: true },
                                                               album: { str: true, place: 1, allowNull: true },
                                                               title: { str: true, place: 2 },
                                                               artLocation: { str: true, place: 3, allowNull: true } } }]
@@ -139,44 +137,44 @@
                  *
                  * @param callback {Function}
                  */
-                setCanGoNext: createArgumentsSanitizer ([{ number: true }], 'MediaPlayer.setCanGoNext'),
+                setCanGoNext: createArgumentsSanitizer (backend, [{ number: true }], 'MediaPlayer.setCanGoNext'),
 
                 /**
                  *
                  * @param callback {Function}
                  */
-                setCanGoPrevious: createArgumentsSanitizer ([{ number: true }], 'MediaPlayer.setCanGoPrevious'),
+                setCanGoPrevious: createArgumentsSanitizer (backend, [{ number: true }], 'MediaPlayer.setCanGoPrevious'),
 
                 /**
                  *
                  * @param callback {Function}
                  */
-                setCanPlay: createArgumentsSanitizer ([{ number: true }], 'MediaPlayer.setCanPlay'),
+                setCanPlay: createArgumentsSanitizer (backend, [{ number: true }], 'MediaPlayer.setCanPlay'),
 
                 /**
                  *
                  * @param callback {Function}
                  */
-                setCanPause: createArgumentsSanitizer ([{ number: true }], 'MediaPlayer.setCanPause'),
+                setCanPause: createArgumentsSanitizer (backend, [{ number: true }], 'MediaPlayer.setCanPause'),
 
                 /**
                  *
                  * @param callback {Function}
                  */
-                setPlaybackState: createArgumentsSanitizer ([{ number: true }], 'MediaPlayer.setPlaybackState'),
+                setPlaybackState: createArgumentsSanitizer (backend, [{ number: true }], 'MediaPlayer.setPlaybackState'),
 
                 /**
                  *
                  * @param callback {Function}
                  */
-                getPlaybackState: createArgumentsSanitizer ([{ type: Function }], 'MediaPlayer.getPlaybackState'),
+                getPlaybackState: createArgumentsSanitizer (backend, [{ type: Function }], 'MediaPlayer.getPlaybackState'),
 
                 PlaybackState: {PLAYING: 0, PAUSED:1},
 
                 /**
                  * @private
                  */
-                __get: createArgumentsSanitizer([{ str: true }, { type: Function, argAsCallbackId: 0 }], 'MediaPlayer.__get')
+                __get: createArgumentsSanitizer(backend, [{ str: true }, { type: Function, argAsCallbackId: 0 }], 'MediaPlayer.__get')
             },
 
             Notification: {
@@ -184,7 +182,7 @@
                 *
                 * @param callback {Function}
                 */
-                showNotification: createArgumentsSanitizer ([{ str: true }, { str: true }, { str: true, allowNull: true }]
+                showNotification: createArgumentsSanitizer (backend, [{ str: true }, { str: true }, { str: true, allowNull: true }]
                                                            , 'Notification.showNotification')
             },
 
@@ -193,31 +191,31 @@
                  *
                  * @param callback {Function}
                  */
-                setCount: createArgumentsSanitizer ([{ number: true }], 'Launcher.setCount'),
+                setCount: createArgumentsSanitizer (backend, [{ number: true }], 'Launcher.setCount'),
 
                 /**
                  *
                  * @param callback {Function}
                  */
-                clearCount: createArgumentsSanitizer ([], 'Launcher.clearCount'),
+                clearCount: createArgumentsSanitizer (backend, [], 'Launcher.clearCount'),
 
                 /**
                  *
                  * @param callback {Function}
                  */
-                setProgress: createArgumentsSanitizer ([{ number: true }], 'Launcher.setProgress'),
+                setProgress: createArgumentsSanitizer (backend, [{ number: true }], 'Launcher.setProgress'),
 
                 /**
                  *
                  * @param callback {Function}
                  */
-                clearProgress: createArgumentsSanitizer ([], 'Launcher.clearProgress'),
+                clearProgress: createArgumentsSanitizer (backend, [], 'Launcher.clearProgress'),
 
                 /**
                  *
                  * @param callback {Function}
                  */
-                setUrgent: createArgumentsSanitizer ([], 'Launcher.setUrgent'),
+                setUrgent: createArgumentsSanitizer (backend, [], 'Launcher.setUrgent'),
 
                 /**
                  *
@@ -234,19 +232,19 @@
                  *
                  * @param callback {Function}
                  */
-                removeAction: createArgumentsSanitizer ([{ str: true }], 'Launcher.removeAction'),
+                removeAction: createArgumentsSanitizer (backend, [{ str: true }], 'Launcher.removeAction'),
 
                 /**
                  *
                  * @private
                  */
-                removeActions: createArgumentsSanitizer ([], 'Launcher.removeActions'),
+                removeActions: createArgumentsSanitizer (backend, [], 'Launcher.removeActions'),
 
                  /**
                   *
                   * @private
                   */
-                __get: createArgumentsSanitizer ([{ str: true }, { type: Function, argAsCallbackId: 0 }]
+                __get: createArgumentsSanitizer (backend, [{ str: true }, { type: Function, argAsCallbackId: 0 }]
                                                 , 'Launcher.__get')
             },
             MessagingIndicator: {
@@ -254,7 +252,7 @@
                  *
                  * @private
                  */
-                addAction: createArgumentsSanitizer ([{ str: true }, { type: Function, argAsCallbackId: 0 }, { dummy: true }]
+                addAction: createArgumentsSanitizer (backend, [{ str: true }, { type: Function, argAsCallbackId: 0 }, { dummy: true }]
                                                     , 'MessagingIndicator.addAction'),
 
                 /**
@@ -269,13 +267,13 @@
                  *
                  * @private
                  */
-                clearIndicator: createArgumentsSanitizer ([{ str: true }], 'MessagingIndicator.clearIndicator'),
+                clearIndicator: createArgumentsSanitizer (backend, [{ str: true }], 'MessagingIndicator.clearIndicator'),
 
                 /**
                  *
                  * @private
                  */
-                clearIndicators: createArgumentsSanitizer ([], 'MessagingIndicator.clearIndicators'),
+                clearIndicators: createArgumentsSanitizer (backend, [], 'MessagingIndicator.clearIndicators'),
             },
 
             OnlineAccounts: createOnlineAccountsApi(backend),
@@ -286,7 +284,7 @@
         return api;
     };
 
-    var apiBridge = new UnityBindingBridge();
+    var apiBridge = new UnityBindingBridge(makeCallbackManager());
     var api = apiBuilder (apiBridge);
 
     apiBridge.setBindingApi(api);

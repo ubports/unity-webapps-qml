@@ -206,6 +206,13 @@ UbuntuBindingBackendDelegate.prototype = {
             'objectid' in info;
     },
 
+    deleteId: function(id) {
+        if (this._objects[id] != null) {
+            delete this._objects[id];
+            this._objects[id] = null;
+        }
+    },
+
     objectFromId: function(id) {
         return id != null ? this._objects[id] : null;
     },
@@ -227,7 +234,7 @@ UbuntuBindingBackendDelegate.prototype = {
         var candidate = uri + name + this._id;
         while (this._objects[candidate] != undefined) {
             ++this._last_proxy_id;
-            candidate = uri + object_name + this._last_proxy_id;
+            candidate = uri + name + this._last_proxy_id;
         }
         return candidate;
     }
@@ -422,14 +429,73 @@ function createOnlineAccountsApi(backendDelegate) {
                 throw new TypeError("Invalid object null");
         },
 
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            backendDelegate.deleteId(this._id);
+        },
+
         // object methods
         serialize: function() {
+            var self = this;
             return {
                 type: 'object-proxy',
                 apiid: 'OnlineAccounts',
                 objecttype: 'Account',
-                objectid: this._id,
+                objectid: self._id,
+
+                // serialize immutable values
+                content: {
+                    enabled: self._object.enabled,
+                    provider: self._object.provider,
+                    displayName: self._object.displayName,
+                    accountId: self._object.accountId,
+                }
             }
+        },
+
+        // properties
+
+        // immutable
+        enabled: function(callback) {
+            this._validate();
+            callback(this._object.enabled);
+        },
+
+        // immutable
+        provider: function(callback) {
+            this._validate();
+            callback(this._object.provider);
+        },
+
+        // immutable
+        displayName: function(callback) {
+            this._validate();
+            callback(this._object.displayName);
+        },
+
+        // immutable
+        accountId: function(callback) {
+            this._validate();
+            callback(this._object.accountId);
+        },
+
+        // method
+
+        updateDisplayName: function(displayName) {
+            this._validate();
+            this._object.updateDisplayName(displayName);
+        },
+
+        updateEnabled: function(enabled) {
+            this._validate();
+            this._object.updateEnabled(enabled);
+        },
+
+        remove: function(enabled) {
+            this._validate();
+            this._object.remove();
         },
     };
 
@@ -454,80 +520,91 @@ function createOnlineAccountsApi(backendDelegate) {
                 throw new TypeError("Invalid object null");
         },
 
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            backendDelegate.deleteId(this._id);
+        },
+
         // object methods
         serialize: function() {
+            var self = this;
             return {
                 type: 'object-proxy',
                 apiid: 'OnlineAccounts',
                 objecttype: 'AccountService',
-                objectid: this._id,
+                objectid: self._id,
+
+                // serialize immutable values
+
+                content: {
+                    accountId: self._object.accountId,
+                    enabled: self._object.enabled,
+                    serviceEnabled: self._object.serviceEnabled,
+                    displayName: self._object.displayName,
+                    provider: self.internal.getProvider(self),
+                    service: self.internal.getService(self),
+                },
             }
         },
 
         // properties
-        accountId: function(callback) {
-            this._validate();
-            callback(this._object.accountId);
-        },
-        setAccountId: function(accountId) {
-            this._validate();
-            this._object.accountId = accountId;
-        },
-
-        enabled: function(callback) {
-            this._validate();
-            callback(this._object.enabled);
-        },
-        setEnabled: function(enabled) {
-            this._validate();
-            this._object.enabled = enabled;
-        },
-
-        serviceEnabled: function(callback) {
-            this._validate();
-            callback(this._object.serviceEnabled);
-        },
-        setServiceEnabled: function(serviceEnabled) {
-            this._validate();
-            this._object.serviceEnabled = serviceEnabled;
-        },
 
         autoSync: function(callback) {
             this._validate();
             callback(this._object.autoSync);
         },
-        setAutoSync: function(autoSync) {
+        setAutoSync: function(autoSync, callback) {
             this._validate();
             this._object.autoSync = autoSync;
+            if (callback)
+                callback();
         },
 
+        // immutable
+        accountId: function(callback) {
+            this._validate();
+            callback(this._object.accountId);
+        },
+
+        // immutable
+        enabled: function(callback) {
+            this._validate();
+            callback(this._object.enabled);
+        },
+
+        // immutable
+        serviceEnabled: function(callback) {
+            this._validate();
+            callback(this._object.serviceEnabled);
+        },
+
+        // immutable
         displayName: function(callback) {
             this._validate();
             callback(this._object.displayName);
         },
 
+        // immutable
         provider: function(callback) {
             this._validate();
-            callback({
-                         id: this._object.provider.id,
-                         displayName: this._object.provider.displayName,
-                         iconName: this._object.provider.iconName,
-                     });
+            callback(this.internal.getProvider(this));
         },
 
+        // immutable
+        service: function(callback) {
+            this._validate();
+            callback(this.internal.getService(this));
+        },
+
+        objectHandle: function(callback) {
+            this._validate();
+            callback(this._object.objectHandle);
+        },
         setObjectHandle: function(objectHandle) {
             this._validate();
             this._object.objectHandle = objectHandle;
-        },
-
-        service: function(callback) {
-            this._validate();
-            callback({
-                         id: this._object.service.id,
-                         displayName: this._object.service.displayName,
-                         iconName: this._object.service.iconName,
-                         serviceTypeId: this._object.service.serviceTypeId,
-                     });
         },
 
         // methods
@@ -539,12 +616,20 @@ function createOnlineAccountsApi(backendDelegate) {
 
             var self = this;
             onAuthenticated = function(reply) {
-                callback({error: null, authenticated: true, data: reply.AccessToken});
+                callback({error: null,
+                          authenticated: true,
+                          data: reply.AccessToken,
+                          accountId: accountId});
+
                 self._object.onAuthenticated.disconnect(onAuthenticated);
                 self._object.onAuthenticationError.disconnect(onAuthenticationError);
             };
             onAuthenticationError = function(error){
-                callback({error: error.message, authenticated: false, data: null});
+                callback({error: error.message,
+                          authenticated: false,
+                          data: null,
+                          accountId: null});
+
                 self._object.onAuthenticated.disconnect(onAuthenticated);
                 self._object.onAuthenticationError.disconnect(onAuthenticationError);
             };
@@ -554,7 +639,27 @@ function createOnlineAccountsApi(backendDelegate) {
 
             this._object.authenticate(null);
         },
+
+        // Internal
+
+        internal: {
+            getService: function(self) {
+                return {
+                    id: self._object.service.id,
+                    displayName: self._object.service.displayName,
+                    iconName: self._object.service.iconName,
+                };
+            },
+            getProvider: function(self) {
+                return {
+                    id: self._object.provider.id,
+                    displayName: self._object.provider.displayName,
+                    iconName: self._object.provider.iconName,
+                };
+            }
+        }
     };
+
 
     function Manager() {
         var result = backendDelegate.createQmlObject(
@@ -566,6 +671,13 @@ function createOnlineAccountsApi(backendDelegate) {
         _validate: function() {
             if (! this._object)
                 throw new TypeError("Invalid object null");
+        },
+
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            backendDelegate.deleteId(this._id);
         },
 
         // object methods
@@ -589,7 +701,14 @@ function createOnlineAccountsApi(backendDelegate) {
             var account = new Account(this._object.loadAccount(id));
             callback(account.serialize());
         },
+
+        internal: {
+            loadAccount: function(self, id) {
+                return new Account(self._object.loadAccount(id));
+            },
+        },
     };
+
 
     function ProviderModel() {
         var result = backendDelegate.createQmlObject(
@@ -606,8 +725,17 @@ function createOnlineAccountsApi(backendDelegate) {
                 throw new TypeError("Invalid object null");
         },
 
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            this._modelAdaptor.destroy();
+            backendDelegate.deleteId(this._id);
+        },
+
         // object methods
         serialize: function() {
+            this._validate();
             return {
                 type: 'object-proxy',
                 apiid: 'OnlineAccounts',
@@ -616,10 +744,33 @@ function createOnlineAccountsApi(backendDelegate) {
             }
         },
 
+        // properties
+
+        applicationId: function(callback) {
+            this._validate();
+            callback(this._object.applicationId);
+        },
+        setApplicationId: function(applicationId, callback) {
+            this._validate();
+            this._object.applicationId = applicationId;
+            if (callback)
+                callback();
+        },
+
         // QAbtractListModel prototype
+        count: function(callback) {
+            this._validate();
+            if (this._modelAdaptor) {
+                return -1;
+            }
+            callback(this._modelAdaptor.rownCount());
+        },
+
         at: function(idx, callback) {
+            this._validate();
             if (idx >= this.proxy.count || ! this._modelAdaptor) {
-                return null;
+                callback(null);
+                return;
             }
 
             var result = {};
@@ -653,6 +804,14 @@ function createOnlineAccountsApi(backendDelegate) {
                 throw new TypeError("Invalid object null");
         },
 
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            this._modelAdaptor.destroy();
+            backendDelegate.deleteId(this._id);
+        },
+
         // properties
         count: function(callback) {
             this._validate();
@@ -663,60 +822,91 @@ function createOnlineAccountsApi(backendDelegate) {
             this._validate();
             callback(this._object.service);
         },
-        setService: function(service) {
+        setService: function(service, callback) {
             this._validate();
             this._object.service = service;
+            if (callback)
+                callback();
         },
 
         provider: function(callback) {
             this._validate();
             callback(this._object.provider);
         },
-        setProvider: function(provider) {
+        setProvider: function(provider, callback) {
             this._validate();
             this._object.provider = provider;
+            if (callback)
+                callback();
         },
 
         serviceType: function(callback) {
             this._validate();
             callback(this._object.serviceType);
         },
-        setServiceType: function(serviceType) {
+        setServiceType: function(serviceType, callback) {
             this._validate();
             this._object.serviceType = serviceType;
+            if (callback)
+                callback();
         },
 
         accountId: function(callback) {
             this._validate();
             callback(this._object.accountId);
         },
-        setAccountId: function(accountId) {
+        setAccountId: function(accountId, callback) {
             this._validate();
             this._object.accountId = accountId;
-        },
-
-        // special case for an object wrapper
-        accountServiceHandleAtIndex: function(idx) {
-            this._validate();
-            var accountServiceHandle = this._modelAdaptor.itemAt(idx, "accountServiceHandle");
-            if (accountServiceHandle != null) {
-                var accountService = new AccountService();
-                accountService.setObjectHandle(accountServiceHandle);
-                return accountService;
-            }
-            return null;
+            if (callback)
+                callback();
         },
 
         // QAbtractListModel prototype
+        count: function(callback) {
+            if (this._modelAdaptor) {
+                callback(-1);
+            }
+            callback(this._modelAdaptor.rownCount());
+        },
+
         at: function(idx, callback) {
-            if (idx >= this.proxy.count || ! this._modelAdaptor) {
-                return null;
+            var count = this._modelAdaptor.rownCount();
+            if (idx >= count || ! this._modelAdaptor) {
+                callback(null);
+                return;
             }
             var result = {};
             for (var role in this._roles) {
                 result[role] = this._modelAdaptor.itemAt(idx, role);
             }
             callback(result);
+        },
+
+        // Internal bits, not part of the API (especially no async)
+
+        internal: {
+
+            // special case for an object wrapper
+            accountServiceHandleAtIndex: function(idx) {
+                this._validate();
+
+                var accountServiceHandle = this._modelAdaptor.itemAt(idx, "accountServiceHandle");
+
+                if (accountServiceHandle != null) {
+                    var accountService = new AccountService();
+                    accountService.setObjectHandle(accountServiceHandle);
+                    return accountService;
+                }
+
+                return null;
+            },
+
+            count: function() {
+                return this._modelAdaptor ?
+                            this._modelAdaptor.rownCount()
+                          : -1;
+            },
         }
     };
 
@@ -748,15 +938,62 @@ function createOnlineAccountsApi(backendDelegate) {
         },
 
         // api
-        getAccessTokenFor: function(serviceName, providerName, callback) {
+        getAccountsInfoFor: function(serviceName, providerName, callback) {
             var serviceModel = new AccountServiceModel();
+
             if (serviceName)
                 serviceModel.setService(serviceName);
             if (providerName)
                 serviceModel.setProvider(providerName);
 
-            // TODO fixup
-            serviceModel.accountServiceHandleAtIndex(0).authenticate(callback);
+            var count = serviceModel.internal.count();
+            console.log(count)
+            var accountsInfo = []
+            for (var i = 0; i < count; ++i) {
+                var displayName = serviceModel.internal.itemAt(i, "displayName");
+                var accountId = serviceModel.internal.itemAt(i, "accountId");
+
+                accountsInfo.push({displayName: displayName
+                                      , accountId: accountId});
+            }
+            serviceModel.destroy();
+
+            callback(accountsInfo);
+        },
+
+        getAccountById: function(accountId, callback) {
+            var manager = new Manager();
+            var account = manager.internal.loadAccount(manager, accountId);
+            manager.destroy();
+            callback(account.serialize());
+        },
+
+        getAccessTokenFor: function(serviceName, providerName, accountId, callback) {
+            var serviceModel = new AccountServiceModel();
+
+            if (serviceName)
+                serviceModel.setService(serviceName);
+            if (providerName)
+                serviceModel.setProvider(providerName);
+            if (accountId)
+                serviceModel.setAccountId(accountId);
+
+            var count = serviceModel.internal.count();
+            if (count > 0) {
+                var accountIdx = 0;
+                if (count > 1) {
+                    console.debug("More than one account with id: " + accountId);
+                }
+                var onAuthenticated = function(results) {
+                    serviceModel.destroy();
+                    callback(results);
+                };
+                serviceModel.internal.accountServiceHandleAtIndex(accountIdx).authenticate(onAuthenticated);
+            }
+            else {
+                serviceModel.destroy();
+                callback({error: "No account found"});
+            }
         },
 
         // Internal
@@ -772,6 +1009,11 @@ function createOnlineAccountsApi(backendDelegate) {
                 args.push(callback);
 
             var o = backendDelegate.objectFromId(objectid);
+            if (o == null) {
+                console.debug('Cannot dispatch to unknown object: ' + objectid);
+                return;
+            }
+
             var Constructor = _constructorFromName(class_name);
 
             var instance = new Constructor(o, objectid);
@@ -813,11 +1055,18 @@ function createAlarmApi(backendDelegate) {
                 throw new TypeError("Invalid object null");
         },
 
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            backendDelegate.deleteId(this._id);
+        },
+
         // object methods
         serialize: function() {
             return {
                 type: 'object-proxy',
-                apiid: 'Components',
+                apiid: 'Alarm',
                 objecttype: 'Alarm',
                 objectid: this._id,
             }
@@ -921,6 +1170,7 @@ function createAlarmApi(backendDelegate) {
             alarm.setDate(date);
             alarm.setMessage(date);
             alarm.save();
+            alarm.destroy();
         },
 
 
@@ -937,6 +1187,11 @@ function createAlarmApi(backendDelegate) {
                 args.push(callback);
 
             var o = backendDelegate.objectFromId(objectid);
+            if (o == null) {
+                console.debug('Cannot dispatch to unknown object: ' + objectid);
+                return;
+            }
+
             var Constructor = _constructorFromName(class_name);
 
             var instance = new Constructor(o, objectid);
@@ -1008,6 +1263,13 @@ function createContentHubApi(backendDelegate) {
         _validate: function() {
             if (! this._object)
                 throw new TypeError("Invalid object null");
+        },
+
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            backendDelegate.deleteId(this._id);
         },
 
         // object methods
@@ -1083,17 +1345,33 @@ function createContentHubApi(backendDelegate) {
                 throw new TypeError("Invalid object null");
         },
 
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            backendDelegate.deleteId(this._id);
+        },
+
         // object methods
         serialize: function() {
+            var self = this;
             return {
                 type: 'object-proxy',
                 apiid: 'ContentHub',
                 objecttype: 'ContentStore',
                 objectid: this._id,
+
+                // serialize immutable values
+
+                content: {
+                    uri: self._object.uri,
+                }
             }
         },
 
         // properties
+
+        //immutable
         uri: function(callback) {
             this._validate();
             callback(this._object.uri);
@@ -1121,6 +1399,13 @@ function createContentHubApi(backendDelegate) {
                 throw new TypeError("Invalid object null");
         },
 
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            backendDelegate.deleteId(this._id);
+        },
+
         // object methods
         serialize: function() {
             var self = this;
@@ -1129,6 +1414,9 @@ function createContentHubApi(backendDelegate) {
                 apiid: 'ContentHub',
                 objecttype: 'ContentPeer',
                 objectid: self._id,
+
+                // serialize immutable values
+
                 content: {
                     appId: self._object.appId,
                     name: self._object.name,
@@ -1137,10 +1425,14 @@ function createContentHubApi(backendDelegate) {
         },
 
         // properties
+
+        // immutable
         appId: function(callback) {
             this._validate();
             callback(this._object.appId);
         },
+
+        // immutable
         name: function(callback) {
             this._validate();
             callback(this._object.name);
@@ -1161,7 +1453,6 @@ function createContentHubApi(backendDelegate) {
     return {
         defaultSourceForType: function(type, callback) {
             var source = new ContentPeer(_contenthub.defaultSourceForType(_nameToContentType(type)));
-            console.log('callback ' + callback);
             callback(source.serialize());
         },
 
@@ -1199,6 +1490,11 @@ function createContentHubApi(backendDelegate) {
                 args.push(callback);
 
             var o = backendDelegate.objectFromId(objectid);
+            if (o == null) {
+                console.debug('Cannot dispatch to unknown object: ' + objectid);
+                return;
+            }
+
             var Constructor = _constructorFromName(class_name);
 
             var instance = new Constructor(o, objectid);
