@@ -111,13 +111,10 @@ var UnityWebApps = (function () {
             this._log ('WebApps API message received: ' + json.stringify(msg));
 
             var self = this;
-            console.log(msg.args);
             var args = json.parse(msg.args);
-            console.log(args);
             args = args.map (function (arg) {
                 return self._wrapCallbackIds (arg);
             });
-            console.log(args);
 
             this._dispatch(msg, args);
 
@@ -130,7 +127,7 @@ var UnityWebApps = (function () {
          */
         _dispatch: function(message, params) {
             var target = message.target;
-            console.log(target)
+
             //TODO improve dispatch
             if (target === UnityWebAppsUtils.UBUNTU_WEBAPPS_BINDING_API_CALL_MESSAGE) {
                 // Actuall call, e.g. 'Notification.showNotification("a","b")
@@ -196,6 +193,7 @@ var UnityWebApps = (function () {
             var self = this;
             return function () {
                 var sendToPage = self._bindeeProxies.sendToPage;
+
                 // TODO add validation higher
                 if (!sendToPage || !(sendToPage instanceof Function))
                     return;

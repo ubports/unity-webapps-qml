@@ -1,13 +1,15 @@
 import QtQuick 2.0
 import QtWebKit 3.0 
 import QtWebKit.experimental 1.0
+import Ubuntu.Components 0.1
 import Ubuntu.UnityWebApps 0.1
 
 Item {
-  id: webView
+  id: root
   focus: true
-  width: 800
-  height: 800
+
+  width: units.gu(50)
+  height: units.gu(75)
 
   WebView {
     id: webview

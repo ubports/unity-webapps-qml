@@ -15,8 +15,32 @@ window.onload = function() {
         renderResults(results);
     };
 
-    function renderResults(results) {
+    function displayImages(images) {
+        var res = document.getElementById('results');
+        for (var i = 0; i < images.length; ++i) {
+            var img = document.createElement('img');
+
+            img.setAttribute('src', images[i].url);
+
+            if (images[i].name && images[i].name.length !== 0)
+                img.setAttribute('alt', images[i].name);
+
+            res.appendChild(img);
+        }
+    };
+
+    function aborted() {
+        setResults('Transfer aborted');
+    };
+
+    function setResults(results) {
         var resultEl = document.getElementById('results');
+        resultEl.innerHTML = results;
+
+        displayImages(results);
+    };
+
+    function formatResults(results) {
         var content = '<ul>';
         for (var i = 0; i < results.length; ++i) {
             content += '<li>'
@@ -26,7 +50,11 @@ window.onload = function() {
             + '</li>';
         }
         content += '</ul>';
-        resultEl.innerHTML = content;
+        return content;
+    };
+
+    function renderResults(results) {
+        setResults(formatResults(results));
     };
 
     function doImport() {
@@ -46,11 +74,22 @@ window.onload = function() {
                     peer,
                     function(transfer) {
                         transfer.start(function(state) {
-                            if (transferState.Charged == state) {
+                            if (transferState.Aborted === state) {
+                                transfer.finalize();
+                                peer.destroy();
+                                transfer.destroy();
+                                aborted();
+                                return;
+                            }
+
+                            if (transferState.Charged === state) {
                                 transfer.items(function(items) {
                                     for (var i = 0; i < items.length; ++i) {
                                         addResult(items[i]);
                                     }
+                                    transfer.finalize();
+                                    peer.destroy();
+                                    transfer.destroy();
                                 });
                             }
                         });

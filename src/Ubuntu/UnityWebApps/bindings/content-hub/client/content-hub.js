@@ -18,13 +18,51 @@ function createContentHubApi(backendBridge) {
         },
 
         // properties
+
+        /**
+         * Retrieves the current selection type.
+         *
+         * @method selectionType
+         * @param callback {Function(ContentTransfer.SelectionType)}
+         */
         selectionType: function(callback) {
             this._proxy.call('selectionType', [], callback);
         },
+        /**
+         * Sets the selection type (single or multiple).
+         *
+         * @method setSelectionType
+         * @param selectionType {ContentTransfer.SelectionType}
+         */
         setSelectionType: function(selectionType) {
             this._proxy.call('setSelectionType', [selectionType]);
         },
 
+        /**
+         * Retrieves the current transfer direction.
+         *
+         * @method direction
+         * @param callback {Function(ContentTransfer.Direction)}
+         */
+        direction: function(callback) {
+            this._proxy.call('direction', [], callback);
+        },
+        /**
+         * Sets the transfer direction (import or export).
+         *
+         * @method setDirection
+         * @param direction {ContentTransfer.Direction}
+         */
+        setDirection: function(direction) {
+            this._proxy.call('setDirection', [direction]);
+        },
+
+        /**
+         * Retrieves the list of items included in the ContentTransfer.
+         *
+         * @method items
+         * @param callback {Function( {Object{name: , url: }} )}
+         */
         items: function(callback) {
             this._proxy.call('items', [], callback);
         },
@@ -40,6 +78,12 @@ function createContentHubApi(backendBridge) {
         start: function(callback) {
             this._proxy.call('start', [callback]);
         },
+
+        /**
+         * Sets State to ContentTransfer.Finalized and cleans up temporary files.
+         *
+         * @method finalize
+         */
         finalize: function() {
             this._proxy.call('finalize', []);
         },
@@ -80,6 +124,15 @@ function createContentHubApi(backendBridge) {
         // properties
 
         // immutable
+
+        /**
+         * Retrieves the app Id of the associated peer.
+         *
+         * If the callback parameter is not set, the current "local" value is retrieved.
+         *
+         * @method appId
+         * @param callback (optional) {Function(String)}
+         */
         appId: function(callback) {
             if (callback && typeof(callback) === 'function') {
                 this._proxy.call('appId', [], callback);
@@ -87,7 +140,17 @@ function createContentHubApi(backendBridge) {
             }
             return this._appId;
         },
+
         // immutable
+
+        /**
+         * Retrieves the name of the associated peer.
+         *
+         * If the callback parameter is not set, the current "local" value is retrieved.
+         *
+         * @method name
+         * @param callback (optional) {Function(String)}
+         */
         name: function(callback) {
             if (callback && typeof(callback) === 'function') {
                 this._proxy.call('name', [], callback);
@@ -129,6 +192,15 @@ function createContentHubApi(backendBridge) {
         // properties
 
         //immutable
+
+        /**
+         * Retrieves the uri of the associated store.
+         *
+         * If the callback parameter is not set, the current "local" value is retrieved.
+         *
+         * @method uri
+         * @param callback (optional) {Function(String)}
+         */
         uri: function() {
             if (callback && typeof(callback) === 'function') {
                 this._proxy.call('uri', [], callback);
@@ -197,7 +269,23 @@ function createContentHubApi(backendBridge) {
 
                 // Transfer has been finished and cleaned up.
                 Finalized: "Finalized",
-            }
+            },
+
+            Direction: {
+                // Transfer is a request to import content
+                Import: "Import",
+
+                // Transfer is a request to export content
+                Export: "Export",
+            },
+
+            SelectionType: {
+                // Transfer should contain a single item
+                Single: "Single",
+
+                // Transfer can contain multiple items
+                Multiple: "Multiple",
+            },
         },
 
         /**

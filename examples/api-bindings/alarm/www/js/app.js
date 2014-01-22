@@ -1,18 +1,22 @@
 window.onload = function() {
-    document.getElementById('start').addEventListener('click', doStart);
+    document.getElementById('start')
+        .addEventListener('click', doStart);
 
     function doStart() {
         var api = external.getUnityObject(1.0);
 
-        api.Alarm.createAlarm(function(alarm) {
-            var date = new Date();
-            date.setTime(Date.parse(document.getElementById('date').value));
-            alarm.setDate(date);
-            alarm.setMessage(document.getElementById('message').value);
-            alarm.save();
+        var date = new Date();
+        date.setTime(Date.parse(document.getElementById('date').value));
 
-            var results = document.getElementById('results');
-            results.innerHTML = 'SAVED!';
-        });
-    }
+        api.Alarm.api.createAndSaveAlarmFor(
+                    date,
+                    api.Alarm.AlarmType.OneTime,
+                    api.Alarm.AlarmDayOfWeek.AutoDetect,
+                    document.getElementById('message').value,
+                    function(errorid) {
+                        var results = document.getElementById('results');
+                        results.innerHTML = api.Alarm.api.errorToMessage(errorid);
+
+                    });
+    };
 };

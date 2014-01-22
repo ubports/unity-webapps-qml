@@ -17,6 +17,7 @@
  */
 
 .import Ubuntu.Content 0.1 as ContentHubBridge
+.import Ubuntu.Components 0.1 as ComponentsBridge
 
 var _backends = {};
 
@@ -1033,6 +1034,23 @@ function createAlarmApi(backendDelegate) {
     var PLUGIN_URI = 'Ubuntu.Components';
     var VERSION = 0.1;
 
+    function _nameToAlarmType(name) {
+        var alarmTypePerName = {
+            "OneTime": ComponentsBridge.Alarm.OneTime,
+            "Repeating": ComponentsBridge.Alarm.Repeating,
+        };
+        return name in alarmTypePerName ?
+                    alarmTypePerName[name]
+                  : ComponentsBridge.Alarm.OneTime;
+    };
+    function _alarmTypeToName(type) {
+        if (type === ComponentsBridge.Alarm.OneTime)
+            return "OneTime";
+        else if (type === ComponentsBridge.Alarm.Repeating)
+            return "Repeating";
+        return ;
+    };
+
     function Alarm(alarm, objectid) {
         var id = objectid;
         if ( ! alarm) {
@@ -1097,56 +1115,81 @@ function createAlarmApi(backendDelegate) {
             this._validate();
             callback(this._object.date.getTime());
         },
-        setDate: function(date) {
+        setDate: function(date, callback) {
             this._validate();
             this._object.date = new Date();
             this._object.date.setTime(parseInt(date));
+            if (callback && typeof(callback) === 'function')
+                callback();
+        },
+
+        daysOfWeek: function(callback) {
+            this._validate();
+            callback(this._object.daysOfWeek);
+        },
+        setDaysOfWeek: function(daysOfWeek, callback) {
+            this._validate();
+            this._object.daysOfWeek = daysOfWeek;
+            if (callback && typeof(callback) === 'function')
+                callback();
         },
 
         enabled: function(callback) {
             this._validate();
             callback(this._object.enabled);
         },
-        setEnabled: function(enabled) {
+        setEnabled: function(enabled, callback) {
             this._validate();
             this._object.enabled = enabled;
+            if (callback && typeof(callback) === 'function')
+                callback();
         },
 
         message: function(callback) {
             this._validate();
             callback(this._object.message);
         },
-        setMessage: function(message) {
+        setMessage: function(message, callback) {
             this._validate();
             this._object.message = message;
+            if (callback && typeof(callback) === 'function')
+                callback();
         },
 
         sound: function(callback) {
             this._validate();
             callback(this._object.sound);
         },
-        setSound: function(sound) {
+        setSound: function(sound, callback) {
             this._validate();
             this._object.sound = sound;
+            if (callback && typeof(callback) === 'function')
+                callback();
         },
 
         status: function(callback) {
             this._validate();
-            callback(this._object.status);
-        },
-        setStatus: function(status) {
-            this._validate();
-            this._object.status = status;
+            callback(this._object.status.toString());
         },
 
         type: function(callback) {
             this._validate();
-            callback(this._object.type);
+            callback(_alarmTypeToName(this._object.type));
         },
-        setType: function(type) {
+        setType: function(type, callback) {
             this._validate();
-            this._object.type = type;
+            this._object.type = _nameToAlarmType(type);
+            if (callback && typeof(callback) === 'function')
+                callback();
         },
+
+        // internal
+
+        internal: {
+            error: function(self) {
+                return self._object.error;
+            }
+        }
     };
 
     function _constructorFromName(className) {
@@ -1165,11 +1208,18 @@ function createAlarmApi(backendDelegate) {
             callback(alarm.serialize());
         },
 
-        createAndSaveAlarmFor: function(date, message) {
+        createAndSaveAlarmFor: function(date, type, daysOfWeek, message, callback) {
             var alarm = new Alarm();
+
             alarm.setDate(date);
-            alarm.setMessage(date);
+            alarm.setMessage(message);
+            alarm.setType(_nameToAlarmType(type));
+            alarm.setDaysOfWeek(daysOfWeek);
             alarm.save();
+
+            if (callback && typeof(callback) === 'function')
+                callback(alarm.internal.error(alarm));
+
             alarm.destroy();
         },
 
@@ -1214,6 +1264,7 @@ function createContentHubApi(backendDelegate) {
 
     var _contenthub = ContentHubBridge.ContentHub;
 
+    // TODO find a better way
     function _nameToContentType(name) {
         var contentTypePerName = {
             "Pictures": ContentHubBridge.ContentType.Pictures,
@@ -1223,6 +1274,40 @@ function createContentHubApi(backendDelegate) {
         return name in contentTypePerName ?
                     contentTypePerName[name]
                   : ContentHubBridge.ContentType.Unknown;
+    };
+
+    function _nameToContentTransferSelection(name) {
+        var contentTypePerName = {
+            "Single": ContentHubBridge.ContentTransfer.Single,
+            "Multiple": ContentHubBridge.ContentTransfer.Multiple,
+        };
+        return name in contentTypePerName ?
+                    contentTypePerName[name]
+                  : ContentHubBridge.ContentTransfer.Single;
+    };
+    function _contentTransferSelectionToName(state) {
+        if (state === ContentHubBridge.ContentTransfer.Single)
+            return "Single";
+        else if (state === ContentHubBridge.ContentTransfer.Multiple)
+            return "Multiple";
+        return "Single";
+    };
+
+    function _nameToContentTransferDirection(name) {
+        var contentTypePerName = {
+            "Import": ContentHubBridge.ContentTransfer.Import,
+            "Export": ContentHubBridge.ContentTransfer.Export,
+        };
+        return name in contentTypePerName ?
+                    contentTypePerName[name]
+                  : ContentHubBridge.ContentTransfer.Import;
+    };
+    function _contentTransferDirectionToName(state) {
+        if (state === ContentHubBridge.ContentTransfer.Import)
+            return "Import";
+        else if (state === ContentHubBridge.ContentTransfer.Export)
+            return "Export";
+        return "Import";
     };
 
     function _contentTransferStateToName(state) {
@@ -1283,13 +1368,23 @@ function createContentHubApi(backendDelegate) {
         },
 
         // properties
+
         selectionType: function(callback) {
             this._validate();
-            callback(this._object.selectionType)
+            callback(_contentTransferSelectionToName(this._object.selectionType));
         },
         setSelectionType: function(selectionType) {
             this._validate();
-            this._object.selectionType = selectionType;
+            this._object.selectionType = _nameToContentTransferSelection(selectionType);
+        },
+
+        direction: function(callback) {
+            this._validate();
+            callback(_contentTransferDirectionToName(this._object.direction));
+        },
+        setDirection: function(direction) {
+            this._validate();
+            this._object.direction = _nameToContentTransferDirection(direction);
         },
 
         items: function(callback) {
@@ -1298,7 +1393,8 @@ function createContentHubApi(backendDelegate) {
             // return in serialized form
             var items = [];
             for (var i = 0; i < this._object.items.length; ++i) {
-                items.push({name: this._object.items[i].name, url: this._object.items[i].url});
+                items.push({name: this._object.items[i].name.toString(),
+                               url: this._object.items[i].url.toString()});
             }
             callback(items)
         },
