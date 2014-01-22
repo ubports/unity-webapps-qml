@@ -1117,8 +1117,9 @@ function createAlarmApi(backendDelegate) {
         },
         setDate: function(date, callback) {
             this._validate();
-            this._object.date = new Date();
-            this._object.date.setTime(parseInt(date));
+            var _date = new Date();
+            _date.setTime(parseInt(date));
+            this._object.date = _date;
             if (callback && typeof(callback) === 'function')
                 callback();
         },
