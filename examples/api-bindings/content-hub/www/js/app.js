@@ -21,6 +21,8 @@ window.onload = function() {
             var img = document.createElement('img');
 
             img.setAttribute('src', images[i].url);
+            img.setAttribute('height', '100px');
+            img.setAttribute('width', '100px');
 
             if (images[i].name && images[i].name.length !== 0)
                 img.setAttribute('alt', images[i].name);
@@ -36,8 +38,6 @@ window.onload = function() {
     function setResults(results) {
         var resultEl = document.getElementById('results');
         resultEl.innerHTML = results;
-
-        displayImages(results);
     };
 
     function formatResults(results) {
@@ -55,6 +55,7 @@ window.onload = function() {
 
     function renderResults(results) {
         setResults(formatResults(results));
+        displayImages(results);
     };
 
     function doImport() {
