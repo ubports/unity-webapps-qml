@@ -24,26 +24,14 @@ Homepage: https://launchpad.net/unity-webapp-qml
 # upstream branch
 Vcs-Bzr: lp:unity-webapps-qml
 
-Package: qtdeclarative5-ubuntu-webapps-common
-Architecture: any
+Package: unity-webapps-qml
+Architecture: all
 Multi-Arch: same
-Depends: libqt5webkit5-qmlwebkitplugin,
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+	 libqt5webkit5-qmlwebkitplugin,
          qtdeclarative5-qtquick2-plugin,
          qtdeclarative5-unity-action-plugin,
-         ${misc:Depends},
-         ${shlibs:Depends},
-Description: Unity Webapps QML component
- Unity Webapps QML is a QML component that binds to a QML WebView and allows
- running javascript code to access Ubuntu stack components.
-
-Package: qtdeclarative5-ubuntu-webapps-plugins
-Architecture: any
-Multi-Arch: same
-Depends: libqt5webkit5-qmlwebkitplugin,
-         qtdeclarative5-qtquick2-plugin,
-         qtdeclarative5-unity-action-plugin,
-         ${misc:Depends},
-         ${shlibs:Depends},
 Description: Unity Webapps QML component
  Unity Webapps QML is a QML component that binds to a QML WebView and allows
  running javascript code to access Ubuntu stack components.
@@ -51,10 +39,10 @@ Description: Unity Webapps QML component
 Package: unity-webapps-qml-examples
 Section: libs
 Architecture: any
-Depends: qtdeclarative5-window-plugin,
-         unity-webapps-qml (>= ${binary:Version}),
-         ${misc:Depends},
+Depends: ${misc:Depends},
          ${shlibs:Depends},
+	 qtdeclarative5-window-plugin,
+         unity-webapps-qml (>= ${binary:Version}),
 Description: Example usage of Unity Webapps QML component
  Some examples demonstrating the webapps QML component.
 
