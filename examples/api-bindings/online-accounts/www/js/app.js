@@ -7,6 +7,8 @@ window.onload = function() {
     };
 
     function doGetAuth() {
+	setResults('');
+
         var api = external.getUnityObject(1.0);
         var oa = api.OnlineAccounts;
 
@@ -16,7 +18,12 @@ window.onload = function() {
             }
             else {
                 for (var i = 0; i < result.length; ++i) {
-                    setResults("name: " + result[i].displayName + ', id: ' + result[i].accountId);
+                    setResults("name: " + result[i].displayName
+			       + ', id: ' + result[i].accountId
+			       + ', providerName: ' + result[i].providerName
+			       + ', serviceName: ' + result[i].serviceName
+			       + ', enabled: ' + (result[i].enabled ? "true" : "false")
+			       + '<br>');
                 }
             }
 
@@ -26,12 +33,10 @@ window.onload = function() {
                     return;
                 }
 
-                setResults("Authenticated: "
+                setResults("<br><br>Authenticated: "
                              + result.authenticated
                              + ", token: "
-                             + result.data
-                             + ", account Id: "
-                             + result.accountId);
+                             + result.data);
             });
         });
     }

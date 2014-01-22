@@ -619,8 +619,7 @@ function createOnlineAccountsApi(backendDelegate) {
             onAuthenticated = function(reply) {
                 callback({error: null,
                           authenticated: true,
-                          data: reply.AccessToken,
-                          accountId: accountId});
+                          data: reply.AccessToken});
 
                 self._object.onAuthenticated.disconnect(onAuthenticated);
                 self._object.onAuthenticationError.disconnect(onAuthenticationError);
@@ -764,7 +763,7 @@ function createOnlineAccountsApi(backendDelegate) {
             if (this._modelAdaptor) {
                 return -1;
             }
-            callback(this._modelAdaptor.rownCount());
+            callback(this._modelAdaptor.rowCount());
         },
 
         at: function(idx, callback) {
@@ -852,6 +851,17 @@ function createOnlineAccountsApi(backendDelegate) {
                 callback();
         },
 
+        includeDisabled: function(callback) {
+            this._validate();
+            callback(this._object.includeDisabled);
+        },
+        setIncludeDisabled: function(includeDisabled, callback) {
+            this._validate();
+            this._object.includeDisabled = includeDisabled;
+            if (callback)
+                callback();
+        },
+
         accountId: function(callback) {
             this._validate();
             callback(this._object.accountId);
@@ -868,11 +878,11 @@ function createOnlineAccountsApi(backendDelegate) {
             if (this._modelAdaptor) {
                 callback(-1);
             }
-            callback(this._modelAdaptor.rownCount());
+            callback(this._modelAdaptor.rowCount());
         },
 
         at: function(idx, callback) {
-            var count = this._modelAdaptor.rownCount();
+            var count = this._modelAdaptor.rowCount();
             if (idx >= count || ! this._modelAdaptor) {
                 callback(null);
                 return;
@@ -889,10 +899,10 @@ function createOnlineAccountsApi(backendDelegate) {
         internal: {
 
             // special case for an object wrapper
-            accountServiceHandleAtIndex: function(idx) {
-                this._validate();
+            accountServiceHandleAtIndex: function(self, idx) {
+                self._validate();
 
-                var accountServiceHandle = this._modelAdaptor.itemAt(idx, "accountServiceHandle");
+                var accountServiceHandle = self._modelAdaptor.itemAt(idx, "accountServiceHandle");
 
                 if (accountServiceHandle != null) {
                     var accountService = new AccountService();
@@ -903,10 +913,19 @@ function createOnlineAccountsApi(backendDelegate) {
                 return null;
             },
 
-            count: function() {
-                return this._modelAdaptor ?
-                            this._modelAdaptor.rownCount()
+            itemAt: function(self, idx, role) {
+                self._validate();
+                return self._modelAdaptor.itemAt(idx, role);
+            },
+
+            count: function(self) {
+                return self._modelAdaptor ?
+                            self._modelAdaptor.rowCount()
                           : -1;
+            },
+
+            includeDisabled: function(self) {
+                return self._object.includeDisabled;
             },
         }
     };
@@ -939,23 +958,30 @@ function createOnlineAccountsApi(backendDelegate) {
         },
 
         // api
-        getAccountsInfoFor: function(serviceName, providerName, callback) {
+        getAccountsInfoFor: function(service, provider, callback) {
             var serviceModel = new AccountServiceModel();
 
-            if (serviceName)
-                serviceModel.setService(serviceName);
-            if (providerName)
-                serviceModel.setProvider(providerName);
+            if (service)
+                serviceModel.setService(service);
+            if (provider)
+                serviceModel.setProvider(provider);
 
-            var count = serviceModel.internal.count();
+            var count = serviceModel.internal.count(serviceModel);
             console.log(count)
             var accountsInfo = []
             for (var i = 0; i < count; ++i) {
-                var displayName = serviceModel.internal.itemAt(i, "displayName");
-                var accountId = serviceModel.internal.itemAt(i, "accountId");
+                var displayName = serviceModel.internal.itemAt(serviceModel, i, "displayName");
+                var accountId = serviceModel.internal.itemAt(serviceModel, i, "accountId");
+                var providerName = serviceModel.internal.itemAt(serviceModel, i, "providerName");
+                var serviceName = serviceModel.internal.itemAt(serviceModel, i, "serviceName");
+                var enabled = serviceModel.internal.itemAt(serviceModel, i, "enabled");
 
                 accountsInfo.push({displayName: displayName
-                                      , accountId: accountId});
+                                      , accountId: accountId
+                                      , providerName: providerName
+                                      , serviceName: serviceName
+                                      , enabled: enabled
+                                  });
             }
             serviceModel.destroy();
 
@@ -979,7 +1005,7 @@ function createOnlineAccountsApi(backendDelegate) {
             if (accountId)
                 serviceModel.setAccountId(accountId);
 
-            var count = serviceModel.internal.count();
+            var count = serviceModel.internal.count(serviceModel);
             if (count > 0) {
                 var accountIdx = 0;
                 if (count > 1) {
@@ -989,7 +1015,9 @@ function createOnlineAccountsApi(backendDelegate) {
                     serviceModel.destroy();
                     callback(results);
                 };
-                serviceModel.internal.accountServiceHandleAtIndex(accountIdx).authenticate(onAuthenticated);
+                serviceModel.internal
+                    .accountServiceHandleAtIndex(serviceModel, accountIdx)
+                    .authenticate(onAuthenticated);
             }
             else {
                 serviceModel.destroy();

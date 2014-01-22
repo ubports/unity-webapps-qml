@@ -202,6 +202,13 @@ function createOnlineAccountsApi(backendBridge) {
             this._proxy.call('setServiceType', [serviceType, callback]);
         },      
 
+        includeDisabled: function(callback) {
+            this._proxy.call('includeDisabled', [], callback);
+        },
+        setIncludeDisabled: function(includeDisabled, callback) {
+            this._proxy.call('setIncludeDisabled', [includeDisabled, callback]);
+        },
+
         accountId: function(callback) {
             this._proxy.call('accountId', [], callback);
         },
@@ -333,7 +340,7 @@ function createOnlineAccountsApi(backendBridge) {
              * @method getAccountsInfoFor
              * @param service If set, the access token will be retrieved for the accounts that correspond to that specific service.
              * @param provider If set, the access token will be retrieved for the accounts that correspond to that specific service.
-             * @param callback {Function({List {Object(displayName:, accountId: {Bool} )} })} Callback that receives the result or null
+             * @param callback {Function({List {Object(displayName:, accountId: {Bool}, providerName: {String}, serviceName: {String}, enabled: {Bool})} })} Callback that receives the result or null
              */
             getAccountsInfoFor: function(service, provider, callback) {
                 backendBridge.call('OnlineAccounts.getAccountsInfoFor'
