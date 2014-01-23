@@ -1,6 +1,5 @@
 [Desktop Entry]
 Name=BBCNewsWebappsQMLExample
-Encoding=UTF-8
 Type=Application
 Exec=/usr/bin/unity-webapps-qml-launcher --qml=/usr/share/unity-webapps-qml/examples/unity-webapps-example-bbcnews/main.qml --app-id=unity-webapps-qml-bbcnews-example
 Path=/usr/share/unity-webapps-qml/examples/unity-webapps-example-bbcnews
