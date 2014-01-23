@@ -8,8 +8,8 @@ Item {
   id: root
   focus: true
 
-  width: units.gu(50)
-  height: units.gu(75)
+  width: units.gu(100)
+  height: units.gu(100)
 
   WebView {
     id: webview
