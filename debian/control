@@ -32,7 +32,7 @@ Depends: libqt5webkit5-qmlwebkitplugin,
          qtdeclarative5-unity-action-plugin,
          ${misc:Depends},
          ${shlibs:Depends},
-Provides: qt5declarative-ubuntu-html5-api,
+Provides: qtdeclarative5-ubuntu-html5-api,
 Description: Unity Webapps QML component
  Unity Webapps QML is a QML component that binds to a QML WebView and allows
  running javascript code to access Ubuntu stack components.
