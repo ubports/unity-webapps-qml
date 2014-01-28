@@ -17,7 +17,7 @@ Build-Depends: debhelper (>= 9),
                qtbase5-dev,
                qtdeclarative5-dev,
                qtdeclarative5-test-plugin,
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 Homepage: https://launchpad.net/unity-webapp-qml
 # if you don't have have commit access to this branch but would like to upload
 # directly to Ubuntu, don't worry: your changes will be merged back into the
@@ -32,6 +32,7 @@ Depends: libqt5webkit5-qmlwebkitplugin,
          qtdeclarative5-unity-action-plugin,
          ${misc:Depends},
          ${shlibs:Depends},
+Provides: qtdeclarative5-ubuntu-webapps-api,
 Description: Unity Webapps QML component
  Unity Webapps QML is a QML component that binds to a QML WebView and allows
  running javascript code to access Ubuntu stack components.
