@@ -1,5 +1,4 @@
 [Desktop Entry]
-Encoding=UTF-8
 Type=Application
 Exec=qmlscene /usr/share/unity-webapps-qml/examples/basic-webview/main.qml
 Path=/usr/share/unity-webapps-qml/examples/basic-webview

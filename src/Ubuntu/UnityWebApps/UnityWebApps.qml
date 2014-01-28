@@ -1,8 +1,27 @@
+/*
+ * Copyright 2013 Canonical Ltd.
+ *
+ * This file is part of unity-webapps-qml.
+ *
+ * unity-webapps-qml is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 3.
+ *
+ * unity-webapps-qml is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import QtQuick 2.0
 import Ubuntu.UnityWebApps 0.1 as UbuntuUnityWebApps
 import "UnityWebApps.js" as UnityWebAppsJs
 import "UnityWebAppsUtils.js" as UnityWebAppsJsUtils
 import "UnityWebAppsBackendComponents.js" as UnityBackends
+
 
 /*!
     \qmltype UnityWebApps
@@ -90,6 +109,22 @@ Item {
 
 
     /*!
+      \qmlproperty UnityWebappsAppModel UnityWebApps::extraApisSource
+
+      An optional model used in conjunction with the 'name' property
+        as a location for looking up the desired webapps.
+
+     */
+    property alias injectExtraUbuntuApis: settings.injectExtraUbuntuApis
+
+    /*!
+      \qmlproperty UnityWebappsAppModel UnityWebApps::extraApisSource
+
+     */
+    property alias requiresInit: settings.requiresInit
+
+
+    /*!
       \qmlproperty UnityActions.Context UnityWebApps::actionsContext
 
       The actions context that this element can reach out to for
@@ -108,6 +143,17 @@ Item {
      */
     property var _opt_backendProxies: null
 
+
+    Settings {
+        id: settings
+    }
+
+/*
+    Loader {
+        id: apiBindingModelComponentLoader
+        sourceComponent: settings.injectExtraUbuntuApis ? apiBindingModelComponent : undefined
+    }
+*/
 
     /*!
       \internal
@@ -165,6 +211,10 @@ Item {
         internal.instance = instance;
     }
 
+    /*!
+      \internal
+
+     */
     function __createBackendsIfNeeded() {
         var backends;
         if (_opt_backendProxies != null)
@@ -280,6 +330,10 @@ Item {
         }
     }
 
+    /*!
+      \internal
+
+     */
     function __initWebappForName(name) {
         webapps.__unbind();
 
@@ -336,6 +390,10 @@ Item {
     }
 
 
+    /*!
+      \internal
+
+     */
     function __isValidWebAppName(name) {
         return name != null && typeof(name) === 'string' && name != "";
     }
@@ -351,7 +409,7 @@ Item {
       TODO move elsewhere (in js file)
      */
     function __makeBackendProxies () {
-        var initialized = false;
+        var initialized = settings.requiresInit ? false : true;
 
         function getWrappedJsCallback(jscallback) {
             var callback = Qt.createQmlObject('import Ubuntu.UnityWebApps 0.1 as Backends; Backends.UnityWebappsCallback { }', bindee);
@@ -377,6 +435,8 @@ Item {
 
             return params.__unity_webapps_hidden.hostname.indexOf(params.domain) !== -1;
         };
+
+        UnityBackends.createBackendDelegate(webapps);
 
         return {
             init: function (params) {
@@ -564,6 +624,12 @@ Item {
                     }
                 }
             },
+
+            OnlineAccounts: UnityBackends.createOnlineAccountsApi(UnityBackends.backendDelegate),
+
+            Alarm: UnityBackends.createAlarmApi(UnityBackends.backendDelegate),
+
+            ContentHub: UnityBackends.createContentHubApi(UnityBackends.backendDelegate),
 
             Launcher: {
                 setCount: function (count) {

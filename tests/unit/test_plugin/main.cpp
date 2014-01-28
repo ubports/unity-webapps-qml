@@ -1,13 +1,13 @@
 /*
  * Copyright 2013 Canonical Ltd.
  *
- * This file is part of UnityWebappsQML.
+ * This file is part of unity-webapps-qml.
  *
- * UnityWebappsQML is free software; you can redistribute it and/or modify
+ * unity-webapps-qml is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; version 3.
  *
- * UnityWebappsQML is distributed in the hope that it will be useful,
+ * unity-webapps-qml is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -32,6 +32,7 @@ int runTests(int argc, char ** argv)
 
     tests.append(new WebappsAppModelTest());
     tests.append(new ManifestParserTest());
+    tests.append(new PluginTest());
 
     Q_FOREACH(QObject *test, tests)
     {

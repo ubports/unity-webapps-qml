@@ -14,8 +14,6 @@ Window {
         // test url
         url: "file:///usr/share/unity-webapps-qml/examples/data/html/big-test.html"
         anchors.fill: parent
-        width: parent.width
-        height: parent.height
 
         experimental.userScripts: []
         experimental.preferences.navigatorQtObjectEnabled: true

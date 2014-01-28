@@ -26,10 +26,12 @@ Vcs-Bzr: lp:unity-webapps-qml
 
 Package: unity-webapps-qml
 Architecture: any
-Multi-Arch: same
 Depends: libqt5webkit5-qmlwebkitplugin,
          qtdeclarative5-qtquick2-plugin,
          qtdeclarative5-unity-action-plugin,
+         qtdeclarative5-ubuntu-ui-toolkit-plugin,
+         qtdeclarative5-accounts-plugin,
+         qtdeclarative5-ubuntu-content0.1,
          ${misc:Depends},
          ${shlibs:Depends},
 Provides: qtdeclarative5-ubuntu-webapps-api,
@@ -41,7 +43,8 @@ Package: unity-webapps-qml-examples
 Section: libs
 Architecture: any
 Depends: qtdeclarative5-window-plugin,
-         unity-webapps-qml (>= ${binary:Version}),
+         qmlscene,
+         unity-webapps-qml (>= ${source:Version}),
          ${misc:Depends},
          ${shlibs:Depends},
 Description: Example usage of Unity Webapps QML component
@@ -50,8 +53,7 @@ Description: Example usage of Unity Webapps QML component
 Package: unity-webapps-qml-doc
 Section: doc
 Architecture: all
-Depends: ${misc:Depends},
-         ${shlibs:Depends},
+Depends: ${misc:Depends}, ${shlibs:Depends},
 Suggests: unity-webapps-qml-examples,
 Description: Documentation for Unity Webapps QML - documentation
  Unity Webapps QML component

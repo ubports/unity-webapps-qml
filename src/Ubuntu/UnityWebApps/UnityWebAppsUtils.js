@@ -1,13 +1,13 @@
 /*
  * Copyright 2013 Canonical Ltd.
  *
- * This file is part of UnityWebappsQML.
+ * This file is part of unity-webapps-qml.
  *
- * UnityWebappsQML is free software; you can redistribute it and/or modify
+ * unity-webapps-qml is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; version 3.
  *
- * UnityWebappsQML is distributed in the hope that it will be useful,
+ * unity-webapps-qml is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -18,20 +18,27 @@
 
 .pragma library
 
-//
-// \brief Creates a simple proxy object that bridges a UnityWebapps component with a given webview.
-//
-// The UnityWebApps component does not reach out directly to a webview but expects something that
-//  provides a simple interface of needed methods/functions. For the regular case though (binding
-//  to an existing webview) writing the interface manually is tedious, so this tool does it and creates
-//  the bridging object to a webview.
-//
-// \param webViewId
-// \param handlers (optional) map of handlers for UnityWebApps events to the external world, supported events:
-//                  {
-//                      onAppRaised: function () {}
-//                  }
-//
+var UBUNTU_WEBAPPS_BINDING_API_CALL_MESSAGE = "ubuntu-webapps-binding-call";
+var UBUNTU_WEBAPPS_BINDING_OBJECT_METHOD_CALL_MESSAGE = "ubuntu-webapps-binding-call-object-method";
+
+/**
+ * Creates a simple proxy object that bridges
+ *  a UnityWebapps component with a given webview.
+ *
+ * The UnityWebApps component does not reach out directly to
+ *  a webview but expects something that provides a simple
+ *  interface of needed methods/functions. For the regular
+ *  case though (binding to an existing webview) writing the
+ *  interface manually is tedious, so this tool does it and creates
+ *  the bridging object to a webview.
+ *
+ * @param webViewId
+ * @param handlers (optional) map of handlers for UnityWebApps
+ *                            events to the external world, supported events:
+ *  {
+ *    onAppRaised: function () {}
+ *  }
+ */
 function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
 
     var handlers = eventHandlers && typeof(eventHandlers) === 'object' ? eventHandlers : {};
@@ -107,12 +114,14 @@ function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
     })(new SignalConnectionDisposer());
 }
 
-//
-// \brief For a given list of objects returns a function that validates the presence and validity of the
-//  specified properties.
-//
-// \param props list of object properties to validate. Each property is an object w/ a 'name' and 'type' (as in typeof()).
-//
+
+/**
+ * For a given list of objects returns a function that validates the presence and validity of the
+ *  specified properties.
+ *
+ * \param props list of object properties to validate. Each
+ *   property is an object w/ a 'name' and 'type' (as in typeof()).
+ */
 function isIterableObject(obj) {
     if (obj === undefined || obj === null) {
         return false;
@@ -122,15 +131,17 @@ function isIterableObject(obj) {
     return types[t] === undefined;
 };
 
-//
-// \brief For a given list of objects returns a function that validates the presence and validity of the
-//  specified properties.
-//
-// \param props list of object properties to validate. Each property is an object w/ a 'name' and 'type' (as in typeof()).
-//
+
+/**
+ * Format a specific
+ *
+ * \param props list of object properties to validate. Each
+ *   property is an object w/ a 'name' and 'type' (as in typeof()).
+ */
 function formatUnityWebappsCall(type, serialized_args) {
     return {target: "unity-webapps-call", name: type, args: serialized_args};
 }
+
 
 //
 // \brief For a given list of objects returns a function that validates the presence and validity of the
@@ -139,7 +150,7 @@ function formatUnityWebappsCall(type, serialized_args) {
 // \param props list of object properties to validate. Each property is an object w/ a 'name' and 'type' (as in typeof()).
 //
 function formatUnityWebappsCallbackCall(callbackid, args) {
-    return {target: 'unity-webapps-callback-call', id: callbackid, args: args};
+    return {target: 'ubuntu-webapps-binding-callback-call', id: callbackid, args: args};
 };
 
 
@@ -149,13 +160,31 @@ function formatUnityWebappsCallbackCall(callbackid, args) {
 //
 // \param props list of object properties to validate. Each property is an object w/ a 'name' and 'type' (as in typeof()).
 //
-function isUnityWebappsCallbackCall(params) {
+function isUbuntuBindingCallbackCall(params) {
     function _has(o,k) { return (k in o) && o[k] != null; }
-    return params != null && _has(params,"target") && _has(params,"args") && _has(params,"id") && params.target === 'unity-webapps-callback-call';
+    return params != null
+            && (typeof(params) === 'object')
+            && _has(params,"target")
+            && _has(params,"args")
+            && _has(params,"id")
+            && params.target === 'ubuntu-webapps-binding-callback-call';
 };
 
+/**
+ *
+ *
+ */
+function isUbuntuBindingObjectProxy(params) {
+    function _has(o,k) { return (k in o) && o[k] != null; }
+    return params != null
+            && (typeof(params) === 'object')
+            && _has(params,"type")
+            && params.type === 'object-proxy'
+            && _has(params,"apiid")
+            && _has(params,"objecttype")
+            && _has(params,"objectid");
+};
 
-//
 // \brief For a given list of objects returns a function that validates the presence and validity of the
 //  specified properties.
 //
@@ -167,7 +196,6 @@ function makePropertyValidator(props) {
         return !props.some(function (prop) { return !_hasProperty(object, prop.name, prop.type); });
     };
 }
-
 
 //
 // \brief For a given list of objects returns a function that validates the presence and validity of the

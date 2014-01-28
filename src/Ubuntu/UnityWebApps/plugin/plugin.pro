@@ -39,7 +39,8 @@ SOURCES += \
     unity-webapps-app-infos.cpp \
     unity-webapps-desktop-infos.cpp \
     unity-webapps-icon-utils.cpp \
-    callback.cpp
+    callback.cpp \
+    abstract-item-model-adaptor.cpp
 
 HEADERS += \
     qml-plugin.h \
@@ -55,7 +56,8 @@ HEADERS += \
     unity-webapps-app-infos.h \
     unity-webapps-desktop-infos.h \
     unity-webapps-icon-utils.h \
-    callback.h
+    callback.h \
+    abstract-item-model-adaptor.h
 
 DEFINES += \
     API_URI=\\\"$${API_URI}\\\"

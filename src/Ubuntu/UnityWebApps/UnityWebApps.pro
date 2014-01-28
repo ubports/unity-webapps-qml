@@ -21,13 +21,21 @@ PRE_TARGETDEPS += \
 #
 # deployment directives
 #
-JS_FILES = $$system(ls *.js) $${UNITY_API_JS_FILE}
+JS_FILES = $$system(ls *.js) \
+    $${UNITY_API_JS_FILE} \
+    $$system(ls ./common/*/*.js) \
+    $$system(ls ./bindings/*/*/*.js)
+
 QML_FILES = $$system(ls *.qml)
 
 QMLDIR_FILE = qmldir
 QMAKE_SUBSTITUTES += qmldir.in
 
-OTHER_FILES += $$QML_FILES $$JS_FILES qmldir.in unity-webapps-api.js.in $${UNITY_API_JS_FILE}
+OTHER_FILES += $$QML_FILES \
+    $$JS_FILES \
+    qmldir.in \
+    unity-webapps-api.js.in \
+    $${UNITY_API_JS_FILE}
 
 #
 # Installs

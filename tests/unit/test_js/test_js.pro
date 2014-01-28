@@ -1,17 +1,32 @@
+include(../../../common-project-config.pri)
+
+TESTS += $$system(ls tst_*.qml)
+
 TEMPLATE = app
 
 TARGET = test_js
 
-CONFIG += \
-    debug \
-    link_pkgconfig
-
-QT += \
-    core \
-    qml \
+QT += qml \
     testlib \
     qmltest
 
-# LIBS += $$system(ls ../../src/Ubuntu/UnityWebApps/*.so)
+CONFIG += no_keywords \
+    debug \
+    link_pkgconfig
 
-SOURCES = test_js.cpp
+SOURCES += \
+    test_js.cpp
+
+OTHER_FILES += $$system(ls *.qml) \
+    $$system(ls *.js) \
+    $$system(ls *.sh)
+
+# make check target
+check.target = check
+check.commands = "set -e;"
+for(TEST, TESTS) {
+  check.commands += ./runtest.sh $${TARGET} $${TEST} ../../../src;
+}
+
+QMAKE_EXTRA_TARGETS += check
+

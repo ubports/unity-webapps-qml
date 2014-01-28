@@ -1,13 +1,13 @@
 /*
  * Copyright 2013 Canonical Ltd.
  *
- * This file is part of UnityWebappsQML.
+ * This file is part of unity-webapps-qml.
  *
- * UnityWebappsQML is free software; you can redistribute it and/or modify
+ * unity-webapps-qml is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; version 3.
  *
- * UnityWebappsQML is distributed in the hope that it will be useful,
+ * unity-webapps-qml is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -30,11 +30,11 @@ var UnityWebApps = (function () {
 
     var json = JSON;
 
-    /*!
-        \param parentItem
-        \param bindeeProxies
-        \param backends
-        \param userscriptContent
+    /**
+     * \param parentItem
+     * \param bindeeProxies
+     * \param backends
+     * \param userscriptContent
      */
     function _UnityWebApps(parentItem, bindeeProxies, backends, userscripts) {
         this._injected_unity_api_path = Qt.resolvedUrl('unity-webapps-api.js');
@@ -56,6 +56,10 @@ var UnityWebApps = (function () {
             return this._bindeeProxies;
         },
 
+        /**
+         * \internal
+         *
+         */
         _bind: function () {
             var self = this;
 
@@ -66,117 +70,199 @@ var UnityWebApps = (function () {
             self._bindeeProxies.messageReceivedConnect(cb);
         },
 
+        /**
+         * \internal
+         *
+         */
         _onLoadingStartedCallback: function () {
             var scripts = [this._injected_unity_api_path];
             for(var i = 0; i < this._userscripts.length; ++i) {
 
-                console.debug('Injecting webapps script[' + i + '] : ' + Qt.resolvedUrl(this._userscripts[i]))
+                console.debug('Injecting webapps script[' + i + '] : '
+                              + Qt.resolvedUrl(this._userscripts[i]));
+
                 scripts.push(Qt.resolvedUrl(this._userscripts[i]));
             }
 
             this._bindeeProxies.injectUserScripts(scripts);
         },
 
+        /**
+         * \internal
+         *
+         */
         _onMessageReceivedCallback: function (message) {
             if (!message)
                 return;
             this._onMessage(message);
         },
 
-        //FIXME: api design
+        /**
+         * \internal
+         *
+         */
         _onMessage: function(msg) {
-            if (!this._isValidWebAppsMessage(msg)) {
-                //FIXME(AAU): proper error handling
+            if ( ! this._isValidWebAppsMessage(msg)) {
+                this._log ('Invalid message received: ' + json.stringify(msg));
+
                 return;
             }
 
-            this._log ('WebApps received message: ' + json.stringify(msg));
+            this._log ('WebApps API message received: ' + json.stringify(msg));
 
             var self = this;
             var args = json.parse(msg.args);
-            args = args.map (function (arg) { return self._wrapCallbackIds (arg); });
+            args = args.map (function (arg) {
+                return self._wrapCallbackIds (arg);
+            });
 
-            // Actuall call, e.g. 'Notification.showNotification("a","b")
-            // being reduces to successive calls to associated objects:
-            // Notification, showNotification
-            //
-            // TODO add proper error handling
-            this._dispatchApiCall(msg.name, args);
+            this._dispatch(msg, args);
 
             return true;
         },
 
-        _makeWebpageCallback: function (callbackid) {
-            var self = this;
-            return function () {
-                var sendToPage = self._bindeeProxies.sendToPage;
-                // TODO add validation higher
-                if (!sendToPage || !(sendToPage instanceof Function))
-                    return;
-                sendToPage(JSON.stringify(UnityWebAppsUtils.formatUnityWebappsCallbackCall(callbackid, Array.prototype.slice.call(arguments))));
-            };
+        /**
+         * \internal
+         *
+         */
+        _dispatch: function(message, params) {
+            var target = message.target;
+
+            //TODO improve dispatch
+            if (target === UnityWebAppsUtils.UBUNTU_WEBAPPS_BINDING_API_CALL_MESSAGE) {
+                // Actuall call, e.g. 'Notification.showNotification("a","b")
+                // being reduces to successive calls to associated objects:
+                // Notification, showNotification
+                //
+                // TODO add proper error handling
+                if (message.callback) {
+                    var cb = this._wrapCallbackIds (message.callback);
+                    params.push(cb);
+                }
+                this._dispatchApiCall (message.name, params);
+
+            } else if (target === UnityWebAppsUtils.UBUNTU_WEBAPPS_BINDING_OBJECT_METHOD_CALL_MESSAGE) {
+
+                var objectid = message.objectid;
+                var api_uri = message.api_uri;
+                var class_name = message.class_name;
+                var method_name = message.name;
+                var callback = this._wrapCallbackIds (message.callback);
+
+                console.debug('Dispatching object method call to: '
+                              + api_uri
+                              + ', method: '
+                              + method_name);
+
+                this._dispatchApiCall(api_uri + ".dispatchToObject",
+                                      [{args: params,
+                                          callback: callback,
+                                          objectid: objectid,
+                                          class_name: class_name,
+                                          method_name: method_name}]);
+            }
         },
 
         /**
-         * Wraps callback ids in proper callback that dispatch to the
-         * webpage thru a proper event
+         * \internal
          *
          */
-        _wrapCallbackIds: function (obj) {
-          if ( ! UnityWebAppsUtils.isIterableObject(obj)) {
-            return obj;
-          }
-          if (obj
-              && obj.hasOwnProperty('callbackid')
-              && obj.callbackid !== null) {
-            return this._makeWebpageCallback (obj.callbackid);
-          }
-
-          var ret = (obj instanceof Array) ? [] : {};
-          for (var key in obj) {
-            if (obj.hasOwnProperty(key)) {
-
-              if (UnityWebAppsUtils.isIterableObject (obj[key])) {
-
-                if (obj[key].callbackid != null) {
-                  ret[key] = this._makeWebpageCallback (obj[key].callbackid);
-                }
-                else {
-                  ret[key] = this._wrapCallbackIds (obj[key]);
-                }
-              }
-              else {
-                ret[key] = obj[key];
-              }
-            }
-          }
-          return ret;
-        },
-
         _dispatchApiCall: function (name, args) {
             var names = name.split('.');
             var reducetarget = this._backends;
-
             try {
               // Assumes that we are calling a 'callable' from a succession of objects
-              names.reduce (
+              var t = names.reduce (
                 function (prev, cur) {
-                    return (typeof prev[cur] == "function") ? (function(prev, cur) { return prev[cur].bind(prev); })(prev, cur) : prev[cur];
-                }, reducetarget).apply (null, args);
+                    return (typeof prev[cur] == "function") ?
+                                (function(prev, cur) { return prev[cur].bind(prev); })(prev, cur)
+                                : prev[cur];
+                }, reducetarget);
+                t.apply (null, args);
 
             } catch (err) {
               this._log('Error while dispatching call to ' + names.join('.') + ': ' + err);
             }
         },
 
-        _log: function (msg) {
-            console.debug(msg);
+        /**
+         * \internal
+         *
+         */
+        _makeWebpageCallback: function (callbackid) {
+            var self = this;
+            return function () {
+                var sendToPage = self._bindeeProxies.sendToPage;
+
+                // TODO add validation higher
+                if (!sendToPage || !(sendToPage instanceof Function))
+                    return;
+
+                var callback_args = Array.prototype.slice.call(arguments);
+                var message = UnityWebAppsUtils.formatUnityWebappsCallbackCall(callbackid, callback_args);
+
+                sendToPage(JSON.stringify(message));
+            };
         },
 
+        /**
+         * \internal
+         *
+         * Wraps callback ids in proper callback that dispatch to the
+         * webpage thru a proper event
+         *
+         */
+        _wrapCallbackIds: function (obj) {
+            if ( ! obj)
+                return obj;
+            if ( ! UnityWebAppsUtils.isIterableObject(obj)) {
+                return obj;
+            }
+
+            if (obj
+                && obj.hasOwnProperty('callbackid')
+                && obj.callbackid !== null) {
+              return this._makeWebpageCallback (obj.callbackid);
+            }
+
+            var ret = (obj instanceof Array) ? [] : {};
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    if (UnityWebAppsUtils.isIterableObject (obj[key])) {
+                        if (obj[key].callbackid != null) {
+                            ret[key] = this._makeWebpageCallback (obj[key].callbackid);
+                        }
+                        else {
+                            ret[key] = this._wrapCallbackIds (obj[key]);
+                        }
+                    }
+                    else {
+                        ret[key] = obj[key];
+                    }
+                }
+            }
+            return ret;
+          },
+
+        /**
+         * \internal
+         *
+         */
+        _log: function (msg) {
+            try {
+                console.debug(msg);
+            }
+            catch(e) {}
+        },
+
+        /**
+         * \internal
+         *
+         */
         _isValidWebAppsMessage: function(message) {
             return message != null &&
                     message.target &&
-                    message.target === 'unity-webapps-call' &&
+                    message.target.indexOf('ubuntu-webapps-binding-call') === 0 &&
                     message.name &&
                     message.args;
         }
