@@ -1339,6 +1339,20 @@ function createContentHubApi(backendDelegate) {
         return "Import";
     };
 
+    function _nameToContentTransferState(name) {
+        var contentTransferStatePerName = {
+            "Created": ContentHubBridge.ContentTransfer.Created,
+            "Initiated": ContentHubBridge.ContentTransfer.Initiated,
+            "InProgress": ContentHubBridge.ContentTransfer.InProgress,
+            "Charged": ContentHubBridge.ContentTransfer.Charged,
+            "Collected": ContentHubBridge.ContentTransfer.Collected,
+            "Aborted": ContentHubBridge.ContentTransfer.Aborted,
+            "Finalized": ContentHubBridge.ContentTransfer.Finalized,
+        };
+        return name in contentTransferStatePerName ?
+                    contentTransferStatePerName[name]
+                  : ContentHubBridge.ContentTransfer.Created;
+    };
     function _contentTransferStateToName(state) {
         if (state === ContentHubBridge.ContentTransfer.Created)
             return "Created";
@@ -1388,32 +1402,60 @@ function createContentHubApi(backendDelegate) {
 
         // object methods
         serialize: function() {
+            var self = this;
             return {
                 type: 'object-proxy',
                 apiid: 'ContentHub',
                 objecttype: 'ContentTransfer',
-                objectid: this._id,
+                objectid: self._id,
+
+                // serialize immutable values
+
+                content: {
+                    store: self._object.store,
+                    state: self._object.state,
+                }
             }
         },
 
         // properties
 
+        store: function(callback) {
+            this._validate();
+            callback(this._object.store);
+        },
+
+        state: function(callback) {
+            this._validate();
+            callback(_contentTransferStateToName(this._object.state));
+        },
+        setState: function(state, callback) {
+            this._validate();
+            this._object.state = _nameToContentTransferState(state);
+            if (callback && typeof(callback) === 'function')
+                callback();
+        },
+
         selectionType: function(callback) {
             this._validate();
             callback(_contentTransferSelectionToName(this._object.selectionType));
         },
-        setSelectionType: function(selectionType) {
+        setSelectionType: function(selectionType, callback) {
             this._validate();
             this._object.selectionType = _nameToContentTransferSelection(selectionType);
+            if (callback && typeof(callback) === 'function')
+                callback();
         },
 
         direction: function(callback) {
             this._validate();
             callback(_contentTransferDirectionToName(this._object.direction));
         },
-        setDirection: function(direction) {
+        setDirection: function(direction, callback) {
             this._validate();
             this._object.direction = _nameToContentTransferDirection(direction);
+            if (callback && typeof(callback) === 'function')
+                callback();
         },
 
         items: function(callback) {
@@ -1426,6 +1468,27 @@ function createContentHubApi(backendDelegate) {
                                url: this._object.items[i].url.toString()});
             }
             callback(items)
+        },
+        setItems: function(items, callback) {
+            this._validate();
+            var contentItems = [];
+            for (var i = 0; i < items.length; ++i) {
+                var item = backendDelegate.createQmlObject(
+                            PLUGIN_URI, VERSION, 'ContentItem');
+                if ( ! item.object) {
+                    console.debug('Could not create ContentItem object');
+                    continue;
+                }
+
+                item.object.name = items[i].name;
+                item.object.url = items[i].url;
+
+                contentItems.push(item.object);
+            }
+            this._object.items = contentItems;
+
+            if (callback && typeof(callback) === 'function')
+                callback();
         },
 
         // methods
@@ -1600,6 +1663,13 @@ function createContentHubApi(backendDelegate) {
             var transfer = new ContentTransfer(_contenthub.importContent(_nameToContentType(type), peer));
 
             callback(transfer.serialize());
+        },
+
+        onExportRequested: function(callback) {
+            _contenthub.exportRequested.connect(function(exportTransfer) {
+                var wrapped = new ContentTransfer(exportTransfer);
+                callback(wrapped.serialize());
+            });
         },
 
         // Internal

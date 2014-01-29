@@ -1,9 +1,14 @@
 function createContentHubApi(backendBridge) {
     var PLUGIN_URI = 'ContentHub';
 
-    function ContentTransfer(objectid) {
+    function ContentTransfer(objectid, content) {
         this._proxy = backendBridge.createRemoteObject(
             PLUGIN_URI, 'ContentTransfer', objectid);
+
+        this._store = content && content.store
+             ? content.store : null;
+        this._state = content && content.state
+             ? content.state : null;
     };
     ContentTransfer.prototype = {
         // object methods
@@ -20,6 +25,48 @@ function createContentHubApi(backendBridge) {
         // properties
 
         /**
+         * Retrieves the current store.
+         *
+         * If the callback parameter is not set, the current "local" value is retrieved.
+         *
+         * @method store
+         * @param callback (optional) {Function(String)}
+         */
+        store: function(callback) {
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('store', [], callback);
+                return;
+            }
+            return this._store;
+        },
+
+        /**
+         * Retrieves the current state.
+         *
+         * If the callback parameter is not set, the current "local" value is retrieved.
+         *
+         * @method state
+         * @param callback (optional) {Function(ContentTransfer.State)}
+         */
+        state: function(callback) {
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('state', [], callback);
+                return;
+            }
+            return this._state;
+        },
+        /**
+         * Sets the state of the transfer.
+         *
+         * @method setState
+         * @param state {ContentTransfer.State}
+         * @param callback {Function()} called when the state has been updated
+         */
+        setState: function(state, callback) {
+            this._proxy.call('setState', [state, callback]);
+        },
+
+        /**
          * Retrieves the current selection type.
          *
          * @method selectionType
@@ -33,9 +80,10 @@ function createContentHubApi(backendBridge) {
          *
          * @method setSelectionType
          * @param selectionType {ContentTransfer.SelectionType}
+         * @param callback {Function()} called when the state has been updated
          */
         setSelectionType: function(selectionType) {
-            this._proxy.call('setSelectionType', [selectionType]);
+            this._proxy.call('setSelectionType', [selectionType, callback]);
         },
 
         /**
@@ -52,19 +100,30 @@ function createContentHubApi(backendBridge) {
          *
          * @method setDirection
          * @param direction {ContentTransfer.Direction}
+         * @param callback {Function()} called when the state has been updated
          */
         setDirection: function(direction) {
-            this._proxy.call('setDirection', [direction]);
+            this._proxy.call('setDirection', [direction, callback]);
         },
 
         /**
-         * Retrieves the list of items included in the ContentTransfer.
+         * Retrieves the list of items associated with the ContentTransfer.
          *
          * @method items
          * @param callback {Function( {Object{name: , url: }} )}
          */
         items: function(callback) {
             this._proxy.call('items', [], callback);
+        },
+        /**
+         * Sets the list of items for the associated ContentTransfer (used when exporting).
+         *
+         * @method setItems
+         * @param items {Array of Object{name: String, url: String}}
+         * @param callback {Function()} called when the state has been updated
+         */
+        setItems: function(items) {
+            this._proxy.call('setItems', [items, callback]);
         },
 
         // methods
@@ -341,6 +400,17 @@ function createContentHubApi(backendBridge) {
                                callback);
         },
 
+        /**
+         * Creates a ContentStore object for the given ContentPeer.
+         *
+         * @method importContent
+         * @param callback {Function} function({ContentTransfer}) Function when one requests a resource to be exported.
+         *                                                          The corresponding ContentTransfer is provided as a parameter.
+         */
+        onExportRequested: function(callback) {
+            backendBridge.call('ContentHub.onExportRequested',
+                               [callback]);
+        },
 
         // Internal
 

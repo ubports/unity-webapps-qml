@@ -1,0 +1,5 @@
+click build .
+pkcon install-local com.ubuntu.developer.alexandre-abreu.content-hub-html5-exporter_0.1_all.click
+
+# /usr/lib/arm-linux-gnueabihf/content-hub/content-hub-peer-hook
+
