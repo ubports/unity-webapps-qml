@@ -1654,6 +1654,19 @@ function createContentHubApi(backendDelegate) {
             callback(transfer.serialize());
         },
 
+        knownSourcesForType: function(type, callback) {
+            var peers = _contenthub.knownSourcesForType(_nameToContentType(type));
+            var wrappedPeers = [];
+
+            for (var i = 0; i < peers.lenght; ++i) {
+                var wrappedPeer = new ContentPeer(peers[i]);
+                console.debug(wrappedPeer.serialize())
+                wrappedPeers.push(wrappedPeer.serialize());
+            }
+
+            callback(wrappedPeers);
+        },
+
         importContentForPeer: function(type, peerProxy, callback) {
             if (! backendDelegate.isObjectProxyInfo(peerProxy)) {
                 console.debug('importContentForPeer: invalid peer object proxy')

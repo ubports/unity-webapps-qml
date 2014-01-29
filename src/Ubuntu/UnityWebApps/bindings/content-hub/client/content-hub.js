@@ -374,6 +374,29 @@ function createContentHubApi(backendBridge) {
         },
 
         /**
+         * Returns all possible peers for the given ContentType.
+         *
+         * @method knownSourcesForType
+         * @param type {ContentType} Content type.
+         * @param callback {Function ({ Array of {ContentPeer} })} Function called with the possible ContentPeers.
+         */
+        knownSourcesForType: function(type, callback) {
+            backendBridge.call('ContentHub.knownSourcesForType',
+                               [type],
+                               function(peers) {
+                                    var wrappedPeers = [];
+                                   // FIXME: do this above recursively in the (bridge.js)
+                                    for (var i = 0; i < peers.length; ++i) {
+                                        wrappedPeers.push(
+                                                    new ContentPeer(
+                                                        peers[i].objectid,
+                                                        peers[i].content));
+                                    }
+                                    callback (wrappedPeers);
+                               });
+        },
+
+        /**
          * Creates a ContentStore object for the given content type.
          *
          * @method importContent
