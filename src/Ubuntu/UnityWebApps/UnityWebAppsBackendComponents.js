@@ -1658,9 +1658,8 @@ function createContentHubApi(backendDelegate) {
             var peers = _contenthub.knownSourcesForType(_nameToContentType(type));
             var wrappedPeers = [];
 
-            for (var i = 0; i < peers.lenght; ++i) {
+            for (var i = 0; i < peers.length; ++i) {
                 var wrappedPeer = new ContentPeer(peers[i]);
-                console.debug(wrappedPeer.serialize())
                 wrappedPeers.push(wrappedPeer.serialize());
             }
 

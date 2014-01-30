@@ -385,6 +385,7 @@ function createContentHubApi(backendBridge) {
                                [type],
                                function(peers) {
                                     var wrappedPeers = [];
+
                                    // FIXME: do this above recursively in the (bridge.js)
                                     for (var i = 0; i < peers.length; ++i) {
                                         wrappedPeers.push(

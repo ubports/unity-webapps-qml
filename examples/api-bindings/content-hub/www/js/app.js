@@ -1,12 +1,53 @@
 window.onload = function() {
+    var api = external.getUnityObject(1.0);
+    var hub = api.ContentHub;
+
+    var transferState = hub.ContentTransfer.State;
+    var pictureContentType = hub.ContentType.Pictures;
+
+    var sourcePeers = {};
+    hub.knownSourcesForType(
+        pictureContentType
+        , function (peers) {
+            for (var j = 0; j < peers.length; ++j) {
+                addPeerElement(peers[i].appId(), peers[i].name());
+                sourcePeers[peers[i].appId()] = peers[i];
+            }
+
+            console.log('peers defaultSourceForType: ' + peers)
+            hub.defaultSourceForType(
+                pictureContentType
+                , function(peer) {
+                    if (peer) {
+                        addPeerElement(peer.appId(), peer.name());
+                        sourcePeers[peer.appId()] = peer;
+                    }
+
+                    if (Object.keys(sourcePeers).length === 0) {
+                        nopeers();
+                        return;
+                    }
+                    document.getElementById('importdiv').style.display = 'block';
+                  }
+            );
+        });
+
     document.getElementById('import').addEventListener('click', doImport);
 
-    function setPeer(appId, name) {
-        var peer = document.getElementById('peer');
-        peer.innerHTML = 'appId: '
-            + appId
-            + ', name: '
-            + name;
+    function addPeerElement(appId, name) {
+        var peers = document.querySelector('#known-peers ul');
+        var li = document.createElement('li');
+
+        var span = document.createElement('span');
+
+        var text = document.createTextNode('appId: ' + appId + ', name: ' + name)
+        span.appendChild(text);
+
+        li.appendChild(span);
+        li.addEventListener('click', function (e) { li.classList.toggle('selected'); });
+        li.setAttribute('data-appid', appId);
+
+        peers.appendChild(li);
     };
 
     var results = [];
@@ -35,6 +76,18 @@ window.onload = function() {
         setResults('Transfer aborted');
     };
 
+    function nopeers() {
+        setResults('No peers found');
+    };
+
+    function selectonlyonepeer() {
+        setResults('Please select only one peer');
+    };
+
+    function pleaseselectonepeer() {
+        setResults('Please select one peer');
+    };
+
     function setResults(results) {
         var resultEl = document.getElementById('results');
         resultEl.innerHTML = results;
@@ -59,42 +112,46 @@ window.onload = function() {
     };
 
     function doImport() {
-        var api = external.getUnityObject(1.0);
-        var hub = api.ContentHub;
+        var peers = document.querySelectorAll('#known-peers ul li.selected');
+        if (peers.length > 1) {
+            selectonlyonepeer();
+            return;
+        }
+        if (peers.length === 0) {
+            pleaseselectonepeer();
+            return;
+        }
 
-        var transferState = hub.ContentTransfer.State;
-        var pictureContentType = hub.ContentType.Pictures;
+        var peer = sourcePeers[peers[0].getAttribute('data-appid')];
+        if (! peer) {
+            return;
+        }
+        hub.importContentForPeer(
+            pictureContentType,
+            peer,
+            function(transfer) {
+                transfer.start(function(state) {
+                    if (transferState.Aborted === state) {
+                        transfer.finalize();
+                        peer.destroy();
+                        transfer.destroy();
+                        aborted();
+                        return;
+                    }
 
-        hub.defaultSourceForType(
-            pictureContentType
-            , function (peer) {
-                setPeer(peer.appId(), peer.name());
-
-                hub.importContentForPeer(
-                    pictureContentType,
-                    peer,
-                    function(transfer) {
-                        transfer.start(function(state) {
-                            if (transferState.Aborted === state) {
-                                transfer.finalize();
-                                peer.destroy();
-                                transfer.destroy();
-                                aborted();
-                                return;
+                    if (transferState.Charged === state) {
+                        transfer.items(function(items) {
+                            for (var i = 0; i < items.length; ++i) {
+                                addResult(items[i]);
                             }
-
-                            if (transferState.Charged === state) {
-                                transfer.items(function(items) {
-                                    for (var i = 0; i < items.length; ++i) {
-                                        addResult(items[i]);
-                                    }
-                                    transfer.finalize();
-                                    peer.destroy();
-                                    transfer.destroy();
-                                });
-                            }
+                            transfer.finalize();
+                            peer.destroy();
+                            transfer.destroy();
                         });
+                    }
                 });
-            });
-    }
+            }
+        );
+    };
 };
+

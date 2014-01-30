@@ -7,7 +7,10 @@ window.onload = function() {
     function onExportRequested(transfer) {
         log('Received an export request');
 
-        transfer.setItems([{name: 'Ubuntu One', url: ''}],
+        var url = window.location.href;
+        url = url.substr(0, url.lastIndexOf('/')+1) + 'img/ubuntuone-music.png';
+
+        transfer.setItems([{name: 'Ubuntu One', url: url}],
                           function() {
                               log('The items have been set in the ContentTransfer');
                               transfer.setState(hub.ContentTransfer.State.Charged);
