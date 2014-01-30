@@ -1,3 +1,18 @@
+unity-webapps-qml (0.1+14.04.20140130.3-0ubuntu1) trusty; urgency=low
+
+  [ Alexandre Abreu ]
+  * Add bindings for Alarm API, contend HUb, Online Accounts,. (LP:
+    #1270210)
+
+  [ Robert Bruce Park ]
+  * Minor packaging cleanup.
+  * Provide virtual package ubuntu-html5-api-bindings.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 76
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 30 Jan 2014 17:52:37 +0000
+
 unity-webapps-qml (0.1+14.04.20131106-0ubuntu1) trusty; urgency=low
 
   * New rebuild forced
