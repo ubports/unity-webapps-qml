@@ -10,8 +10,8 @@ window.onload = function() {
         pictureContentType
         , function (peers) {
             for (var j = 0; j < peers.length; ++j) {
-                addPeerElement(peers[i].appId(), peers[i].name());
-                sourcePeers[peers[i].appId()] = peers[i];
+                addPeerElement(peers[j].appId(), peers[j].name());
+                sourcePeers[peers[j].appId()] = peers[j];
             }
 
             console.log('peers defaultSourceForType: ' + peers)

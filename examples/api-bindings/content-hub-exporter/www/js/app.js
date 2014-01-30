@@ -18,7 +18,7 @@ window.onload = function() {
                           });
     };
 
-    hud.onExportRequested(onExportRequested);
+    hub.onExportRequested(onExportRequested);
 
     function log(content) {
         var resultEl = document.getElementById('results');

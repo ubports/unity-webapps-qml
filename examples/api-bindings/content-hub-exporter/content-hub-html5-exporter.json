@@ -1,5 +1,5 @@
 {
-    template: "unconfined",
+    "template": "unconfined",
     "policy_groups": [
         "networking",
         "content_exchange_source",
