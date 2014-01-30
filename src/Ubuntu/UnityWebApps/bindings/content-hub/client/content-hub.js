@@ -39,6 +39,16 @@ function createContentHubApi(backendBridge) {
             }
             return this._store;
         },
+        /**
+         * Sets the current store for the ContentTransfer.
+         *
+         * @method setStore
+         * @param store {ContentStore}
+         * @param callback (optional) {Function()}
+         */
+        setStore: function(store, callback) {
+            this._proxy.call('setStore', [store.serialize(), callback]);
+        },
 
         /**
          * Retrieves the current state.

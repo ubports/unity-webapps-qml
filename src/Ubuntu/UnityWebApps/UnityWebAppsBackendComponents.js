@@ -1424,6 +1424,20 @@ function createContentHubApi(backendDelegate) {
             this._validate();
             callback(this._object.store);
         },
+        setStore: function(storeProxy, callback) {
+            this._validate();
+
+            if (backendDelegate.isObjectProxyInfo(storeProxy)) {
+                var store = backendDelegate.objectFromId(storeProxy.objectid);
+                if (store)
+                    this._object.setStore(store);
+            }
+            else {
+                console.debug('setStore: invalid store object proxy');
+            }
+            if (callback)
+                callback();
+        },
 
         state: function(callback) {
             this._validate();
