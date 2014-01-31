@@ -92,7 +92,7 @@ function createContentHubApi(backendBridge) {
          * @param selectionType {ContentTransfer.SelectionType}
          * @param callback {Function()} called when the state has been updated
          */
-        setSelectionType: function(selectionType) {
+        setSelectionType: function(selectionType, callback) {
             this._proxy.call('setSelectionType', [selectionType, callback]);
         },
 
@@ -112,7 +112,7 @@ function createContentHubApi(backendBridge) {
          * @param direction {ContentTransfer.Direction}
          * @param callback {Function()} called when the state has been updated
          */
-        setDirection: function(direction) {
+        setDirection: function(direction, callback) {
             this._proxy.call('setDirection', [direction, callback]);
         },
 
@@ -132,7 +132,7 @@ function createContentHubApi(backendBridge) {
          * @param items {Array of Object{name: String, url: String}}
          * @param callback {Function()} called when the state has been updated
          */
-        setItems: function(items) {
+        setItems: function(items, callback) {
             this._proxy.call('setItems', [items, callback]);
         },
 
@@ -270,7 +270,7 @@ function createContentHubApi(backendBridge) {
          * @method uri
          * @param callback (optional) {Function(String)}
          */
-        uri: function() {
+        uri: function(callback) {
             if (callback && typeof(callback) === 'function') {
                 this._proxy.call('uri', [], callback);
                 return;
