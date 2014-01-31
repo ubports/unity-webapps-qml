@@ -1,9 +1,18 @@
+# make sure that you have the latest upstart app launch installed
+
+# I found that it was better to kill the content-hub-service and let it restart itself
+#   since I saw some instances where it didn't pick up the new content hub source peer.
+
 click build .
 
 <on UbuntuTouch:>
     pkcon install-local com.ubuntu.developer.alexandre-abreu.content-hub-html5-exporter_0.1_all.click
 <on the Desktop:>
     sudo click install --user=$USER com.ubuntu.developer.alexandre-abreu.content-hub-html5-exporter_0.1_all.click
+
+# make sure that you have a symbolic link in ~/.local/share/content-hub. It should be the same name as the APP_ID:
+# com.ubuntu.developer.alexandre-abreu.content-hub-html5-exporter_content-hub-html5-exporter_0.1
+# and point to the content-hub-exporter.json file.
 
 
 
