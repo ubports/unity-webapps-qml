@@ -5,16 +5,26 @@
     <script src="./js/app.js"></script>
   </head>
   
+  <style>
+
+  .selected { background-color: red; }
+
+  </style>
+
   <body>
     
     <div>
-      Import: <input type="button" id="import"></input>
-    </div>
-    <div>
-      Peer:
-      <div id="peer">
+      Known source peers (click on one and only one of them to set as the target of the import):
+      <div id="known-peers">
+        <ul>
+        </ul>
       </div>
     </div>
+
+    <div style="display: none" id='importdiv'>
+      Import: <input type="button" id="import"></input>
+    </div>
+
     <div>
       Results:
       <div id="results">

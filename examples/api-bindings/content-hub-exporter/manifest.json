@@ -1,0 +1,15 @@
+{
+    "description": "An example of a Content Hub exporter HTML5 application",
+    "framework": "ubuntu-sdk-13.10",
+    "hooks": {
+        "content-hub-html5-exporter": {
+            "apparmor": "content-hub-html5-exporter.json",
+            "content-hub": "content-hub/content-hub-html5-exporter.json",
+            "desktop": "content-hub-html5-exporter.desktop"
+        }
+    },
+    "name": "com.ubuntu.developer.alexandre-abreu.content-hub-html5-exporter",
+    "title": "content-hub-html5-exporter",
+    "maintainer": "Alexandre Abreu <alexandre.abreu@canonical.com>",
+    "version": "0.1"
+}

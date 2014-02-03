@@ -1,0 +1,9 @@
+{
+    "template": "unconfined",
+    "policy_groups": [
+        "networking",
+        "content_exchange_source",
+        "content_exchange"
+    ],
+    "policy_version": 1
+}

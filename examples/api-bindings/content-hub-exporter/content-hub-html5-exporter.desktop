@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=content-hub-html5-exporter
+Comment=Content Hub HTML5 Exporter application
+Exec=/usr/bin/ubuntu-html5-app-launcher $@ --www=www
+Icon=qmlscene
+Terminal=false
+Type=Application
+X-Ubuntu-Touch=true
