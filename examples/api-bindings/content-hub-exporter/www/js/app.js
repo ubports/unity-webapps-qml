@@ -4,7 +4,7 @@ window.onload = function() {
 
     var transferState = hub.ContentTransfer.State;
 
-    function onExportRequested(transfer) {
+    function _exportRequested(transfer) {
         log('Received an export request');
 
         var url = window.location.href;
@@ -19,8 +19,7 @@ window.onload = function() {
                               log('State set to "Charged"');
                           });
     };
-
-    hub.onExportRequested(onExportRequested);
+    hub.onExportRequested(_exportRequested);
 
     function log(content) {
         var resultEl = document.getElementById('results');
