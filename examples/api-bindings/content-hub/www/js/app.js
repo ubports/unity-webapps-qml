@@ -126,32 +126,18 @@ window.onload = function() {
         if (! peer) {
             return;
         }
-        hub.importContentForPeer(
-            pictureContentType,
-            peer,
-            function(transfer) {
-                transfer.start(function(state) {
-                    if (transferState.Aborted === state) {
-                        transfer.finalize();
-                        peer.destroy();
-                        transfer.destroy();
-                        aborted();
-                        return;
-                    }
 
-                    if (transferState.Charged === state) {
-                        transfer.items(function(items) {
-                            for (var i = 0; i < items.length; ++i) {
-                                addResult(items[i]);
-                            }
-                            transfer.finalize();
-                            peer.destroy();
-                            transfer.destroy();
-                        });
-                    }
-                });
-            }
-        );
+	hub.api.importContent(pictureContentType
+			      , peer
+			      , {importToLocalStore: true}
+			      , function() {
+				  aborted();
+			      }
+			      , function(items) {
+				  for (var i = 0; i < items.length; ++i) {
+				      addResult(items[i]);
+				  }
+			      });
     };
 };
 

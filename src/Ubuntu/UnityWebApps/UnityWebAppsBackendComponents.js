@@ -1476,12 +1476,7 @@ function createContentHubApi(backendDelegate) {
             this._validate();
 
             // return in serialized form
-            var items = [];
-            for (var i = 0; i < this._object.items.length; ++i) {
-                items.push({name: this._object.items[i].name.toString(),
-                               url: this._object.items[i].url.toString()});
-            }
-            callback(items)
+            callback(this.internal.serializeItems(this._object));
         },
         setItems: function(items, callback) {
             this._validate();
@@ -1524,6 +1519,19 @@ function createContentHubApi(backendDelegate) {
             this._callback = null;
             this._object.finalize();
         },
+
+
+        // internal
+        internal: {
+            serializeItems: function(self) {
+                var items = [];
+                for (var i = 0; i < self.items.length; ++i) {
+                    items.push({name: self.items[i].name.toString(),
+                                   url: self.items[i].url.toString()});
+                }
+                return items;
+            }
+        }
     };
 
     function ContentStore(store, objectid) {
@@ -1680,9 +1688,46 @@ function createContentHubApi(backendDelegate) {
             callback(wrappedPeers);
         },
 
+        apiImportContent: function(type, peer, transferOptions, onSuccess, onFailure) {
+            if (! backendDelegate.isObjectProxyInfo(peer)) {
+                console.debug('apiImportContent: invalid peer object proxy')
+                onError("Invalid peer");
+                return;
+            }
+            var _type = _nameToContentType(type);
+            var _peer = backendDelegate.objectFromId(peer.objectid);
+
+            var transfer = _contenthub.importContent(_type, _peer);
+            if (transferOptions.multipleFiles) {
+                transfer.selectionType = ContentHubBridge.ContentTransfer.Multiple;
+            }
+            else {
+                transfer.selectionType = ContentHubBridge.ContentTransfer.Single;
+            }
+
+            if (transferOptions.importToLocalStore) {
+                var store = _contenthub.defaultStoreForType(_type);
+                transfer.setStore(store);
+            }
+
+            var _transfer = new ContentTransfer(transfer);
+            transfer.stateChanged.connect(function(state) {
+                if (state === ContentHubBridge.ContentTransfer.Aborted) {
+                    onFailure("Aborted");
+                    _transfer.destroy();
+                }
+                else if (state === ContentHubBridge.ContentTransfer.Charged) {
+                    onSuccess(_transfer.internal.serializeItems(_transfer));
+                    _transfer.destroy();
+                }
+            });
+            transfer.start();
+        },
+
         importContentForPeer: function(type, peerProxy, callback) {
             if (! backendDelegate.isObjectProxyInfo(peerProxy)) {
                 console.debug('importContentForPeer: invalid peer object proxy')
+                callback();
                 return;
             }
             var peer = backendDelegate.objectFromId(peerProxy.objectid);
