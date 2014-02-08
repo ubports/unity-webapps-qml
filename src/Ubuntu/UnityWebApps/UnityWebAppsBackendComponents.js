@@ -1368,7 +1368,7 @@ function createContentHubApi(backendDelegate) {
             return "Aborted";
         else if (state === ContentHubBridge.ContentTransfer.Finalized)
             return "Finalized";
-        return "Created";
+        return "<Unknown State>";
     };
 
     function ContentTransfer(transfer, objectid) {
@@ -1710,14 +1710,16 @@ function createContentHubApi(backendDelegate) {
                 transfer.setStore(store);
             }
 
-            var _transfer = new ContentTransfer(transfer);
-            transfer.stateChanged.connect(function(state) {
-                if (state === ContentHubBridge.ContentTransfer.Aborted) {
+            var _transfer = new ContentTransfer(transfer)
+            transfer.stateChanged.connect(function() {
+                if (transfer.state == ContentHubBridge.ContentTransfer.Aborted) {
                     onFailure("Aborted");
-                    _transfer.destroy();
+                    transfer.destroy();
                 }
-                else if (state === ContentHubBridge.ContentTransfer.Charged) {
-                    onSuccess(_transfer.internal.serializeItems(_transfer));
+                else if (transfer.state == ContentHubBridge.ContentTransfer.Charged) {
+                    var d = _transfer.internal.serializeItems(transfer);
+                    onSuccess(d);
+                    _transfer.finalize();
                     _transfer.destroy();
                 }
             });

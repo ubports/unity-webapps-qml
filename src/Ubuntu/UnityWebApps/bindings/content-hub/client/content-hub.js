@@ -458,7 +458,7 @@ function createContentHubApi(backendBridge) {
              * @param onError {Function(reason:)} called when the transfer has failed
              * @param onSuccess {Function(Array of {ContentItem})} called when the transfer has been a success and items are available
              */
-            importContent: function(type, peer, transferOptions, onError, onSuccess) {
+            importContent: function(type, peer, transferOptions, onSuccess, onError) {
                 backendBridge.call('ContentHub.apiImportContent',
                                   [type, peer.serialize(), transferOptions, onError, onSuccess]);
             }
