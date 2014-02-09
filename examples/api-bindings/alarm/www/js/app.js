@@ -26,7 +26,7 @@ window.onload = function() {
     }
 
     function doStart() {
-        var api = external.getUnityObject(1.0);
+        var api = external.getUnityObject('1.0');
 
         var date = getDate();
         if ( ! date) {
@@ -35,14 +35,14 @@ window.onload = function() {
             return;
         }
 
-        api.Alarm.api.createAndSaveAlarmFor(
+        api.AlarmApi.api.createAndSaveAlarmFor(
             date,
-            api.Alarm.AlarmType.OneTime,
-            api.Alarm.AlarmDayOfWeek.AutoDetect,
+            api.AlarmApi.AlarmType.OneTime,
+            api.AlarmApi.AlarmDayOfWeek.AutoDetect,
             document.getElementById('message').value,
             function(errorid) {
                 var results = document.getElementById('results');
-                results.innerHTML = api.Alarm.api.errorToMessage(errorid);
+                results.innerHTML = api.AlarmApi.api.errorToMessage(errorid);
 
             });
     };

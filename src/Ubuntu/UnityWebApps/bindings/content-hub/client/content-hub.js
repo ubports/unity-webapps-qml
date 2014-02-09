@@ -1,6 +1,41 @@
+/**
+ * ContentHub is the entry point to resource io transfer
+   from/to remote applications (peers).
+
+ * @module ContentHub
+ */
+
 function createContentHubApi(backendBridge) {
     var PLUGIN_URI = 'ContentHub';
 
+/**
+ * ContentTransfer is an object created by the ContentHub to
+   and allows one to properly setup and manage a data
+   transfer between two peers.
+
+ * @class ContentTransfer
+ * @constructor
+ * @example
+
+      Javascript access:
+
+       var api = external.getUnityObject('1.0');
+       var hub = api.ContentHub;
+
+       var pictureContentType = hub.ContentType.Pictures;
+
+       hub.defaultSourceForType(
+          pictureContentType
+          , function(peer) {
+	    hub.importContentForPeer(
+              pictureContentType,
+              peer,
+              function(transfer) {
+	        [setup the transfer options and store]
+		transfer.start(function(state) { [...] });
+	      });
+	   });
+ */
     function ContentTransfer(objectid, content) {
         this._proxy = backendBridge.createRemoteObject(
             PLUGIN_URI, 'ContentTransfer', objectid);
@@ -169,6 +204,29 @@ function createContentHubApi(backendBridge) {
         },
     };
 
+/**
+ * ContentPeer is an object returned by the ContentHub.
+   It represents a remote peer that can be used in a request
+   to export or import date.
+
+ * @class ContentPeer
+ * @module ContentHub
+ * @constructor
+ * @example
+
+      Javascript access:
+
+       var api = external.getUnityObject('1.0');
+       var hub = api.ContentHub;
+
+       var pictureContentType = hub.ContentType.Pictures;
+
+       hub.defaultSourceForType(
+          pictureContentType
+          , function(peer) {
+	     [do something with the peer]
+	   });
+ */
     function ContentPeer(objectid, content) {
         this._proxy = backendBridge.createRemoteObject(
             PLUGIN_URI, 'ContentPeer', objectid);
@@ -240,6 +298,29 @@ function createContentHubApi(backendBridge) {
         },
     };
 
+/**
+ * ContentStore is an object returned by the ContentHub.
+
+   It represents a location where the resources imported or
+   exported from a peer during a transfer operation are to be
+   either saved or found.
+
+ * @class ContentStore
+ * @module ContentHub
+ * @constructor
+ * @example
+
+      Javascript access:
+
+       var api = external.getUnityObject('1.0');
+       var hub = api.ContentHub;
+
+       var pictureContentType = hub.ContentType.Pictures;
+
+       hub.defaultStoreForType(pictureContentType, function(store) {
+         [do something with the store]
+	 });
+ */
     function ContentStore(objectid, content) {
         this._proxy = backendBridge.createRemoteObject(
             PLUGIN_URI, 'ContentStore', objectid);
@@ -301,22 +382,93 @@ function createContentHubApi(backendBridge) {
                 : null;
     };
 
+/**
+ * The ContentHub object.
+
+ * @class ContentHub
+ * @constructor
+ */
     return {
-        /**
-         * ContentType is an enumeration of well known content types.
-         *
-         */
+	/**
+	 ContentType is an enumeration of well known content types.
+	 
+	   Values:
+
+             Pictures
+
+	     Documents
+	     
+	     Music
+	  
+	 @static
+	 @property ContentType {String}
+	 
+	 @example
+
+	 Javascript access:
+
+	  var api = external.getUnityObject('1.0');
+	  var hub = api.ContentHub;
+	 
+	  var pictureContentType = hub.ContentType.Pictures;
+	 */
         ContentType: {
             Pictures: "Pictures",
             Documents: "Documents",
             Music: "Music"
         },
 
-        /**
-         * ContentTransfer.State is an enumeration of the states of a content transfer.
-         *
-         */
         ContentTransfer: {
+
+	/**
+	 ContentTransfer.State is an enumeration of the state of a given ongoing ContentTransfer.
+	 
+	   Values:
+
+            Created: Transfer created, waiting to be initiated.
+
+            Initiated: Transfer has been initiated.
+
+            InProgress: Transfer is in progress.
+
+            Charged: Transfer is charged with items and ready to be collected.
+
+            Collected: Items in the transfer have been collected.
+
+            Aborted: Transfer has been aborted.
+
+            Finalized: Transfer has been finished and cleaned up.
+	  
+	 @static
+	 @property ContentTransfer.State {String}
+	 
+	 @example
+
+	 Javascript access:
+
+	  var api = external.getUnityObject('1.0');
+	  var hub = api.ContentHub;
+	 
+	  var transferState = hub.ContentTransfer.State;
+	  var pictureContentType = hub.ContentType.Pictures;
+
+          hub.importContentForPeer(
+            pictureContentType,
+            peer,
+            function(transfer) {
+                hub.defaultStoreForType(pictureContentType, function(store) {
+                    transfer.setStore(store, function() {
+                        transfer.start(function(state) {
+                            if (transferState.Aborted === state) {
+			      [...]
+			    }
+			    [...]
+			});
+		    });
+		});
+	  });
+
+	 */
             State: {
                 // Transfer created, waiting to be initiated.
                 Created: "Created",
@@ -340,6 +492,18 @@ function createContentHubApi(backendBridge) {
                 Finalized: "Finalized",
             },
 
+	/**
+	 ContentTransfer.Direction is an enumeration of the directions of a given ContentTransfer.
+	 
+	   Values:
+
+            Import
+
+            Export
+
+	 @static
+	 @property ContentTransfer.Direction {String}
+	 */
             Direction: {
                 // Transfer is a request to import content
                 Import: "Import",
@@ -348,6 +512,18 @@ function createContentHubApi(backendBridge) {
                 Export: "Export",
             },
 
+	/**
+	 ContentTransfer.SelectionType is an enumeration of the directions of a given ContentTransfer.
+	 
+	   Values:
+
+            Single: Transfer should contain a single item
+
+            Multiple: Transfer can contain multiple items
+
+	 @static
+	 @property ContentTransfer.SelectionType {String}
+	 */
             SelectionType: {
                 // Transfer should contain a single item
                 Single: "Single",
@@ -362,7 +538,7 @@ function createContentHubApi(backendBridge) {
          *
          * @method defaultSourceForType
          * @param type {ContentType} Content type.
-         * @param callback {Function ({ContentPeer})} Function called with the created ContentPeer.
+         * @param callback {Function (ContentPeer)} Function called with the created ContentPeer.
          */
         defaultSourceForType: function(type, callback) {
             backendBridge.call('ContentHub.defaultSourceForType',
@@ -375,7 +551,7 @@ function createContentHubApi(backendBridge) {
          *
          * @method defaultStoreForType
          * @param type {ContentType} Content type.
-         * @param callback {Function ({ContentStore})} Function called with the created ContentStore.
+         * @param callback {Function (ContentStore)} Function called with the created ContentStore.
          */
         defaultStoreForType: function(type, callback) {
             backendBridge.call('ContentHub.defaultStoreForType',
@@ -388,7 +564,7 @@ function createContentHubApi(backendBridge) {
          *
          * @method knownSourcesForType
          * @param type {ContentType} Content type.
-         * @param callback {Function ({ Array of {ContentPeer} })} Function called with the possible ContentPeers.
+         * @param callback {Function (Array of ContentPeer)} Function called with the possible ContentPeers.
          */
         knownSourcesForType: function(type, callback) {
             backendBridge.call('ContentHub.knownSourcesForType',
@@ -408,11 +584,11 @@ function createContentHubApi(backendBridge) {
         },
 
         /**
-         * Creates a ContentStore object for the given content type.
+         * Creates a ContentTransfer object for the given content type.
          *
          * @method importContent
          * @param type {ContentType} Content type.
-         * @param callback {Function} function({ContentTransfer}) Function called with the created ContentTransfer.
+         * @param callback {Function(ContentTransfer)} Function called with the created ContentTransfer.
          */
         importContent: function(type, callback) {
             backendBridge.call('ContentHub.importContent',
@@ -421,12 +597,12 @@ function createContentHubApi(backendBridge) {
         },
 
         /**
-         * Creates a ContentStore object for the given ContentPeer.
+         * Creates a ContentTransfer object for the given ContentPeer.
          *
-         * @method importContent
+         * @method importContentForPeer
          * @param type {ContentType} Content type.
          * @param peer {ContentPeer} Content peer.
-         * @param callback {Function} function({ContentTransfer}) Function called with the created ContentTransfer.
+         * @param callback {Function(ContentTransfer)} Function called with the created ContentTransfer.
          */
         importContentForPeer: function(type, peer, callback) {
             backendBridge.call('ContentHub.importContentForPeer',
@@ -435,11 +611,32 @@ function createContentHubApi(backendBridge) {
         },
 
         /**
-         * Creates a ContentStore object for the given ContentPeer.
+         * Sets a handler that is to be called when the current application is the
+	 * target of an export request.
          *
-         * @method importContent
-         * @param callback {Function} function({ContentTransfer}) Function when one requests a resource to be exported.
+         * @method onExportRequested
+         * @param callback {Function(ContentTransfer)} Function when one requests a resource to be exported.
          *                                                          The corresponding ContentTransfer is provided as a parameter.
+	 * 
+	 * @example
+	 
+	    var api = external.getUnityObject(1.0);
+	    var hub = api.ContentHub;
+	 
+	    var transferState = hub.ContentTransfer.State;
+	    
+	    function _exportRequested(transfer) {
+              var url = window.location.href;
+              url = url.substr(0, url.lastIndexOf('/')+1) + 'img/ubuntuone-music.png';
+	    
+              transfer.setItems([{name: 'Ubuntu One', url: url}],
+                function() {
+                  transfer.setState(hub.ContentTransfer.State.Charged);
+	        });
+	      };
+	    
+	    hub.onExportRequested(_exportRequested);
+	 
          */
         onExportRequested: function(callback) {
             backendBridge.call('ContentHub.onExportRequested',

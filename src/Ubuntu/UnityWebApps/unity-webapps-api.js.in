@@ -277,7 +277,7 @@
             },
 
             OnlineAccounts: createOnlineAccountsApi(backend),
-            Alarm: createAlarmApi(backend),
+            AlarmApi: createAlarmApi(backend),
             ContentHub: createContentHubApi(backend),
         };
 

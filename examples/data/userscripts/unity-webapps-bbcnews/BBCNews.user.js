@@ -9,7 +9,7 @@ const WebappsGettextDict = JSON.parse(unescape(
   "[]"
 ));
 
-window.Unity = external.getUnityObject(1);
+window.Unity = external.getUnityObject('1.0');
 
 function isCorrectPage() {
     var i, ids = ['tickerHolder'];

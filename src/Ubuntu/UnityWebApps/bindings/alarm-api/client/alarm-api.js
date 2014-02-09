@@ -1,6 +1,33 @@
+/**
+ * AlarmApi gives access to Alarm management.
+
+ * @module AlarmApi
+ */
 function createAlarmApi(backendBridge) {
     var PLUGIN_URI = 'Alarm';
 
+/**
+ * An Alarm.
+
+ * @class Alarm
+ * @constructor
+ * @example
+
+      Javascript access:
+
+      var date = new Date();
+      <set a valid date in the future>
+
+      var api = external.getUnityObject('1.0');
+      api.AlarmApi.api.createAndSaveAlarmFor(
+          date,
+          api.AlarmApi.AlarmType.OneTime,
+          api.AlarmApi.AlarmDayOfWeek.AutoDetect,
+          "alarm triggered",
+          function(errorid) {
+              console.log(api.AlarmApi.api.errorToMessage(errorid));
+          });
+ */
     function Alarm(id) {
         this._proxy = backendBridge.createRemoteObject(
             PLUGIN_URI, 'Alarm', id);
@@ -179,7 +206,8 @@ function createAlarmApi(backendBridge) {
         // methods
 
         /**
-         *
+         * Cancels a given Alarm.
+	 * 
          * @method cancel
          */
         cancel: function() {
@@ -187,7 +215,8 @@ function createAlarmApi(backendBridge) {
         },
 
         /**
-         *
+         * Resets a given Alarm.
+	 * 
          * @method reset
          */
         reset: function() {
@@ -224,7 +253,51 @@ function createAlarmApi(backendBridge) {
                 : null;
     };
 
+/**
+ * The AlarmApi object
+
+ * @class AlarmApi
+ * @constructor
+ * @example
+
+      Javascript access:
+
+       var date = new Date();
+       <set a valid date in the future>
+
+       var api = external.getUnityObject('1.0');
+       api.AlarmApi.api.createAndSaveAlarmFor(
+          date,
+          api.AlarmApi.AlarmType.OneTime,
+          api.AlarmApi.AlarmDayOfWeek.AutoDetect,
+          "alarm triggered",
+          function(errorid) {
+              console.log(api.AlarmApi.api.errorToMessage(errorid));
+          });
+ */
     return {
+	/**
+	   Enumeration of the available types of Alarm.
+	   
+  	     Values:
+
+	       OneTime: The alarm occurs only once
+
+	       Repeating: The alarm is a repeating one,
+	           either daily, weekly on a given day
+		   or on selected days
+	   
+	   @static
+	   @property AlarmType {Object}
+	   
+	   @example
+
+  	      Javascript access:
+
+	       var api = external.getUnityObject('1.0');
+	       var alarmtype = api.AlarmApi.AlarmType;
+	       // use alarmtype.OneTime or alarmtype.Repeating
+	 */
         AlarmType: {
             // The alarm occurs only once.
             OneTime: "OneTime",
@@ -233,6 +306,39 @@ function createAlarmApi(backendBridge) {
             Repeating: "Repeating",
         },
 
+	/**
+	   Flags for the week days an Alarm should be triggered.
+	   
+	     Values:
+
+	       Monday: The alarm will kick on Mondays
+
+	       Tuesday: The alarm will kick on Tuesdays
+
+	       Wednesday: The alarm will kick on Wednesday
+
+	       Thursday: The alarm will kick on Thursday
+
+	       Friday: The alarm will kick on Friday
+
+	       Saturday: The alarm will kick on Saturday
+
+	       Sunday: The alarm will kick on Sunday
+
+	       AutoDetect: The alarm day will be detected
+	         from the alarm date.
+	   
+	   @static
+	   @property AlarmDayOfWeek {Integer}
+	   
+	   @example
+
+  	      Javascript access:
+
+	       var api = external.getUnityObject('1.0');
+	       var dayofweek = api.AlarmApi.AlarmDayOfWeek;
+	       // use dayofweek.Monday or/and dayofweek.Tuesday, etc.
+	 */
         AlarmDayOfWeek: {
             // The alarm will kick on Mondays.
             Monday: 1,
@@ -259,6 +365,47 @@ function createAlarmApi(backendBridge) {
             AutoDetect: 128,
         },
 
+	/**
+	 Error ids returned during AlarmApi calls.
+	 
+	   Values:
+
+             NoError: Successful operation completion
+	     
+	     InvalidDate: The date specified for the alarm was invalid
+	     
+	     EarlyDate: The date specified for the alarm is an earlier
+	         date than the current one
+
+	     NbDaysOfWeek: The daysOfWeek parameter of the alarm was not specified
+	     
+	     OneTimeOnMoreDays: The one-time alarm was set to be kicked in several days
+	     
+	     InvalidEvent: The alarm event is invalid
+	     
+	     AdaptationError: The error occurred in alarm adaptation layer.
+	         Adaptations may define additional behind this value
+	 
+	  
+	 @static
+	 @property AlarmError {Integer}
+	 
+	 @example
+	    Javascript access:
+	 
+	     var date = new Date();
+	     <set a valid date in the future>
+	 
+	     var api = external.getUnityObject('1.0');
+	     api.AlarmApi.api.createAndSaveAlarmFor(
+               date,
+               api.AlarmApi.AlarmType.OneTime,
+               api.AlarmApi.AlarmDayOfWeek.AutoDetect,
+               "alarm triggered",
+               function(errorid) {
+                 console.log(api.AlarmApi.api.errorToMessage(errorid));
+               });
+	 */
         AlarmError: {
             // Successful operation completion
             NoError: 0,
@@ -286,7 +433,7 @@ function createAlarmApi(backendBridge) {
          * Creates a Alarm object.
          * 
          * @method createAlarm
-         * @param callback {Function ({Alarm})} Function called with the created Alarm.
+         * @param callback {Function(Alarm)} Function called with the created Alarm.
          */
         createAlarm: function(callback) {
             backendBridge.call('Alarm.createAlarm'
@@ -298,7 +445,7 @@ function createAlarmApi(backendBridge) {
             /**
              * Creates and saves a new alarm.
              *
-             * @method createAndSaveAlarmFor
+             * @method api.createAndSaveAlarmFor
              * @param date {Date} date at which the alarm is to be triggered.
              * @param type {AlarmType} type of the alarm.
              * @param daysOfWeek {AlarmDayOfWeek} days of the week the alarm is scheduled.
@@ -313,7 +460,7 @@ function createAlarmApi(backendBridge) {
             /**
              * Returns a message adapted to the given error id.
              *
-             * @method errorToMessage
+             * @method api.errorToMessage
              * @param error {AlarmError} error id.
              */
             errorToMessage: function(error) {

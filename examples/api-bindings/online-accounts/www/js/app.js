@@ -9,7 +9,7 @@ window.onload = function() {
     function doGetAuth() {
 	setResults('');
 
-        var api = external.getUnityObject(1.0);
+        var api = external.getUnityObject('1.0');
         var oa = api.OnlineAccounts;
 
         oa.api.getAccountsInfoFor(null, 'facebook', function(result) {
