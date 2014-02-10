@@ -386,6 +386,7 @@ function createContentHubApi(backendBridge) {
  * The ContentHub object.
 
  * @class ContentHub
+ * @static
  * @constructor
  */
     return {
