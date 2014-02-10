@@ -170,6 +170,7 @@ function UbuntuBindingBackendDelegate(parent) {
     this._parent = parent;
     this._id = 0;
     this._objects = {};
+    this._last_proxy_id = 0;
 }
 UbuntuBindingBackendDelegate.prototype = {
     createQmlObject: function(uri, version, component, properties) {
@@ -220,6 +221,7 @@ UbuntuBindingBackendDelegate.prototype = {
 
     storeQmlObject: function(object, uri, version, component, properties) {
         var id = this._generateObjectId(uri, component);
+        console.debug('got an id: ' + id)
         this._objects[id] = object;
         return id;
     },
@@ -1662,7 +1664,9 @@ function createContentHubApi(backendDelegate) {
 
     return {
         defaultSourceForType: function(type, callback) {
-            var source = new ContentPeer(_contenthub.defaultSourceForType(_nameToContentType(type)));
+            var _type = _nameToContentType(type);
+            var peer = _contenthub.defaultSourceForType(_type)
+            var source = new ContentPeer(peer);
             callback(source.serialize());
         },
 
@@ -1696,6 +1700,10 @@ function createContentHubApi(backendDelegate) {
             }
             var _type = _nameToContentType(type);
             var _peer = backendDelegate.objectFromId(peer.objectid);
+            if ( ! _peer) {
+                onError("Invalid peer object (NULL)");
+                return;
+            }
 
             var transfer = _contenthub.importContent(_type, _peer);
             if (transferOptions.multipleFiles) {
@@ -1714,13 +1722,12 @@ function createContentHubApi(backendDelegate) {
             transfer.stateChanged.connect(function() {
                 if (transfer.state == ContentHubBridge.ContentTransfer.Aborted) {
                     onFailure("Aborted");
-                    transfer.destroy();
+                    transfer.finalize();
                 }
                 else if (transfer.state == ContentHubBridge.ContentTransfer.Charged) {
                     var d = _transfer.internal.serializeItems(transfer);
                     onSuccess(d);
-                    _transfer.finalize();
-                    _transfer.destroy();
+                    transfer.finalize();
                 }
             });
             transfer.start();

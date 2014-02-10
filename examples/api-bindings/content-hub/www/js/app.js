@@ -15,6 +15,7 @@ window.onload = function() {
             }
 
             console.log('peers defaultSourceForType: ' + peers)
+
             hub.defaultSourceForType(
                 pictureContentType
                 , function(peer) {
