@@ -358,9 +358,9 @@ function createOnlineAccountsApi(backendBridge) {
              * @param accountId {Integer} If set, the access token will be retrieved for the accounts that correspond to that specific service.
              *                  It is used when multiple accounts are found, otherwise the first account is selected.
              * @param callback {Function(Object(error:, authenticated: Bool, data: ))} Callback that receives the result or null
-	     * 
-	     * @example
-	     
+             * 
+             * @example
+             
              var api = external.getUnityObject(1.0);
              var oa = api.OnlineAccounts;
 
@@ -373,7 +373,7 @@ function createOnlineAccountsApi(backendBridge) {
                              + result.authenticated
                              + ", token: "
                              + result.data);
-	     });
+             });
              */
             getAccessTokenFor: function(service, provider, accountId, callback) {
                 backendBridge.call('OnlineAccounts.getAccessTokenFor'
@@ -388,21 +388,21 @@ function createOnlineAccountsApi(backendBridge) {
              * @param service {String} If set, the access token will be retrieved for the accounts that correspond to that specific service.
              * @param provider {String} If set, the access token will be retrieved for the accounts that correspond to that specific service.
              * @param callback {Function(List of Object(displayName:, accountId: Bool, providerName: String, serviceName: String, enabled: Bool))} Callback that receives the result or null
-	     *
-	     * @example
+             *
+             * @example
                var api = external.getUnityObject(1.0);
                var oa = api.OnlineAccounts;
-	     
+             
                oa.api.getAccountsInfoFor(null, 'facebook', function(result) {
                  for (var i = 0; i < result.length; ++i) {
                    console.log("name: " + result[i].displayName
-			       + ', id: ' + result[i].accountId
-			       + ', providerName: ' + result[i].providerName
-			       + ', serviceName: ' + result[i].serviceName
-			       + ', enabled: ' + (result[i].enabled ? "true" : "false")
-			       );
-	         }	         
-	       });
+                               + ', id: ' + result[i].accountId
+                               + ', providerName: ' + result[i].providerName
+                               + ', serviceName: ' + result[i].serviceName
+                               + ', enabled: ' + (result[i].enabled ? "true" : "false")
+                               );
+                 }               
+               });
 
              */
             getAccountsInfoFor: function(service, provider, callback) {
