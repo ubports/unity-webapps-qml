@@ -17,8 +17,6 @@ function createContentHubApi(backendBridge) {
  * @constructor
  * @example
 
-      Javascript access:
-
        var api = external.getUnityObject('1.0');
        var hub = api.ContentHub;
 
@@ -27,14 +25,14 @@ function createContentHubApi(backendBridge) {
        hub.defaultSourceForType(
           pictureContentType
           , function(peer) {
-	    hub.importContentForPeer(
+            hub.importContentForPeer(
               pictureContentType,
               peer,
               function(transfer) {
-	        [setup the transfer options and store]
-		transfer.start(function(state) { [...] });
-	      });
-	   });
+                [setup the transfer options and store]
+                transfer.start(function(state) { [...] });
+              });
+           });
  */
     function ContentTransfer(objectid, content) {
         this._proxy = backendBridge.createRemoteObject(
@@ -214,8 +212,6 @@ function createContentHubApi(backendBridge) {
  * @constructor
  * @example
 
-      Javascript access:
-
        var api = external.getUnityObject('1.0');
        var hub = api.ContentHub;
 
@@ -224,8 +220,8 @@ function createContentHubApi(backendBridge) {
        hub.defaultSourceForType(
           pictureContentType
           , function(peer) {
-	     [do something with the peer]
-	   });
+             [do something with the peer]
+           });
  */
     function ContentPeer(objectid, content) {
         this._proxy = backendBridge.createRemoteObject(
@@ -310,8 +306,6 @@ function createContentHubApi(backendBridge) {
  * @constructor
  * @example
 
-      Javascript access:
-
        var api = external.getUnityObject('1.0');
        var hub = api.ContentHub;
 
@@ -319,7 +313,7 @@ function createContentHubApi(backendBridge) {
 
        hub.defaultStoreForType(pictureContentType, function(store) {
          [do something with the store]
-	 });
+         });
  */
     function ContentStore(objectid, content) {
         this._proxy = backendBridge.createRemoteObject(
@@ -390,29 +384,27 @@ function createContentHubApi(backendBridge) {
  * @constructor
  */
     return {
-	/**
-	 ContentType is an enumeration of well known content types.
-	 
-	   Values:
+        /**
+         ContentType is an enumeration of well known content types.
+         
+           Values:
 
              Pictures
 
-	     Documents
-	     
-	     Music
-	  
-	 @static
-	 @property ContentType {String}
-	 
-	 @example
+             Documents
+             
+             Music
+          
+         @static
+         @property ContentType {String}
+         
+         @example
 
-	 Javascript access:
-
-	  var api = external.getUnityObject('1.0');
-	  var hub = api.ContentHub;
-	 
-	  var pictureContentType = hub.ContentType.Pictures;
-	 */
+          var api = external.getUnityObject('1.0');
+          var hub = api.ContentHub;
+         
+          var pictureContentType = hub.ContentType.Pictures;
+         */
         ContentType: {
             Pictures: "Pictures",
             Documents: "Documents",
@@ -421,10 +413,10 @@ function createContentHubApi(backendBridge) {
 
         ContentTransfer: {
 
-	/**
-	 ContentTransfer.State is an enumeration of the state of a given ongoing ContentTransfer.
-	 
-	   Values:
+        /**
+         ContentTransfer.State is an enumeration of the state of a given ongoing ContentTransfer.
+         
+           Values:
 
             Created: Transfer created, waiting to be initiated.
 
@@ -439,19 +431,17 @@ function createContentHubApi(backendBridge) {
             Aborted: Transfer has been aborted.
 
             Finalized: Transfer has been finished and cleaned up.
-	  
-	 @static
-	 @property ContentTransfer.State {String}
-	 
-	 @example
+          
+         @static
+         @property ContentTransfer.State {String}
+         
+         @example
 
-	 Javascript access:
-
-	  var api = external.getUnityObject('1.0');
-	  var hub = api.ContentHub;
-	 
-	  var transferState = hub.ContentTransfer.State;
-	  var pictureContentType = hub.ContentType.Pictures;
+          var api = external.getUnityObject('1.0');
+          var hub = api.ContentHub;
+         
+          var transferState = hub.ContentTransfer.State;
+          var pictureContentType = hub.ContentType.Pictures;
 
           hub.importContentForPeer(
             pictureContentType,
@@ -461,15 +451,15 @@ function createContentHubApi(backendBridge) {
                     transfer.setStore(store, function() {
                         transfer.start(function(state) {
                             if (transferState.Aborted === state) {
-			      [...]
-			    }
-			    [...]
-			});
-		    });
-		});
-	  });
+                              [...]
+                            }
+                            [...]
+                        });
+                    });
+                });
+          });
 
-	 */
+         */
             State: {
                 // Transfer created, waiting to be initiated.
                 Created: "Created",
@@ -493,18 +483,18 @@ function createContentHubApi(backendBridge) {
                 Finalized: "Finalized",
             },
 
-	/**
-	 ContentTransfer.Direction is an enumeration of the directions of a given ContentTransfer.
-	 
-	   Values:
+        /**
+         ContentTransfer.Direction is an enumeration of the directions of a given ContentTransfer.
+         
+           Values:
 
             Import
 
             Export
 
-	 @static
-	 @property ContentTransfer.Direction {String}
-	 */
+         @static
+         @property ContentTransfer.Direction {String}
+         */
             Direction: {
                 // Transfer is a request to import content
                 Import: "Import",
@@ -513,18 +503,18 @@ function createContentHubApi(backendBridge) {
                 Export: "Export",
             },
 
-	/**
-	 ContentTransfer.SelectionType is an enumeration of the directions of a given ContentTransfer.
-	 
-	   Values:
+        /**
+         ContentTransfer.SelectionType is an enumeration of the directions of a given ContentTransfer.
+         
+           Values:
 
             Single: Transfer should contain a single item
 
             Multiple: Transfer can contain multiple items
 
-	 @static
-	 @property ContentTransfer.SelectionType {String}
-	 */
+         @static
+         @property ContentTransfer.SelectionType {String}
+         */
             SelectionType: {
                 // Transfer should contain a single item
                 Single: "Single",
@@ -613,31 +603,31 @@ function createContentHubApi(backendBridge) {
 
         /**
          * Sets a handler that is to be called when the current application is the
-	 * target of an export request.
+         * target of an export request.
          *
          * @method onExportRequested
          * @param callback {Function(ContentTransfer)} Function when one requests a resource to be exported.
          *                                                          The corresponding ContentTransfer is provided as a parameter.
-	 * 
-	 * @example
-	 
-	    var api = external.getUnityObject(1.0);
-	    var hub = api.ContentHub;
-	 
-	    var transferState = hub.ContentTransfer.State;
-	    
-	    function _exportRequested(transfer) {
+         * 
+         * @example
+         
+            var api = external.getUnityObject(1.0);
+            var hub = api.ContentHub;
+         
+            var transferState = hub.ContentTransfer.State;
+            
+            function _exportRequested(transfer) {
               var url = window.location.href;
               url = url.substr(0, url.lastIndexOf('/')+1) + 'img/ubuntuone-music.png';
-	    
+            
               transfer.setItems([{name: 'Ubuntu One', url: url}],
                 function() {
                   transfer.setState(hub.ContentTransfer.State.Charged);
-	        });
-	      };
-	    
-	    hub.onExportRequested(_exportRequested);
-	 
+                });
+              };
+            
+            hub.onExportRequested(_exportRequested);
+         
          */
         onExportRequested: function(callback) {
             backendBridge.call('ContentHub.onExportRequested',

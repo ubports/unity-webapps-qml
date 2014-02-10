@@ -13,8 +13,6 @@ function createAlarmApi(backendBridge) {
  * @constructor
  * @example
 
-      Javascript access:
-
       var date = new Date();
       <set a valid date in the future>
 
@@ -207,7 +205,7 @@ function createAlarmApi(backendBridge) {
 
         /**
          * Cancels a given Alarm.
-	 * 
+         * 
          * @method cancel
          */
         cancel: function() {
@@ -216,7 +214,7 @@ function createAlarmApi(backendBridge) {
 
         /**
          * Resets a given Alarm.
-	 * 
+         * 
          * @method reset
          */
         reset: function() {
@@ -260,8 +258,6 @@ function createAlarmApi(backendBridge) {
  * @constructor
  * @example
 
-      Javascript access:
-
        var date = new Date();
        <set a valid date in the future>
 
@@ -276,28 +272,26 @@ function createAlarmApi(backendBridge) {
           });
  */
     return {
-	/**
-	   Enumeration of the available types of Alarm.
-	   
-  	     Values:
+        /**
+           Enumeration of the available types of Alarm.
+           
+             Values:
 
-	       OneTime: The alarm occurs only once
+               OneTime: The alarm occurs only once
 
-	       Repeating: The alarm is a repeating one,
-	           either daily, weekly on a given day
-		   or on selected days
-	   
-	   @static
-	   @property AlarmType {Object}
-	   
-	   @example
+               Repeating: The alarm is a repeating one,
+                   either daily, weekly on a given day
+                   or on selected days
+           
+           @static
+           @property AlarmType {Object}
+           
+           @example
 
-  	      Javascript access:
-
-	       var api = external.getUnityObject('1.0');
-	       var alarmtype = api.AlarmApi.AlarmType;
-	       // use alarmtype.OneTime or alarmtype.Repeating
-	 */
+               var api = external.getUnityObject('1.0');
+               var alarmtype = api.AlarmApi.AlarmType;
+               // use alarmtype.OneTime or alarmtype.Repeating
+         */
         AlarmType: {
             // The alarm occurs only once.
             OneTime: "OneTime",
@@ -306,39 +300,37 @@ function createAlarmApi(backendBridge) {
             Repeating: "Repeating",
         },
 
-	/**
-	   Flags for the week days an Alarm should be triggered.
-	   
-	     Values:
+        /**
+           Flags for the week days an Alarm should be triggered.
+           
+             Values:
 
-	       Monday: The alarm will kick on Mondays
+               Monday: The alarm will kick on Mondays
 
-	       Tuesday: The alarm will kick on Tuesdays
+               Tuesday: The alarm will kick on Tuesdays
 
-	       Wednesday: The alarm will kick on Wednesday
+               Wednesday: The alarm will kick on Wednesday
 
-	       Thursday: The alarm will kick on Thursday
+               Thursday: The alarm will kick on Thursday
 
-	       Friday: The alarm will kick on Friday
+               Friday: The alarm will kick on Friday
 
-	       Saturday: The alarm will kick on Saturday
+               Saturday: The alarm will kick on Saturday
 
-	       Sunday: The alarm will kick on Sunday
+               Sunday: The alarm will kick on Sunday
 
-	       AutoDetect: The alarm day will be detected
-	         from the alarm date.
-	   
-	   @static
-	   @property AlarmDayOfWeek {Integer}
-	   
-	   @example
+               AutoDetect: The alarm day will be detected
+                 from the alarm date.
+           
+           @static
+           @property AlarmDayOfWeek {Integer}
+           
+           @example
 
-  	      Javascript access:
-
-	       var api = external.getUnityObject('1.0');
-	       var dayofweek = api.AlarmApi.AlarmDayOfWeek;
-	       // use dayofweek.Monday or/and dayofweek.Tuesday, etc.
-	 */
+               var api = external.getUnityObject('1.0');
+               var dayofweek = api.AlarmApi.AlarmDayOfWeek;
+               // use dayofweek.Monday or/and dayofweek.Tuesday, etc.
+         */
         AlarmDayOfWeek: {
             // The alarm will kick on Mondays.
             Monday: 1,
@@ -365,39 +357,37 @@ function createAlarmApi(backendBridge) {
             AutoDetect: 128,
         },
 
-	/**
-	 Error ids returned during AlarmApi calls.
-	 
-	   Values:
+        /**
+         Error ids returned during AlarmApi calls.
+         
+           Values:
 
              NoError: Successful operation completion
-	     
-	     InvalidDate: The date specified for the alarm was invalid
-	     
-	     EarlyDate: The date specified for the alarm is an earlier
-	         date than the current one
+             
+             InvalidDate: The date specified for the alarm was invalid
+             
+             EarlyDate: The date specified for the alarm is an earlier
+                 date than the current one
 
-	     NbDaysOfWeek: The daysOfWeek parameter of the alarm was not specified
-	     
-	     OneTimeOnMoreDays: The one-time alarm was set to be kicked in several days
-	     
-	     InvalidEvent: The alarm event is invalid
-	     
-	     AdaptationError: The error occurred in alarm adaptation layer.
-	         Adaptations may define additional behind this value
-	 
-	  
-	 @static
-	 @property AlarmError {Integer}
-	 
-	 @example
-	    Javascript access:
-	 
-	     var date = new Date();
-	     <set a valid date in the future>
-	 
-	     var api = external.getUnityObject('1.0');
-	     api.AlarmApi.api.createAndSaveAlarmFor(
+             NbDaysOfWeek: The daysOfWeek parameter of the alarm was not specified
+             
+             OneTimeOnMoreDays: The one-time alarm was set to be kicked in several days
+             
+             InvalidEvent: The alarm event is invalid
+             
+             AdaptationError: The error occurred in alarm adaptation layer.
+                 Adaptations may define additional behind this value
+         
+          
+         @static
+         @property AlarmError {Integer}
+         
+         @example
+             var date = new Date();
+             <set a valid date in the future>
+         
+             var api = external.getUnityObject('1.0');
+             api.AlarmApi.api.createAndSaveAlarmFor(
                date,
                api.AlarmApi.AlarmType.OneTime,
                api.AlarmApi.AlarmDayOfWeek.AutoDetect,
@@ -405,7 +395,7 @@ function createAlarmApi(backendBridge) {
                function(errorid) {
                  console.log(api.AlarmApi.api.errorToMessage(errorid));
                });
-	 */
+         */
         AlarmError: {
             // Successful operation completion
             NoError: 0,
