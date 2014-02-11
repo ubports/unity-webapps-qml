@@ -1,3 +1,18 @@
+unity-webapps-qml (0.1+14.04.20140211.1-0ubuntu1) trusty; urgency=low
+
+  [ CI bot ]
+  * Null merge to trigger a CI Train trunk release.
+
+  [ Alexandre Abreu ]
+  * Fix content hub export.
+  * "Move the content hub depends to a suggests to avoid pulling click
+    deps on the desktop".
+  * Fix the inline docs to work properly with yuidocs. (LP: #1274191)
+  * Simplify content hub application import action through an extra api
+    that basically wraps it all. .
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 11 Feb 2014 20:02:20 +0000
+
 unity-webapps-qml (0.1+14.04.20140130.3-0ubuntu2) trusty; urgency=medium
 
   * Revert previous upload entirely as it somehow caused unwanted
