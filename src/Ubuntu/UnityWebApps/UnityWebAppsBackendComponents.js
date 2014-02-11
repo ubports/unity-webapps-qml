@@ -1721,6 +1721,7 @@ function createContentHubApi(backendDelegate) {
 
             var _transfer = new ContentTransfer(transfer)
             transfer.stateChanged.connect(function() {
+                console.log('** Transfer state change: ' + transfer + ', state: ' + _contentTransferStateToName(transfer.state));
                 if (transfer.state == ContentHubBridge.ContentTransfer.Aborted) {
                     onFailure("Aborted");
                     transfer.finalize();
