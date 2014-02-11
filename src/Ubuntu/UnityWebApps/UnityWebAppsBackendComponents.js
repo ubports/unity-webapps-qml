@@ -1706,6 +1706,7 @@ function createContentHubApi(backendDelegate) {
             }
 
             var transfer = _contenthub.importContent(_type, _peer);
+            console.log('*** Transfer object: ' + transfer + '')
             if (transferOptions.multipleFiles) {
                 transfer.selectionType = ContentHubBridge.ContentTransfer.Multiple;
             }
@@ -1725,6 +1726,11 @@ function createContentHubApi(backendDelegate) {
                     transfer.finalize();
                 }
                 else if (transfer.state == ContentHubBridge.ContentTransfer.Charged) {
+                    console.log('*** Transfer complete: got: ' + transfer.items.length + ' items (' + transfer + ')')
+                    for (var i = 0; i < transfer.items.length; ++i) {
+                        console.log('** item ' + i + ' : ' + transfer.items[i].url);
+                    }
+
                     var d = _transfer.internal.serializeItems(transfer);
                     onSuccess(d);
                     transfer.finalize();
