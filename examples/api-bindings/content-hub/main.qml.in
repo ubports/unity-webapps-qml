@@ -7,7 +7,7 @@ import Ubuntu.UnityWebApps 0.1
 MainView {
   id: root
   focus: true
-  applicationName: "helloworld"
+  applicationName: \"helloworld\"
 
   width: units.gu(100)
   height: units.gu(100)
