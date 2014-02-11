@@ -1730,7 +1730,6 @@ function createContentHubApi(backendDelegate) {
                 console.log('** Transfer state change: ' + transfer + ', state: ' + _contentTransferStateToName(transfer.state));
                 if (transfer.state === ContentHubBridge.ContentTransfer.Aborted) {
                     onFailure("Aborted");
-                    transfer.destroy();
                     return;
                 }
                 else if (transfer.state === ContentHubBridge.ContentTransfer.Charged) {
@@ -1742,7 +1741,6 @@ function createContentHubApi(backendDelegate) {
                     var d = _transfer.internal.serializeItems(transfer);
                     onSuccess(d);
                     transfer.finalize();
-                    transfer.destroy();
                     return;
                 }
             });
