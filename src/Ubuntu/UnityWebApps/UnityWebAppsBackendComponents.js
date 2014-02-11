@@ -1494,9 +1494,15 @@ function createContentHubApi(backendDelegate) {
                 item.object.name = items[i].name;
                 item.object.url = items[i].url;
 
+                console.debug('setItems: adding item ' + item.object.name.toString()
+                              + ', ' + item.object.url.toString());
+
                 contentItems.push(item.object);
             }
+
             this._object.items = contentItems;
+
+            console.debug('setItems: grand total of ' + this._object.items.length + ' added');
 
             if (callback && typeof(callback) === 'function')
                 callback();
