@@ -10,7 +10,7 @@ window.onload = function() {
         var url = window.location.href;
         url = url.substr(0, url.lastIndexOf('/')+1) + 'img/ubuntuone-music.png';
 
-	log('item url: ' + url);
+        log('item url: ' + url);
 
         transfer.setItems([{name: 'Ubuntu One', url: url}],
                           function() {

@@ -634,6 +634,24 @@ function createContentHubApi(backendBridge) {
                                [callback]);
         },
 
+        api: {
+
+            /**
+             * Creates a ContentStore object for the given ContentPeer.
+             *
+             * @method api.importContent
+             * @param type {ContentType} type of the content to import
+             * @param peer {ContentPeer} peer whos content should be imported
+             * @param transferOptions {Object {multipleFiles: {Bool}, importToLocalStore: {Bool}} } the set of options for the transfer
+             * @param onError {Function(reason:)} called when the transfer has failed
+             * @param onSuccess {Function(Array of {ContentItem})} called when the transfer has been a success and items are available
+             */
+            importContent: function(type, peer, transferOptions, onSuccess, onError) {
+                backendBridge.call('ContentHub.apiImportContent',
+                                  [type, peer.serialize(), transferOptions, onError, onSuccess]);
+            }
+        },
+
         // Internal
 
         /**

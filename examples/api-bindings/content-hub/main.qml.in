@@ -4,9 +4,10 @@ import QtWebKit.experimental 1.0
 import Ubuntu.Components 0.1
 import Ubuntu.UnityWebApps 0.1
 
-Item {
+MainView {
   id: root
   focus: true
+  applicationName: \"helloworld\"
 
   width: units.gu(100)
   height: units.gu(100)

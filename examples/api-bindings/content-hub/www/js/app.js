@@ -15,6 +15,7 @@ window.onload = function() {
             }
 
             console.log('peers defaultSourceForType: ' + peers)
+
             hub.defaultSourceForType(
                 pictureContentType
                 , function(peer) {
@@ -28,11 +29,13 @@ window.onload = function() {
                         return;
                     }
                     document.getElementById('importdiv').style.display = 'block';
+                    document.getElementById('lowLevelImportdiv').style.display = 'block';
                   }
             );
         });
 
-    document.getElementById('import').addEventListener('click', doImport);
+    document.getElementById('import').addEventListener('click', doSimpleApiImport);
+    document.getElementById('lowLevelImport').addEventListener('click', doLowLevelImport);
 
     function addPeerElement(appId, name) {
         var peers = document.querySelector('#known-peers ul');
@@ -111,7 +114,7 @@ window.onload = function() {
         displayImages(results);
     };
 
-    function doImport() {
+    function doSimpleApiImport() {
         var peers = document.querySelectorAll('#known-peers ul li.selected');
         if (peers.length > 1) {
             selectonlyonepeer();
@@ -126,30 +129,68 @@ window.onload = function() {
         if (! peer) {
             return;
         }
+
+        hub.api.importContent(pictureContentType
+                      , peer
+                      , {importToLocalStore: true}
+                      , function(items) {
+                          for (var i = 0; i < items.length; ++i) {
+                              addResult(items[i]);
+                          }
+                      }
+                      , function() {
+                          aborted();
+                      });
+    };
+
+    function doLowLevelImport() {
+        var peers = document.querySelectorAll('#known-peers ul li.selected');
+        if (peers.length > 1) {
+            selectonlyonepeer();
+            return;
+        }
+        if (peers.length === 0) {
+            pleaseselectonepeer();
+            return;
+        }
+
+        var peer = sourcePeers[peers[0].getAttribute('data-appid')];
+        if (! peer) {
+            return;
+        }
+
         hub.importContentForPeer(
             pictureContentType,
             peer,
             function(transfer) {
-                transfer.start(function(state) {
-                    if (transferState.Aborted === state) {
-                        transfer.finalize();
-                        peer.destroy();
-                        transfer.destroy();
-                        aborted();
-                        return;
-                    }
 
-                    if (transferState.Charged === state) {
-                        transfer.items(function(items) {
-                            for (var i = 0; i < items.length; ++i) {
-                                addResult(items[i]);
+                hub.defaultStoreForType(pictureContentType, function(store) {
+                    transfer.setStore(store, function() {
+
+                        transfer.start(function(state) {
+                            if (transferState.Aborted === state) {
+                                transfer.finalize();
+                                peer.destroy();
+                                transfer.destroy();
+                                aborted();
+                                return;
                             }
-                            transfer.finalize();
-                            peer.destroy();
-                            transfer.destroy();
+
+                            if (transferState.Charged === state) {
+                                transfer.items(function(items) {
+                                    for (var i = 0; i < items.length; ++i) {
+                                        addResult(items[i]);
+                                    }
+                                    transfer.finalize();
+                                    peer.destroy();
+                                    transfer.destroy();
+                                });
+                            }
                         });
-                    }
+                    });
+
                 });
+
             }
         );
     };

@@ -170,6 +170,7 @@ function UbuntuBindingBackendDelegate(parent) {
     this._parent = parent;
     this._id = 0;
     this._objects = {};
+    this._last_proxy_id = 0;
 }
 UbuntuBindingBackendDelegate.prototype = {
     createQmlObject: function(uri, version, component, properties) {
@@ -220,6 +221,7 @@ UbuntuBindingBackendDelegate.prototype = {
 
     storeQmlObject: function(object, uri, version, component, properties) {
         var id = this._generateObjectId(uri, component);
+        console.debug('got an id: ' + id)
         this._objects[id] = object;
         return id;
     },
@@ -1368,7 +1370,7 @@ function createContentHubApi(backendDelegate) {
             return "Aborted";
         else if (state === ContentHubBridge.ContentTransfer.Finalized)
             return "Finalized";
-        return "Created";
+        return "<Unknown State>";
     };
 
     function ContentTransfer(transfer, objectid) {
@@ -1476,12 +1478,7 @@ function createContentHubApi(backendDelegate) {
             this._validate();
 
             // return in serialized form
-            var items = [];
-            for (var i = 0; i < this._object.items.length; ++i) {
-                items.push({name: this._object.items[i].name.toString(),
-                               url: this._object.items[i].url.toString()});
-            }
-            callback(items)
+            callback(this.internal.serializeItems(this._object));
         },
         setItems: function(items, callback) {
             this._validate();
@@ -1497,9 +1494,15 @@ function createContentHubApi(backendDelegate) {
                 item.object.name = items[i].name;
                 item.object.url = items[i].url;
 
+                console.debug('setItems: adding item ' + item.object.name.toString()
+                              + ', ' + item.object.url.toString());
+
                 contentItems.push(item.object);
             }
+
             this._object.items = contentItems;
+
+            console.debug('setItems: grand total of ' + this._object.items.length + ' added');
 
             if (callback && typeof(callback) === 'function')
                 callback();
@@ -1524,6 +1527,19 @@ function createContentHubApi(backendDelegate) {
             this._callback = null;
             this._object.finalize();
         },
+
+
+        // internal
+        internal: {
+            serializeItems: function(self) {
+                var items = [];
+                for (var i = 0; i < self.items.length; ++i) {
+                    items.push({name: self.items[i].name.toString(),
+                                   url: self.items[i].url.toString()});
+                }
+                return items;
+            }
+        }
     };
 
     function ContentStore(store, objectid) {
@@ -1654,7 +1670,9 @@ function createContentHubApi(backendDelegate) {
 
     return {
         defaultSourceForType: function(type, callback) {
-            var source = new ContentPeer(_contenthub.defaultSourceForType(_nameToContentType(type)));
+            var _type = _nameToContentType(type);
+            var peer = _contenthub.defaultSourceForType(_type)
+            var source = new ContentPeer(peer);
             callback(source.serialize());
         },
 
@@ -1680,9 +1698,59 @@ function createContentHubApi(backendDelegate) {
             callback(wrappedPeers);
         },
 
+        apiImportContent: function(type, peer, transferOptions, onSuccess, onFailure) {
+            if (! backendDelegate.isObjectProxyInfo(peer)) {
+                console.debug('apiImportContent: invalid peer object proxy')
+                onError("Invalid peer");
+                return;
+            }
+            var _type = _nameToContentType(type);
+            var _peer = backendDelegate.objectFromId(peer.objectid);
+            if ( ! _peer) {
+                onError("Invalid peer object (NULL)");
+                return;
+            }
+
+            var transfer = _contenthub.importContent(_type, _peer);
+            console.log('*** Transfer object: ' + transfer + '')
+            if (transferOptions.multipleFiles) {
+                transfer.selectionType = ContentHubBridge.ContentTransfer.Multiple;
+            }
+            else {
+                transfer.selectionType = ContentHubBridge.ContentTransfer.Single;
+            }
+
+            if (transferOptions.importToLocalStore) {
+                var store = _contenthub.defaultStoreForType(_type);
+                transfer.setStore(store);
+            }
+
+            var _transfer = new ContentTransfer(transfer)
+            transfer.stateChanged.connect(function() {
+                console.log('** Transfer state change: ' + transfer + ', state: ' + _contentTransferStateToName(transfer.state));
+                if (transfer.state === ContentHubBridge.ContentTransfer.Aborted) {
+                    onFailure("Aborted");
+                    return;
+                }
+                else if (transfer.state === ContentHubBridge.ContentTransfer.Charged) {
+                    console.log('*** Transfer complete: got: ' + transfer.items.length + ' items (' + transfer + ')')
+                    for (var i = 0; i < transfer.items.length; ++i) {
+                        console.log('** item ' + i + ' : ' + transfer.items[i].url);
+                    }
+
+                    var d = _transfer.internal.serializeItems(transfer);
+                    onSuccess(d);
+                    transfer.finalize();
+                    return;
+                }
+            });
+            transfer.start();
+        },
+
         importContentForPeer: function(type, peerProxy, callback) {
             if (! backendDelegate.isObjectProxyInfo(peerProxy)) {
                 console.debug('importContentForPeer: invalid peer object proxy')
+                callback();
                 return;
             }
             var peer = backendDelegate.objectFromId(peerProxy.objectid);
