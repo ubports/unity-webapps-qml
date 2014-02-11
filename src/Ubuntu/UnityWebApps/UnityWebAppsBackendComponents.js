@@ -1722,11 +1722,12 @@ function createContentHubApi(backendDelegate) {
             var _transfer = new ContentTransfer(transfer)
             transfer.stateChanged.connect(function() {
                 console.log('** Transfer state change: ' + transfer + ', state: ' + _contentTransferStateToName(transfer.state));
-                if (transfer.state == ContentHubBridge.ContentTransfer.Aborted) {
+                if (transfer.state === ContentHubBridge.ContentTransfer.Aborted) {
                     onFailure("Aborted");
-                    transfer.finalize();
+                    transfer.destroy();
+                    return;
                 }
-                else if (transfer.state == ContentHubBridge.ContentTransfer.Charged) {
+                else if (transfer.state === ContentHubBridge.ContentTransfer.Charged) {
                     console.log('*** Transfer complete: got: ' + transfer.items.length + ' items (' + transfer + ')')
                     for (var i = 0; i < transfer.items.length; ++i) {
                         console.log('** item ' + i + ' : ' + transfer.items[i].url);
@@ -1735,6 +1736,8 @@ function createContentHubApi(backendDelegate) {
                     var d = _transfer.internal.serializeItems(transfer);
                     onSuccess(d);
                     transfer.finalize();
+                    transfer.destroy();
+                    return;
                 }
             });
             transfer.start();
