@@ -1,5 +1,5 @@
 window.onload = function() {
-    var api = external.getUnityObject(1.0);
+    var api = external.getUnityObject('1.0');
     var hub = api.ContentHub;
 
     var transferState = hub.ContentTransfer.State;

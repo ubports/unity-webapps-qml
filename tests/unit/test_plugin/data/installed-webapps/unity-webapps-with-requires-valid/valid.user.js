@@ -1,1 +1,1 @@
-var Unity = window.external.getUnityObject(1);
+var Unity = window.external.getUnityObject('1.0');
