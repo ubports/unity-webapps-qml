@@ -33,7 +33,6 @@ Depends: libqt5webkit5-qmlwebkitplugin,
          qtdeclarative5-accounts-plugin,
          ${misc:Depends},
          ${shlibs:Depends},
-Provides: qtdeclarative5-ubuntu-webapps-api,
 Suggests: qtdeclarative5-ubuntu-content0.1,
 Description: Unity Webapps QML component
  Unity Webapps QML is a QML component that binds to a QML WebView and allows
@@ -78,3 +77,9 @@ Description: Autopilot tests for the Unity Webapps QML
  Unity Webapps QML is a QML component that binds to a QML WebView and allows
  running javascript code to access Ubuntu stack components. This package
  contains autopilot tests for it.
+
+Package: qtdeclarative5-ubuntu-webapps-api
+Architecture: any
+Depends: unity-webapps-qml
+Description: Virtual Package depending on Unity Webapps QML Component
+ This empty package can be safely removed.
