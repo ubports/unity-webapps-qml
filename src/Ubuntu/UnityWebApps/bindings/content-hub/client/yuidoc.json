@@ -3,7 +3,7 @@
     "description": "Ubuntu App Platform Content Hub JavaScript API docs",
     "version": "0.1",
     "options": {
-        "outdir": "./build",
+        "outdir": "./docsbuild",
         "themedir": "../../yuidoc-theme"
     }
 }
