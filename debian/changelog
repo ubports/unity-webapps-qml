@@ -1,3 +1,14 @@
+unity-webapps-qml (0.1+14.04.20140212.1-0ubuntu1) trusty; urgency=low
+
+  [ Kyle Nitzsche ]
+  * A single script (yuidoc-build.sh) to build all api docs for all
+    current js apis.
+
+  [ Robert Bruce Park ]
+  * Define the virtual package more concretely.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 12 Feb 2014 20:43:20 +0000
+
 unity-webapps-qml (0.1+14.04.20140211.1-0ubuntu1) trusty; urgency=low
 
   [ CI bot ]
