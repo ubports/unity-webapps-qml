@@ -1,0 +1,9 @@
+{
+    "name": "Alarms JS API",
+    "description": "Ubuntu App Platform Alarms JavaScript API docs",
+    "version": "0.1",
+    "options": {
+        "outdir": "./docsbuild",
+        "themedir": "../../yuidoc-theme"
+    }
+}

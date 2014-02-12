@@ -1,0 +1,9 @@
+{
+    "name": "Content Hub JS API",
+    "description": "Ubuntu App Platform Content Hub JavaScript API docs",
+    "version": "0.1",
+    "options": {
+        "outdir": "./docsbuild",
+        "themedir": "../../yuidoc-theme"
+    }
+}

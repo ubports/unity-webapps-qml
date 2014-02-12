@@ -1,0 +1,16 @@
+To build docs for the known apis:
+
+Install yuidocs as described here:
+https://bugs.launchpad.net/ubuntu-html5-theme/+bug/1241029/comments/16
+
+Run yuidoc-build.sh
+
+Docs are generated in each API/client/docsbuild, for example in:
+* alarm-api/client/docsbuild
+
+To add new api directories for autobuilding:
+* Add the dir to the for loop in yuidocs-build.sh
+* Add the following to the NEWAPI/client/ dir
+  - yudioc.json filei, edited accordingly
+  - index.handlebars file,, edited accordinly
+

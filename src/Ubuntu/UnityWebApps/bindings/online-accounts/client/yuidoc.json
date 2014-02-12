@@ -1,0 +1,9 @@
+{
+    "name": "Online Accounts JS API",
+    "description": "Ubuntu App Platform Online Accounts JavaScript API docs",
+    "version": "0.1",
+    "options": {
+        "outdir": "./docsbuild",
+        "themedir": "../../yuidoc-theme"
+    }
+}
