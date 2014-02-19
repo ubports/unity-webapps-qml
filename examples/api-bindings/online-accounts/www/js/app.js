@@ -7,7 +7,7 @@ window.onload = function() {
     };
 
     function doGetAuth() {
-	setResults('');
+        setResults('');
 
         var api = external.getUnityObject('1.0');
         var oa = api.OnlineAccounts;
@@ -36,7 +36,7 @@ window.onload = function() {
                 setResults("<br><br>Authenticated: "
                              + result.authenticated
                              + ", token: "
-                             + result.data);
+                             + result.data.AccessToken);
             });
         });
     }

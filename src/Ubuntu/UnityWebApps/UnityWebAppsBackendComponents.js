@@ -621,7 +621,7 @@ function createOnlineAccountsApi(backendDelegate) {
             onAuthenticated = function(reply) {
                 callback({error: null,
                           authenticated: true,
-                          data: reply.AccessToken});
+                          data: reply});
 
                 self._object.onAuthenticated.disconnect(onAuthenticated);
                 self._object.onAuthenticationError.disconnect(onAuthenticationError);
