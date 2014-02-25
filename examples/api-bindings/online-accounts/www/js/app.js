@@ -7,12 +7,12 @@ window.onload = function() {
     };
 
     function doGetAuth() {
-	setResults('');
+        setResults('');
 
         var api = external.getUnityObject('1.0');
         var oa = api.OnlineAccounts;
 
-        oa.api.getAccountsInfoFor(null, 'facebook', function(result) {
+        oa.api.getAccountsInfoFor(null, document.getElementById('service').value, function(result) {
             if (result.length != undefined && result.length === 0) {
                 setResults("No account found");
             }
