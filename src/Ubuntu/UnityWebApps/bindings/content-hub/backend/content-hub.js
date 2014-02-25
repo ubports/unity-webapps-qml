@@ -1,3 +1,23 @@
+/*
+ * Copyright 2014 Canonical Ltd.
+ *
+ * This file is part of unity-webapps-qml.
+ *
+ * unity-webapps-qml is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 3.
+ *
+ * unity-webapps-qml is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.import Ubuntu.Content 0.1 as ContentHubBridge
+
 /**
  *
  * ContentHub API backend binding
@@ -10,6 +30,7 @@ function createContentHubApi(backendDelegate) {
 
     var _contenthub = ContentHubBridge.ContentHub;
 
+    // TODO find a better way
     function _nameToContentType(name) {
         var contentTypePerName = {
             "Pictures": ContentHubBridge.ContentType.Pictures,
@@ -21,6 +42,54 @@ function createContentHubApi(backendDelegate) {
                   : ContentHubBridge.ContentType.Unknown;
     };
 
+    function _nameToContentTransferSelection(name) {
+        var contentTypePerName = {
+            "Single": ContentHubBridge.ContentTransfer.Single,
+            "Multiple": ContentHubBridge.ContentTransfer.Multiple,
+        };
+        return name in contentTypePerName ?
+                    contentTypePerName[name]
+                  : ContentHubBridge.ContentTransfer.Single;
+    };
+    function _contentTransferSelectionToName(state) {
+        if (state === ContentHubBridge.ContentTransfer.Single)
+            return "Single";
+        else if (state === ContentHubBridge.ContentTransfer.Multiple)
+            return "Multiple";
+        return "Single";
+    };
+
+    function _nameToContentTransferDirection(name) {
+        var contentTypePerName = {
+            "Import": ContentHubBridge.ContentTransfer.Import,
+            "Export": ContentHubBridge.ContentTransfer.Export,
+        };
+        return name in contentTypePerName ?
+                    contentTypePerName[name]
+                  : ContentHubBridge.ContentTransfer.Import;
+    };
+    function _contentTransferDirectionToName(state) {
+        if (state === ContentHubBridge.ContentTransfer.Import)
+            return "Import";
+        else if (state === ContentHubBridge.ContentTransfer.Export)
+            return "Export";
+        return "Import";
+    };
+
+    function _nameToContentTransferState(name) {
+        var contentTransferStatePerName = {
+            "Created": ContentHubBridge.ContentTransfer.Created,
+            "Initiated": ContentHubBridge.ContentTransfer.Initiated,
+            "InProgress": ContentHubBridge.ContentTransfer.InProgress,
+            "Charged": ContentHubBridge.ContentTransfer.Charged,
+            "Collected": ContentHubBridge.ContentTransfer.Collected,
+            "Aborted": ContentHubBridge.ContentTransfer.Aborted,
+            "Finalized": ContentHubBridge.ContentTransfer.Finalized,
+        };
+        return name in contentTransferStatePerName ?
+                    contentTransferStatePerName[name]
+                  : ContentHubBridge.ContentTransfer.Created;
+    };
     function _contentTransferStateToName(state) {
         if (state === ContentHubBridge.ContentTransfer.Created)
             return "Created";
@@ -36,7 +105,7 @@ function createContentHubApi(backendDelegate) {
             return "Aborted";
         else if (state === ContentHubBridge.ContentTransfer.Finalized)
             return "Finalized";
-        return "Created";
+        return "<Unknown State>";
     };
 
     function ContentTransfer(transfer, objectid) {
@@ -61,35 +130,112 @@ function createContentHubApi(backendDelegate) {
                 throw new TypeError("Invalid object null");
         },
 
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            backendDelegate.deleteId(this._id);
+        },
+
         // object methods
         serialize: function() {
+            var self = this;
             return {
                 type: 'object-proxy',
                 apiid: 'ContentHub',
                 objecttype: 'ContentTransfer',
-                objectid: this._id,
+                objectid: self._id,
+
+                // serialize immutable values
+
+                content: {
+                    store: self._object.store,
+                    state: self._object.state,
+                }
             }
         },
 
         // properties
+
+        store: function(callback) {
+            this._validate();
+            callback(this._object.store);
+        },
+        setStore: function(storeProxy, callback) {
+            this._validate();
+
+            if (backendDelegate.isObjectProxyInfo(storeProxy)) {
+                var store = backendDelegate.objectFromId(storeProxy.objectid);
+                if (store)
+                    this._object.setStore(store);
+            }
+            else {
+                console.debug('setStore: invalid store object proxy');
+            }
+            if (callback)
+                callback();
+        },
+
+        state: function(callback) {
+            this._validate();
+            callback(_contentTransferStateToName(this._object.state));
+        },
+        setState: function(state, callback) {
+            this._validate();
+            this._object.state = _nameToContentTransferState(state);
+            if (callback && typeof(callback) === 'function')
+                callback();
+        },
+
         selectionType: function(callback) {
             this._validate();
-            callback(this._object.selectionType)
+            callback(_contentTransferSelectionToName(this._object.selectionType));
         },
-        setSelectionType: function(selectionType) {
+        setSelectionType: function(selectionType, callback) {
             this._validate();
-            this._object.selectionType = selectionType;
+            this._object.selectionType = _nameToContentTransferSelection(selectionType);
+            if (callback && typeof(callback) === 'function')
+                callback();
+        },
+
+        direction: function(callback) {
+            this._validate();
+            callback(_contentTransferDirectionToName(this._object.direction));
+        },
+        setDirection: function(direction, callback) {
+            this._validate();
+            this._object.direction = _nameToContentTransferDirection(direction);
+            if (callback && typeof(callback) === 'function')
+                callback();
         },
 
         items: function(callback) {
             this._validate();
 
             // return in serialized form
-            var items = [];
-            for (var i = 0; i < this._object.items.length; ++i) {
-                items.push({name: this._object.items[i].name, url: this._object.items[i].url});
+            callback(this.internal.serializeItems(this._object));
+        },
+        setItems: function(items, callback) {
+            this._validate();
+            var contentItems = [];
+            for (var i = 0; i < items.length; ++i) {
+                var item = backendDelegate.createQmlObject(
+                            PLUGIN_URI, VERSION, 'ContentItem');
+                if ( ! item.object) {
+                    console.debug('Could not create ContentItem object');
+                    continue;
+                }
+
+                item.object.name = items[i].name;
+                item.object.url = items[i].url;
+
+                contentItems.push(item.object);
             }
-            callback(items)
+
+            this._object.items = contentItems;
+
+            if (callback && typeof(callback) === 'function')
+                callback();
         },
 
         // methods
@@ -111,6 +257,19 @@ function createContentHubApi(backendDelegate) {
             this._callback = null;
             this._object.finalize();
         },
+
+
+        // internal
+        internal: {
+            serializeItems: function(self) {
+                var items = [];
+                for (var i = 0; i < self.items.length; ++i) {
+                    items.push({name: self.items[i].name.toString(),
+                                   url: self.items[i].url.toString()});
+                }
+                return items;
+            }
+        }
     };
 
     function ContentStore(store, objectid) {
@@ -134,17 +293,33 @@ function createContentHubApi(backendDelegate) {
                 throw new TypeError("Invalid object null");
         },
 
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            backendDelegate.deleteId(this._id);
+        },
+
         // object methods
         serialize: function() {
+            var self = this;
             return {
                 type: 'object-proxy',
                 apiid: 'ContentHub',
                 objecttype: 'ContentStore',
                 objectid: this._id,
+
+                // serialize immutable values
+
+                content: {
+                    uri: self._object.uri,
+                }
             }
         },
 
         // properties
+
+        //immutable
         uri: function(callback) {
             this._validate();
             callback(this._object.uri);
@@ -172,6 +347,13 @@ function createContentHubApi(backendDelegate) {
                 throw new TypeError("Invalid object null");
         },
 
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            backendDelegate.deleteId(this._id);
+        },
+
         // object methods
         serialize: function() {
             var self = this;
@@ -180,6 +362,9 @@ function createContentHubApi(backendDelegate) {
                 apiid: 'ContentHub',
                 objecttype: 'ContentPeer',
                 objectid: self._id,
+
+                // serialize immutable values
+
                 content: {
                     appId: self._object.appId,
                     name: self._object.name,
@@ -188,10 +373,14 @@ function createContentHubApi(backendDelegate) {
         },
 
         // properties
+
+        // immutable
         appId: function(callback) {
             this._validate();
             callback(this._object.appId);
         },
+
+        // immutable
         name: function(callback) {
             this._validate();
             callback(this._object.name);
@@ -211,7 +400,9 @@ function createContentHubApi(backendDelegate) {
 
     return {
         defaultSourceForType: function(type, callback) {
-            var source = new ContentPeer(_contenthub.defaultSourceForType(_nameToContentType(type)));
+            var _type = _nameToContentType(type);
+            var peer = _contenthub.defaultSourceForType(_type)
+            var source = new ContentPeer(peer);
             callback(source.serialize());
         },
 
@@ -225,17 +416,77 @@ function createContentHubApi(backendDelegate) {
             callback(transfer.serialize());
         },
 
-        importContentForPeer: function(type, peerProxy, callback) {
-            if (! backendDelegate.isObjectProxyInfo(peerProxy)) {
-                console.debug('importContentForPeer: invalid peer object proxy')
-                callback(null);
+        knownSourcesForType: function(type, callback) {
+            var peers = _contenthub.knownSourcesForType(_nameToContentType(type));
+            var wrappedPeers = [];
+
+            for (var i = 0; i < peers.length; ++i) {
+                var wrappedPeer = new ContentPeer(peers[i]);
+                wrappedPeers.push(wrappedPeer.serialize());
+            }
+
+            callback(wrappedPeers);
+        },
+
+        apiImportContent: function(type, peer, transferOptions, onSuccess, onFailure) {
+            if (! backendDelegate.isObjectProxyInfo(peer)) {
+                console.debug('apiImportContent: invalid peer object proxy')
+                onError("Invalid peer");
+                return;
+            }
+            var _type = _nameToContentType(type);
+            var _peer = backendDelegate.objectFromId(peer.objectid);
+            if ( ! _peer) {
+                onError("Invalid peer object (NULL)");
                 return;
             }
 
+            var transfer = _contenthub.importContent(_type, _peer);
+            if (transferOptions.multipleFiles) {
+                transfer.selectionType = ContentHubBridge.ContentTransfer.Multiple;
+            }
+            else {
+                transfer.selectionType = ContentHubBridge.ContentTransfer.Single;
+            }
+
+            if (transferOptions.importToLocalStore) {
+                var store = _contenthub.defaultStoreForType(_type);
+                transfer.setStore(store);
+            }
+
+            var _transfer = new ContentTransfer(transfer)
+            transfer.stateChanged.connect(function() {
+                if (transfer.state === ContentHubBridge.ContentTransfer.Aborted) {
+                    onFailure("Aborted");
+                    return;
+                }
+                else if (transfer.state === ContentHubBridge.ContentTransfer.Charged) {
+                    var d = _transfer.internal.serializeItems(transfer);
+                    onSuccess(d);
+                    transfer.finalize();
+                    return;
+                }
+            });
+            transfer.start();
+        },
+
+        importContentForPeer: function(type, peerProxy, callback) {
+            if (! backendDelegate.isObjectProxyInfo(peerProxy)) {
+                console.debug('importContentForPeer: invalid peer object proxy')
+                callback();
+                return;
+            }
             var peer = backendDelegate.objectFromId(peerProxy.objectid);
             var transfer = new ContentTransfer(_contenthub.importContent(_nameToContentType(type), peer));
 
             callback(transfer.serialize());
+        },
+
+        onExportRequested: function(callback) {
+            _contenthub.exportRequested.connect(function(exportTransfer) {
+                var wrapped = new ContentTransfer(exportTransfer);
+                callback(wrapped.serialize());
+            });
         },
 
         // Internal
@@ -251,6 +502,11 @@ function createContentHubApi(backendDelegate) {
                 args.push(callback);
 
             var o = backendDelegate.objectFromId(objectid);
+            if (o == null) {
+                console.debug('Cannot dispatch to unknown object: ' + objectid);
+                return;
+            }
+
             var Constructor = _constructorFromName(class_name);
 
             var instance = new Constructor(o, objectid);
@@ -258,6 +514,6 @@ function createContentHubApi(backendDelegate) {
             instance[method_name].apply(instance, args);
         }
     };
-};
+}
 
 
