@@ -8,17 +8,17 @@
   <body>
     
     <div>
-      Service: <input type="text" id="service"></input>
-      Get authentication token: <input type="button" id="getauth"></input>
-    </div>
-
-    <div>
       Results:
       <div id="results">
       </div>
     </div>
 
     <div style="margin-top: 30px">
+        <div>
+          Provider: <input type="text" id="provider"></input>
+          Service: <input type="text" id="service"></input>
+          <input type="button" id="refreshAccounts" value="List accounts"></input>
+        </div>
         Accounts (click on an account to authenticate):
         <div id='accounts'>
             <ul>

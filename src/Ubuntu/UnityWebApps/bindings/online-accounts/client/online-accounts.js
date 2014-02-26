@@ -105,76 +105,42 @@ function createOnlineAccountsApi(backendBridge) {
         var api = external.getUnityObject(1.0);
         var oa = api.OnlineAccounts;
 
-        oa.api.getAccountsInfoFor(null, 'facebook', function(result) { [...] });
+        oa.api.getAccounts({'provider': 'facebook'}, function(result) { [...] });
  */
    return {
 
         api: {
             /**
-             * Gets the access token for a given set of filtering parameters.
-             * 
-             * @method api.getAccessTokenFor
-             * @param service {String} If set, the access token will be retrieved for the accounts that correspond to that specific service.
-             * @param provider {String} If set, the access token will be retrieved for the accounts that correspond to that specific service.
-             * @param accountId {Integer} If set, the access token will be retrieved for the accounts that correspond to that specific service.
-             *                  It is used when multiple accounts are found, otherwise the first account is selected.
-             * @param callback {Function(Object(error:, authenticated: Bool, data: ))} Callback that receives the result or null
-             * 
-             * @example
-             
-             var api = external.getUnityObject(1.0);
-             var oa = api.OnlineAccounts;
-
-             oa.api.getAccessTokenFor(null, 'facebook', null, function(result) {
-               if (result.error) {
-                 console.log("Error: " + result.error);
-                 return;
-               }
-               console.log("Authenticated: "
-                             + result.authenticated
-                             + ", token: "
-                             + result.data);
-             });
-             */
-            getAccessTokenFor: function(service, provider, accountId, callback) {
-                backendBridge.call('OnlineAccounts.getAccessTokenFor'
-                                   , [service, provider, accountId]
-                                   , callback);
-            },
-
-            /**
-             * Gets the account information for a given set of filtering parameters.
+             * Gets the configured accounts satisfying the given filters.
              *
-             * @method api.getAccountsInfoFor
-             * @param service {String} If set, the access token will be retrieved for the accounts that correspond to that specific service.
-             * @param provider {String} If set, the access token will be retrieved for the accounts that correspond to that specific service.
-             * @param callback {Function(List of Object(displayName:, accountId: Bool, providerName: String, serviceName: String, enabled: Bool))} Callback that receives the result or null
+             * @method api.getAccounts
+             * @param filters {Object} A dictionary of parameters to filter the result. The filtering keys are:
+             * - application: the ID of a application (see /usr/share/accounts/applications/ or ~/.local/share/accounts/applications/ for a list of the available applications)
+             * - provider: the ID of a provider (see /usr/share/accounts/providers/ or ~/.local/share/accounts/providers/ for a list of the available providers)
+             * - service: the ID of a service (see /usr/share/accounts/services/ or ~/.local/share/accounts/services/ for a list of the available services)
+             *
+             * @param callback {Function(List of AccountService objects)} Callback that receives the result or null
              *
              * @example
                var api = external.getUnityObject(1.0);
                var oa = api.OnlineAccounts;
              
-               oa.api.getAccountsInfoFor(null, 'facebook', function(result) {
+               oa.api.getAccounts({'provider': 'facebook'}, function(result) {
                  for (var i = 0; i < result.length; ++i) {
-                   console.log("name: " + result[i].displayName
-                               + ', id: ' + result[i].accountId
-                               + ', providerName: ' + result[i].providerName
-                               + ', serviceName: ' + result[i].serviceName
-                               + ', enabled: ' + (result[i].enabled ? "true" : "false")
+                   console.log("name: " + result[i].displayName()
+                               + ', id: ' + result[i].accountId()
+                               + ', providerName: ' + result[i].provider().displayName
+                               + ', enabled: ' + (result[i].enabled() ? "true" : "false")
                                );
                  }               
                });
 
              */
-            getAccountsInfoFor: function(service, provider, callback) {
-                backendBridge.call('OnlineAccounts.getAccountsInfoFor'
-                                   , [service, provider]
+            getAccounts: function(filters, callback) {
+                backendBridge.call('OnlineAccounts.getAccounts'
+                                   , [filters]
                                    , callback);
             },
-
-            getAccounts: function(callback) {
-                backendBridge.call('OnlineAccounts.getAccounts', [callback]);
-            }
         },
 
 

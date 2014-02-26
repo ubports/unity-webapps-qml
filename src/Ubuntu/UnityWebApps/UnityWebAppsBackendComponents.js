@@ -985,8 +985,8 @@ function createOnlineAccountsApi(backendDelegate) {
             callback(accountsInfo);
         },
 
-        getAccounts: function(callback) {
-            var serviceModel = new AccountServiceModel();
+        getAccounts: function(filters, callback) {
+            var serviceModel = new AccountServiceModel(filters);
             var count = serviceModel.internal.count(serviceModel);
             var accounts = []
             for (var i = 0; i < count; ++i) {
