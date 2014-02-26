@@ -155,8 +155,9 @@ function __extractParams(params) {
         return "";
     var extracted = "";
     for (var p in params) {
-        if (params.hasOwnProperty(p))
+        if (params.hasOwnProperty(p) && params[p] != null) {
             extracted += p + ":" + JSON.stringify(params[p]) + "; ";
+        }
     }
     return extracted;
 }
@@ -783,9 +784,9 @@ function createOnlineAccountsApi(backendDelegate) {
         }
     };
 
-    function AccountServiceModel() {
+    function AccountServiceModel(filterParams) {
         var result = backendDelegate.createQmlObject(
-                    PLUGIN_URI, VERSION, 'AccountServiceModel');
+                    PLUGIN_URI, VERSION, 'AccountServiceModel', filterParams);
         this._id = result.id;
         this._object = result.object;
 
@@ -961,12 +962,7 @@ function createOnlineAccountsApi(backendDelegate) {
 
         // api
         getAccountsInfoFor: function(service, provider, callback) {
-            var serviceModel = new AccountServiceModel();
-
-            if (service)
-                serviceModel.setService(service);
-            if (provider)
-                serviceModel.setProvider(provider);
+            var serviceModel = new AccountServiceModel({'service': service, 'provider': provider});
 
             var count = serviceModel.internal.count(serviceModel);
             var accountsInfo = []

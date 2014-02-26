@@ -41,7 +41,7 @@ window.onload = function() {
     function doGetAuth() {
         setResults('');
 
-        oa.api.getAccountsInfoFor(null, 'facebook', function(result) {
+        oa.api.getAccountsInfoFor(null, document.getElementById('service').value, function(result) {
             if (result.length != undefined && result.length === 0) {
                 setResults("No account found");
             }
