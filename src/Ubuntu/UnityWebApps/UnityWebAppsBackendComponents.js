@@ -901,7 +901,7 @@ function createOnlineAccountsApi(backendDelegate) {
         internal: {
 
             // special case for an object wrapper
-            accountServiceHandleAtIndex: function(self, idx) {
+            accountServiceAtIndex: function(self, idx) {
                 self._validate();
 
                 var accountServiceHandle = self._modelAdaptor.itemAt(idx, "accountServiceHandle");
@@ -969,7 +969,6 @@ function createOnlineAccountsApi(backendDelegate) {
                 serviceModel.setProvider(provider);
 
             var count = serviceModel.internal.count(serviceModel);
-            console.log(count)
             var accountsInfo = []
             for (var i = 0; i < count; ++i) {
                 var displayName = serviceModel.internal.itemAt(serviceModel, i, "displayName");
@@ -988,6 +987,21 @@ function createOnlineAccountsApi(backendDelegate) {
             serviceModel.destroy();
 
             callback(accountsInfo);
+        },
+
+        getAccounts: function(callback) {
+            var serviceModel = new AccountServiceModel();
+            var count = serviceModel.internal.count(serviceModel);
+            var accounts = []
+            for (var i = 0; i < count; ++i) {
+                var service = serviceModel.internal.accountServiceAtIndex(serviceModel, i);
+                if (service) {
+                    var s = service.serialize();
+                    console.debug(JSON.stringify(s.content))
+                    accounts.push(s);
+                }
+            }
+            callback(accounts);
         },
 
         getAccountById: function(accountId, callback) {
@@ -1018,7 +1032,7 @@ function createOnlineAccountsApi(backendDelegate) {
                     callback(results);
                 };
                 serviceModel.internal
-                    .accountServiceHandleAtIndex(serviceModel, accountIdx)
+                    .accountServiceAtIndex(serviceModel, accountIdx)
                     .authenticate(onAuthenticated);
             }
             else {

@@ -13,30 +13,63 @@ function createOnlineAccountsApi(backendBridge) {
  * @class AccountService
  * @constructor
  */
-    function AccountService(id) {
+    function AccountService(id, content) {
         this._proxy = backendBridge.createRemoteObject(
             PLUGIN_URI, 'AccountService', id);
+
+        this._accountId = content && content.accountId
+             ? content.accountId : null;
+        this._enabled = content && content.enabled
+             ? content.enabled : null;
+        this._serviceEnabled = content && content.serviceEnabled
+             ? content.serviceEnabled : null;
+        this._displayName = content && content.displayName
+             ? content.displayName : null;
+        this._provider = content && content.provider
+             ? content.provider : null;
+        this._service = content && content.service
+             ? content.service : null;
     };
     AccountService.prototype = {
         // properties
         accountId: function(callback) {
-            this._proxy.call('accountId', [], callback);
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('accountId', [], callback);
+                return;
+            }
+            return this._accountId;
         },
 
         enabled: function(callback) {
-            this._proxy.call('enabled', [], callback);
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('enabled', [], callback);
+                return;
+            }
+            return this._enabled;
         },
 
         displayName: function(callback) {
-            this._proxy.call('displayName', [], callback);
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('displayName', [], callback);
+                return;
+            }
+            return this._displayName;
         },
 
         provider: function(callback) {
-            this._proxy.call('provider', [], callback);
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('provider', [], callback);
+                return;
+            }
+            return this._provider;
         },
 
         service: function(callback) {
-            this._proxy.call('service', [], callback);
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('service', [], callback);
+                return;
+            }
+            return this._service;
         },
 
         // methods
@@ -138,6 +171,10 @@ function createOnlineAccountsApi(backendBridge) {
                                    , [service, provider]
                                    , callback);
             },
+
+            getAccounts: function(callback) {
+                backendBridge.call('OnlineAccounts.getAccounts', [callback]);
+            }
         },
 
 
