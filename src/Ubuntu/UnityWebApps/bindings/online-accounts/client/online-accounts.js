@@ -43,7 +43,7 @@ function createOnlineAccountsApi(backendBridge) {
          *
          * @method accountId
          * @param callback (optional) {Function(String)}
-	 * @return {String} Local value for the accountId
+         * @return {String} Local value for the accountId
          */
         accountId: function(callback) {
             if (callback && typeof(callback) === 'function') {
@@ -61,7 +61,7 @@ function createOnlineAccountsApi(backendBridge) {
          *
          * @method enabled
          * @param callback (optional) {Function(String)}
-	 * @return {Boolean} Local value for the enabled flag
+         * @return {Boolean} Local value for the enabled flag
          */
         enabled: function(callback) {
             if (callback && typeof(callback) === 'function') {
@@ -80,7 +80,7 @@ function createOnlineAccountsApi(backendBridge) {
          *
          * @method displayName
          * @param callback (optional) {Function(String)}
-	 * @return {String} Local value for the displayName
+         * @return {String} Local value for the displayName
          */
         displayName: function(callback) {
             if (callback && typeof(callback) === 'function') {
@@ -102,7 +102,7 @@ function createOnlineAccountsApi(backendBridge) {
          *
          * @method provider
          * @param callback (optional) {Function(String)}
-	 * @return {Object} Local value object for the provider
+         * @return {Object} Local value object for the provider
          */
         provider: function(callback) {
             if (callback && typeof(callback) === 'function') {
@@ -125,7 +125,7 @@ function createOnlineAccountsApi(backendBridge) {
          *
          * @method service
          * @param callback (optional) {Function(String)}
-	 * @return {Object} Local value object for the service
+         * @return {Object} Local value object for the service
          */
         service: function(callback) {
             if (callback && typeof(callback) === 'function') {
@@ -150,7 +150,6 @@ function createOnlineAccountsApi(backendBridge) {
          *
          * @method authenticate
          * @param callback {Function(Object)}
-	 * @return null
          */
         authenticate: function(callback) {
             this._proxy.call('authenticate', [callback]);
@@ -162,7 +161,6 @@ function createOnlineAccountsApi(backendBridge) {
          * Destroys the remote object. This proxy object is not valid anymore.
          *
          * @method destroy
-	 * @return null
          */
         destroy: function() {
             this._proxy.call('destroy', []);
