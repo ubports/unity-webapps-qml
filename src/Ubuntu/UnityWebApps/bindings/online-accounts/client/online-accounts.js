@@ -9,9 +9,11 @@ function createOnlineAccountsApi(backendBridge) {
 
 /**
  * AccountService represents an instance of a service in an Online Accounts.
-
+ * 
+ * The AcountService object is not directly constructible but returned as a result of
+ * OnlineAccounts api calls.
+ *
  * @class AccountService
- * @constructor
  */
     function AccountService(id, content) {
         this._proxy = backendBridge.createRemoteObject(
@@ -34,13 +36,14 @@ function createOnlineAccountsApi(backendBridge) {
         // properties
 
         /**
-         * Retrieves the account's numeric ID; note that all
-	 * AccountService objects which work on the same online account will have the same ID.
+         * Returns the account's numeric ID; note that all
+         * AccountService objects which work on the same online account will have the same ID.
          *
          * If the callback parameter is not set, the current "local" value is retrieved.
          *
          * @method accountId
          * @param callback (optional) {Function(String)}
+	 * @return {String} Local value for the accountId
          */
         accountId: function(callback) {
             if (callback && typeof(callback) === 'function') {
@@ -51,13 +54,14 @@ function createOnlineAccountsApi(backendBridge) {
         },
 
         /**
-         * This read-only property tells whether the AccountService is enabled.
-	 * An application shouldn't use an AccountService which is disabled
+         * This read-only property returns whether the AccountService is enabled.
+         * An application shouldn't use an AccountService which is disabled
          *
          * If the callback parameter is not set, the current "local" value is retrieved.
          *
          * @method enabled
          * @param callback (optional) {Function(String)}
+	 * @return {Boolean} Local value for the enabled flag
          */
         enabled: function(callback) {
             if (callback && typeof(callback) === 'function') {
@@ -68,14 +72,15 @@ function createOnlineAccountsApi(backendBridge) {
         },
 
         /**
-         * Retrieves The account's display name (usually the user's login or ID).
-	 * Note that all AccountService objects which work on the same online account
-	 * will share the same display name.
+         * Returns The account's display name (usually the user's login or ID).
+         * Note that all AccountService objects which work on the same online account
+         * will share the same display name.
          *
          * If the callback parameter is not set, the current "local" value is retrieved.
          *
          * @method displayName
          * @param callback (optional) {Function(String)}
+	 * @return {String} Local value for the displayName
          */
         displayName: function(callback) {
             if (callback && typeof(callback) === 'function') {
@@ -86,17 +91,18 @@ function createOnlineAccountsApi(backendBridge) {
         },
 
         /**
-         * An immutable object representing the provider which provides the account.
-	 * 
-	 * The returned object will have at least these properties:
-	 *   - 'id' is the unique identifier for this provider
-	 *   - 'displayName'
-	 *   - 'iconName'
-	 * 
+         * Returns an object representing the provider which provides the account.
+         * 
+         * The returned object will have at least these properties:
+         *   - 'id' is the unique identifier for this provider
+         *   - 'displayName'
+         *   - 'iconName'
+         * 
          * If the callback parameter is not set, the current "local" value is retrieved.
          *
          * @method provider
          * @param callback (optional) {Function(String)}
+	 * @return {Object} Local value object for the provider
          */
         provider: function(callback) {
             if (callback && typeof(callback) === 'function') {
@@ -107,18 +113,19 @@ function createOnlineAccountsApi(backendBridge) {
         },
 
         /**
-         * An immutable object representing the service which this AccountService instantiates
-	 * 
-	 * The returned object will have at least these properties:
-	 *   - 'id' is the unique identifier for this service
-	 *   - 'displayName'
-	 *   - 'iconName'
-	 *   - 'serviceTypeId' identifies the provided service type
-	 * 
+         * Returns an object representing the service which this AccountService instantiates
+         * 
+         * The returned object will have at least these properties:
+         *   - 'id' is the unique identifier for this service
+         *   - 'displayName'
+         *   - 'iconName'
+         *   - 'serviceTypeId' identifies the provided service type
+         * 
          * If the callback parameter is not set, the current "local" value is retrieved.
          *
          * @method service
          * @param callback (optional) {Function(String)}
+	 * @return {Object} Local value object for the service
          */
         service: function(callback) {
             if (callback && typeof(callback) === 'function') {
@@ -132,17 +139,18 @@ function createOnlineAccountsApi(backendBridge) {
 
         /**
          * Perform the authentication on this account.
-	 * 
-	 * The callback will be called with the authentication result object which will have
-	 * these properties:
-	 *   - 'error': error message if the authentication was a failure
-	 *   - 'authenticated': boolean value that identifies if the operation was a success
-	 *   - 'data': Object with the data returned by the authentication process. An 'AccessToken' property can be usually found (when it applies) with the OAuth access token.
+         * 
+         * The callback will be called with the authentication result object which will have
+         * these properties:
+         *   - 'error': error message if the authentication was a failure
+         *   - 'authenticated': boolean value that identifies if the operation was a success
+         *   - 'data': Object with the data returned by the authentication process. An 'AccessToken' property can be usually found (when it applies) with the OAuth access token.
          * 
          * If the callback parameter is not set, the current "local" value is retrieved.
          *
          * @method authenticate
          * @param callback {Function(Object)}
+	 * @return null
          */
         authenticate: function(callback) {
             this._proxy.call('authenticate', [callback]);
@@ -154,6 +162,7 @@ function createOnlineAccountsApi(backendBridge) {
          * Destroys the remote object. This proxy object is not valid anymore.
          *
          * @method destroy
+	 * @return null
          */
         destroy: function() {
             this._proxy.call('destroy', []);
@@ -170,7 +179,7 @@ function createOnlineAccountsApi(backendBridge) {
     };
  
 /**
- * The OnlineAccounts object.
+ * The OnlineAccounts object is the entry point to online accounts service access.
 
  * @class OnlineAccounts
  * 
