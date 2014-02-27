@@ -60,7 +60,7 @@ function createOnlineAccountsApi(backendBridge) {
          * If the callback parameter is not set, the current "local" value is retrieved.
          *
          * @method enabled
-         * @param callback (optional) {Function(String)}
+         * @param callback (optional) {Function(Boolean)}
          * @return {Boolean} Local value for the enabled flag
          */
         enabled: function(callback) {
@@ -101,7 +101,7 @@ function createOnlineAccountsApi(backendBridge) {
          * If the callback parameter is not set, the current "local" value is retrieved.
          *
          * @method provider
-         * @param callback (optional) {Function(String)}
+         * @param callback (optional) {Function(Object)}
          * @return {Object} Local value object for the provider
          */
         provider: function(callback) {
@@ -124,7 +124,7 @@ function createOnlineAccountsApi(backendBridge) {
          * If the callback parameter is not set, the current "local" value is retrieved.
          *
          * @method service
-         * @param callback (optional) {Function(String)}
+         * @param callback (optional) {Function(Object)}
          * @return {Object} Local value object for the service
          */
         service: function(callback) {
