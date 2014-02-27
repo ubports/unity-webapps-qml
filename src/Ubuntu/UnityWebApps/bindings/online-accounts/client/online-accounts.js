@@ -39,17 +39,10 @@ function createOnlineAccountsApi(backendBridge) {
          * Returns the account's numeric ID; note that all
          * AccountService objects which work on the same online account will have the same ID.
          *
-         * If the callback parameter is not set, the current "local" value is retrieved.
-         *
          * @method accountId
-         * @param callback (optional) {Function(String)}
-         * @return {String} Local value for the accountId
+         * @return {String} Value for the accountId
          */
-        accountId: function(callback) {
-            if (callback && typeof(callback) === 'function') {
-                this._proxy.call('accountId', [], callback);
-                return;
-            }
+        accountId: function() {
             return this._accountId;
         },
 
@@ -57,17 +50,10 @@ function createOnlineAccountsApi(backendBridge) {
          * This read-only property returns whether the AccountService is enabled.
          * An application shouldn't use an AccountService which is disabled
          *
-         * If the callback parameter is not set, the current "local" value is retrieved.
-         *
          * @method enabled
-         * @param callback (optional) {Function(Boolean)}
-         * @return {Boolean} Local value for the enabled flag
+         * @return {Boolean} Value for the enabled flag
          */
-        enabled: function(callback) {
-            if (callback && typeof(callback) === 'function') {
-                this._proxy.call('enabled', [], callback);
-                return;
-            }
+        enabled: function() {
             return this._enabled;
         },
 
@@ -76,17 +62,10 @@ function createOnlineAccountsApi(backendBridge) {
          * Note that all AccountService objects which work on the same online account
          * will share the same display name.
          *
-         * If the callback parameter is not set, the current "local" value is retrieved.
-         *
          * @method displayName
-         * @param callback (optional) {Function(String)}
-         * @return {String} Local value for the displayName
+         * @return {String} Value of the displayName
          */
-        displayName: function(callback) {
-            if (callback && typeof(callback) === 'function') {
-                this._proxy.call('displayName', [], callback);
-                return;
-            }
+        displayName: function() {
             return this._displayName;
         },
 
@@ -98,17 +77,10 @@ function createOnlineAccountsApi(backendBridge) {
          *   - 'displayName'
          *   - 'iconName'
          * 
-         * If the callback parameter is not set, the current "local" value is retrieved.
-         *
          * @method provider
-         * @param callback (optional) {Function(Object)}
-         * @return {Object} Local value object for the provider
+         * @return {Object} Value object for the provider
          */
-        provider: function(callback) {
-            if (callback && typeof(callback) === 'function') {
-                this._proxy.call('provider', [], callback);
-                return;
-            }
+        provider: function() {
             return this._provider;
         },
 
@@ -121,17 +93,10 @@ function createOnlineAccountsApi(backendBridge) {
          *   - 'iconName'
          *   - 'serviceTypeId' identifies the provided service type
          * 
-         * If the callback parameter is not set, the current "local" value is retrieved.
-         *
          * @method service
-         * @param callback (optional) {Function(Object)}
-         * @return {Object} Local value object for the service
+         * @return {Object} Value object for the service
          */
-        service: function(callback) {
-            if (callback && typeof(callback) === 'function') {
-                this._proxy.call('service', [], callback);
-                return;
-            }
+        service: function() {
             return this._service;
         },
 
