@@ -8,10 +8,12 @@ function createOnlineAccountsApi(backendBridge) {
     var PLUGIN_URI = 'OnlineAccounts';
 
 /**
- * AccountService.
-
+ * AccountService represents an instance of a service in an Online Accounts.
+ * 
+ * The AcountService object is not directly constructible but returned as a result of
+ * OnlineAccounts api calls.
+ *
  * @class AccountService
- * @constructor
  */
     function AccountService(id, content) {
         this._proxy = backendBridge.createRemoteObject(
@@ -32,54 +34,99 @@ function createOnlineAccountsApi(backendBridge) {
     };
     AccountService.prototype = {
         // properties
-        accountId: function(callback) {
-            if (callback && typeof(callback) === 'function') {
-                this._proxy.call('accountId', [], callback);
-                return;
-            }
+
+        /**
+         * Returns the account's numeric ID; note that all
+         * AccountService objects which work on the same online account will have the same ID.
+         *
+         * @method accountId
+         * @return {String} Value for the accountId
+         */
+        accountId: function() {
             return this._accountId;
         },
 
-        enabled: function(callback) {
-            if (callback && typeof(callback) === 'function') {
-                this._proxy.call('enabled', [], callback);
-                return;
-            }
+        /**
+         * This read-only property returns whether the AccountService is enabled.
+         * An application shouldn't use an AccountService which is disabled
+         *
+         * @method enabled
+         * @return {Boolean} Value for the enabled flag
+         */
+        enabled: function() {
             return this._enabled;
         },
 
-        displayName: function(callback) {
-            if (callback && typeof(callback) === 'function') {
-                this._proxy.call('displayName', [], callback);
-                return;
-            }
+        /**
+         * Returns The account's display name (usually the user's login or ID).
+         * Note that all AccountService objects which work on the same online account
+         * will share the same display name.
+         *
+         * @method displayName
+         * @return {String} Value of the displayName
+         */
+        displayName: function() {
             return this._displayName;
         },
 
-        provider: function(callback) {
-            if (callback && typeof(callback) === 'function') {
-                this._proxy.call('provider', [], callback);
-                return;
-            }
+        /**
+         * Returns an object representing the provider which provides the account.
+         * 
+         * The returned object will have at least these properties:
+         *   - 'id' is the unique identifier for this provider
+         *   - 'displayName'
+         *   - 'iconName'
+         * 
+         * @method provider
+         * @return {Object} Value object for the provider
+         */
+        provider: function() {
             return this._provider;
         },
 
-        service: function(callback) {
-            if (callback && typeof(callback) === 'function') {
-                this._proxy.call('service', [], callback);
-                return;
-            }
+        /**
+         * Returns an object representing the service which this AccountService instantiates
+         * 
+         * The returned object will have at least these properties:
+         *   - 'id' is the unique identifier for this service
+         *   - 'displayName'
+         *   - 'iconName'
+         *   - 'serviceTypeId' identifies the provided service type
+         * 
+         * @method service
+         * @return {Object} Value object for the service
+         */
+        service: function() {
             return this._service;
         },
 
         // methods
 
+        /**
+         * Perform the authentication on this account.
+         * 
+         * The callback will be called with the authentication result object which will have
+         * these properties:
+         *   - 'error': error message if the authentication was a failure
+         *   - 'authenticated': boolean value that identifies if the operation was a success
+         *   - 'data': Object with the data returned by the authentication process. An 'AccessToken' property can be usually found (when it applies) with the OAuth access token.
+         * 
+         * If the callback parameter is not set, the current "local" value is retrieved.
+         *
+         * @method authenticate
+         * @param callback {Function(Object)}
+         */
         authenticate: function(callback) {
             this._proxy.call('authenticate', [callback]);
         },
 
         // extras
 
+        /**
+         * Destroys the remote object. This proxy object is not valid anymore.
+         *
+         * @method destroy
+         */
         destroy: function() {
             this._proxy.call('destroy', []);
         },
@@ -95,10 +142,9 @@ function createOnlineAccountsApi(backendBridge) {
     };
  
 /**
- * The OnlineAccounts object.
+ * The OnlineAccounts object is the entry point to online accounts service access.
 
  * @class OnlineAccounts
- * @constructor
  * 
  * @example
 
