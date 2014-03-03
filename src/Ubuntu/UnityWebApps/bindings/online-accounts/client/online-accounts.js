@@ -8,42 +8,30 @@ function createOnlineAccountsApi(backendBridge) {
     var PLUGIN_URI = 'OnlineAccounts';
 
 /**
- * Account represents an single online account.
+ * AccountService.
 
- * @class Account
+ * @class AccountService
  * @constructor
  */
-    function Account(id, content) {
+    function AccountService(id, content) {
         this._proxy = backendBridge.createRemoteObject(
-            PLUGIN_URI, 'Account', id);
+            PLUGIN_URI, 'AccountService', id);
 
         this._accountId = content && content.accountId
              ? content.accountId : null;
+        this._enabled = content && content.enabled
+             ? content.enabled : null;
+        this._serviceEnabled = content && content.serviceEnabled
+             ? content.serviceEnabled : null;
+        this._displayName = content && content.displayName
+             ? content.displayName : null;
         this._provider = content && content.provider
              ? content.provider : null;
+        this._service = content && content.service
+             ? content.service : null;
     };
-    Account.prototype = {
-
+    AccountService.prototype = {
         // properties
-
-        enabled: function(callback) {
-            this._proxy.call('enabled', [], callback);
-        },
-
-        displayName: function(callback) {
-            this._proxy.call('displayName', [], callback);
-        },
-
-        // immutable
-        provider: function(callback) {
-            if (callback && typeof(callback) === 'function') {
-                this._proxy.call('provider', [], callback);
-                return;
-            }
-            return this._provider;
-        },
-
-        // immutable
         accountId: function(callback) {
             if (callback && typeof(callback) === 'function') {
                 this._proxy.call('accountId', [], callback);
@@ -52,77 +40,36 @@ function createOnlineAccountsApi(backendBridge) {
             return this._accountId;
         },
 
-        // method
-
-        updateDisplayName: function(displayName) {
-            this._proxy.call('displayName', []);
-        },
-
-        updateEnabled: function(enabled) {
-            this._proxy.call('updateEnabled', [enabled]);
-        },
-
-        remove: function(enabled) {
-            this._proxy.call('remove', [enabled]);
-        },
-
-        // extras
-
-        destroy: function() {
-            this._proxy.call('destroy', []);
-        },
-    };
-
-/**
- * AccountService.
-
- * @class AccountService
- * @constructor
- */
-    function AccountService(id) {
-        this._proxy = backendBridge.createRemoteObject(
-            PLUGIN_URI, 'AccountService', id);
-    };
-    AccountService.prototype = {
-        // properties
-        accountId: function(callback) {
-            this._proxy.call('accountId', [], callback);
-        },
-        setAccountId: function(accountId) {
-            this._proxy.call('setAccountId', [accountId]);
-        },      
-
         enabled: function(callback) {
-            this._proxy.call('enabled', [], callback);
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('enabled', [], callback);
+                return;
+            }
+            return this._enabled;
         },
-        setEnabled: function(enabled) {
-            this._proxy.call('setEnabled', [enabled]);
-        },      
-
-        serviceEnabled: function(callback) {
-            this._proxy.call('serviceEnabled', [], callback);
-        },
-        setServiceEnabled: function(serviceEnabled) {
-            this._proxy.call('setServiceEnabled', [serviceEnabled]);
-        },      
-
-        autoSync: function(callback) {
-            this._proxy.call('autoSync', [], callback);
-        },
-        setAutoSync: function(autoSync) {
-            this._proxy.call('setAutoSync', [autoSync]);
-        },      
 
         displayName: function(callback) {
-            this._proxy.call('displayName', [], callback);
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('displayName', [], callback);
+                return;
+            }
+            return this._displayName;
         },
 
         provider: function(callback) {
-            this._proxy.call('provider', [], callback);
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('provider', [], callback);
+                return;
+            }
+            return this._provider;
         },
 
         service: function(callback) {
-            this._proxy.call('service', [], callback);
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('service', [], callback);
+                return;
+            }
+            return this._service;
         },
 
         // methods
@@ -138,151 +85,8 @@ function createOnlineAccountsApi(backendBridge) {
         },
     };
 
-    function Manager(id) {
-        this._proxy = backendBridge.createRemoteObject(
-            PLUGIN_URI, 'Manager', id);
-    };
-    Manager.prototype = {
-        createAccount: function(providerName, callback) {
-            this._proxy.call('createAccount', [providerName], callback);
-        },
-        loadAccount: function(id, callback) {
-            this._proxy.call('loadAccount', [id], callback);
-        },
-
-        // extras
-
-        destroy: function() {
-            this._proxy.call('destroy', []);
-        },
-    };
-
-    function ProviderModel(id) {
-        this._proxy = backendBridge.createRemoteObject(
-            PLUGIN_URI, 'ProviderModel', id);
-    };
-    ProviderModel.prototype = {
-        // properties
-        count: function(callback) {
-            this._proxy.call('count', [], callback);
-        },
-
-        applicationId: function(callback) {
-            this._proxy.call('applicationId', [], callback);
-        },
-        setApplicationId: function(applicationId, callback) {
-            this._proxy.call('setApplicationId', [applicationId, callback]);
-        },
-
-        // QAbtractListModel prototype
-
-        at: function(idx, callback) {
-            this._proxy.call('at',
-                             [idx],
-                             callback);
-        },
-
-        // extras
-
-        destroy: function() {
-            this._proxy.call('destroy', []);
-        },
-    };
-
-    function AccountServiceModel(id) {
-        this._proxy = backendBridge.createRemoteObject(
-            PLUGIN_URI, 'AccountServiceModel', id);
-    };
-    AccountServiceModel.prototype = {
-        // properties
-        count: function(callback) {
-            this._proxy.call('count', [], callback);
-        },
-
-        service: function(callback) {
-            this._proxy.call('service', [], callback);
-        },
-        setService: function(service, callback) {
-            this._proxy.call('setService', [service, callback]);
-        },
-
-        provider: function(callback) {
-            this._proxy.call('provider', [], callback);
-        },
-        setProvider: function(provider, callback) {
-            this._proxy.call('setProvider', [provider, callback]);
-        },      
-
-        serviceType: function(callback) {
-            this._proxy.call('serviceType', [], callback);
-        },
-        setServiceType: function(serviceType, callback) {
-            this._proxy.call('setServiceType', [serviceType, callback]);
-        },      
-
-        includeDisabled: function(callback) {
-            this._proxy.call('includeDisabled', [], callback);
-        },
-        setIncludeDisabled: function(includeDisabled, callback) {
-            this._proxy.call('setIncludeDisabled', [includeDisabled, callback]);
-        },
-
-        accountId: function(callback) {
-            this._proxy.call('accountId', [], callback);
-        },
-        setAccountId: function(accountId, callback) {
-            this._proxy.call('setAccountId', [accountId, callback]);
-        },
-
-        // QAbtractListModel prototype
-
-        at: function(idx, callback) {
-            this._proxy.call('at',
-                             [idx],
-                             callback);
-        },
-
-        // extras
-
-        destroy: function() {
-            this._proxy.call('destroy', []);
-        },
-    };
-
-    function ApplicationModel(id) {
-        this._proxy = backendBridge.createRemoteObject(
-            PLUGIN_URI, 'ApplicationModel', id);
-    };
-    ApplicationModel.prototype = {
-        // method
-        service: function(callback) {
-            this._proxy.call('service', [], callback);
-        },
-        setService: function(service, callback) {
-            this._proxy.call('setService', [service, callback]);
-        },
-
-        // QAbtractListModel prototype
-
-        at: function(idx, callback) {
-            this._proxy.call('at',
-                             [idx],
-                             callback);
-        },
-
-        // extras
-
-        destroy: function() {
-            this._proxy.call('destroy', []);
-        },
-    };
-
     function _constructorFromName(className) {
         var constructorPerName = {
-            "AccountServiceModel": AccountServiceModel,
-            "Account": Account,
-            "ProviderModel": ProviderModel,
-            "Manager": Manager,
             "AccountService": AccountService,
         };
         return className in constructorPerName
@@ -301,126 +105,40 @@ function createOnlineAccountsApi(backendBridge) {
         var api = external.getUnityObject(1.0);
         var oa = api.OnlineAccounts;
 
-        oa.api.getAccountsInfoFor(null, 'facebook', function(result) { [...] });
+        oa.api.getAccounts({'provider': 'facebook'}, function(result) { [...] });
  */
    return {
 
-        Account: {
-            RemovalOptions: {
-                RemoveAccountOnly: 0,
-                RemoveCredentials: 1
-            }
-        },
-
-        /**
-         * Creates a AccountServiceModel object.
-         * 
-         * @method createAccountServiceModel
-         * @param callback {Function (ProviderModel)}
-         */
-        createAccountServiceModel: function(callback) {
-            backendBridge.call('OnlineAccounts.createAccountServiceModel'
-                               , []
-                               , callback);
-        },
-
-        /**
-         * Creates a Manager object.
-         *
-         * @method createManager
-         * @param callback {Function (Manager)}
-         */
-        createManager:  function(callback) {
-            backendBridge.call('OnlineAccounts.createManager'
-                               , []
-                               , callback);
-        },
-
-        /**
-         * Creates a ProviderModel object.
-         *
-         * @method createProviderModel
-         * @param callback {Function (ProviderModel)}
-         */
-        createProviderModel:  function(callback) {
-            backendBridge.call('OnlineAccounts.createProviderModel'
-                               , []
-                               , callback);
-        },
-
         api: {
             /**
-             * Gets the access token for a given set of filtering parameters.
-             * 
-             * @method api.getAccessTokenFor
-             * @param service {String} If set, the access token will be retrieved for the accounts that correspond to that specific service.
-             * @param provider {String} If set, the access token will be retrieved for the accounts that correspond to that specific service.
-             * @param accountId {Integer} If set, the access token will be retrieved for the accounts that correspond to that specific service.
-             *                  It is used when multiple accounts are found, otherwise the first account is selected.
-             * @param callback {Function(Object(error:, authenticated: Bool, data: ))} Callback that receives the result or null
-             * 
-             * @example
-             
-             var api = external.getUnityObject(1.0);
-             var oa = api.OnlineAccounts;
-
-             oa.api.getAccessTokenFor(null, 'facebook', null, function(result) {
-               if (result.error) {
-                 console.log("Error: " + result.error);
-                 return;
-               }
-               console.log("Authenticated: "
-                             + result.authenticated
-                             + ", token: "
-                             + result.data);
-             });
-             */
-            getAccessTokenFor: function(service, provider, accountId, callback) {
-                backendBridge.call('OnlineAccounts.getAccessTokenFor'
-                                   , [service, provider, accountId]
-                                   , callback);
-            },
-
-            /**
-             * Gets the account information for a given set of filtering parameters.
+             * Gets the configured accounts satisfying the given filters.
              *
-             * @method api.getAccountsInfoFor
-             * @param service {String} If set, the access token will be retrieved for the accounts that correspond to that specific service.
-             * @param provider {String} If set, the access token will be retrieved for the accounts that correspond to that specific service.
-             * @param callback {Function(List of Object(displayName:, accountId: Bool, providerName: String, serviceName: String, enabled: Bool))} Callback that receives the result or null
+             * @method api.getAccounts
+             * @param filters {Object} A dictionary of parameters to filter the result. The filtering keys are:
+             * - application: the ID of a application (see /usr/share/accounts/applications/ or ~/.local/share/accounts/applications/ for a list of the available applications)
+             * - provider: the ID of a provider (see /usr/share/accounts/providers/ or ~/.local/share/accounts/providers/ for a list of the available providers)
+             * - service: the ID of a service (see /usr/share/accounts/services/ or ~/.local/share/accounts/services/ for a list of the available services)
+             *
+             * @param callback {Function(List of AccountService objects)} Callback that receives the result or null
              *
              * @example
                var api = external.getUnityObject(1.0);
                var oa = api.OnlineAccounts;
              
-               oa.api.getAccountsInfoFor(null, 'facebook', function(result) {
+               oa.api.getAccounts({'provider': 'facebook'}, function(result) {
                  for (var i = 0; i < result.length; ++i) {
-                   console.log("name: " + result[i].displayName
-                               + ', id: ' + result[i].accountId
-                               + ', providerName: ' + result[i].providerName
-                               + ', serviceName: ' + result[i].serviceName
-                               + ', enabled: ' + (result[i].enabled ? "true" : "false")
+                   console.log("name: " + result[i].displayName()
+                               + ', id: ' + result[i].accountId()
+                               + ', providerName: ' + result[i].provider().displayName
+                               + ', enabled: ' + (result[i].enabled() ? "true" : "false")
                                );
                  }               
                });
 
              */
-            getAccountsInfoFor: function(service, provider, callback) {
-                backendBridge.call('OnlineAccounts.getAccountsInfoFor'
-                                   , [service, provider]
-                                   , callback);
-            },
-
-            /**
-             * Gets the account that corresponds to a given id.
-             *
-             * @method api.getAccountById
-             * @param accountId {Integer} The account id.
-             * @param callback {Function(Account)} Callback that receives the result or null
-             */
-            getAccountById: function(accountId, callback) {
-                backendBridge.call('OnlineAccounts.getAccountById'
-                                   , [accountId]
+            getAccounts: function(filters, callback) {
+                backendBridge.call('OnlineAccounts.getAccounts'
+                                   , [filters]
                                    , callback);
             },
         },

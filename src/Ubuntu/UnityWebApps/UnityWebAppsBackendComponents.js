@@ -155,8 +155,9 @@ function __extractParams(params) {
         return "";
     var extracted = "";
     for (var p in params) {
-        if (params.hasOwnProperty(p))
+        if (params.hasOwnProperty(p) && params[p] != null) {
             extracted += p + ":" + JSON.stringify(params[p]) + "; ";
+        }
     }
     return extracted;
 }
@@ -621,7 +622,7 @@ function createOnlineAccountsApi(backendDelegate) {
             onAuthenticated = function(reply) {
                 callback({error: null,
                           authenticated: true,
-                          data: reply.AccessToken});
+                          data: reply});
 
                 self._object.onAuthenticated.disconnect(onAuthenticated);
                 self._object.onAuthenticationError.disconnect(onAuthenticationError);
@@ -783,9 +784,9 @@ function createOnlineAccountsApi(backendDelegate) {
         }
     };
 
-    function AccountServiceModel() {
+    function AccountServiceModel(filterParams) {
         var result = backendDelegate.createQmlObject(
-                    PLUGIN_URI, VERSION, 'AccountServiceModel');
+                    PLUGIN_URI, VERSION, 'AccountServiceModel', filterParams);
         this._id = result.id;
         this._object = result.object;
 
@@ -901,7 +902,7 @@ function createOnlineAccountsApi(backendDelegate) {
         internal: {
 
             // special case for an object wrapper
-            accountServiceHandleAtIndex: function(self, idx) {
+            accountServiceAtIndex: function(self, idx) {
                 self._validate();
 
                 var accountServiceHandle = self._modelAdaptor.itemAt(idx, "accountServiceHandle");
@@ -961,15 +962,9 @@ function createOnlineAccountsApi(backendDelegate) {
 
         // api
         getAccountsInfoFor: function(service, provider, callback) {
-            var serviceModel = new AccountServiceModel();
-
-            if (service)
-                serviceModel.setService(service);
-            if (provider)
-                serviceModel.setProvider(provider);
+            var serviceModel = new AccountServiceModel({'service': service, 'provider': provider});
 
             var count = serviceModel.internal.count(serviceModel);
-            console.log(count)
             var accountsInfo = []
             for (var i = 0; i < count; ++i) {
                 var displayName = serviceModel.internal.itemAt(serviceModel, i, "displayName");
@@ -988,6 +983,21 @@ function createOnlineAccountsApi(backendDelegate) {
             serviceModel.destroy();
 
             callback(accountsInfo);
+        },
+
+        getAccounts: function(filters, callback) {
+            var serviceModel = new AccountServiceModel(filters);
+            var count = serviceModel.internal.count(serviceModel);
+            var accounts = []
+            for (var i = 0; i < count; ++i) {
+                var service = serviceModel.internal.accountServiceAtIndex(serviceModel, i);
+                if (service) {
+                    var s = service.serialize();
+                    console.debug(JSON.stringify(s.content))
+                    accounts.push(s);
+                }
+            }
+            callback(accounts);
         },
 
         getAccountById: function(accountId, callback) {
@@ -1018,7 +1028,7 @@ function createOnlineAccountsApi(backendDelegate) {
                     callback(results);
                 };
                 serviceModel.internal
-                    .accountServiceHandleAtIndex(serviceModel, accountIdx)
+                    .accountServiceAtIndex(serviceModel, accountIdx)
                     .authenticate(onAuthenticated);
             }
             else {

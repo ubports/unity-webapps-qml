@@ -172,6 +172,10 @@ UnityBindingBridge.prototype = {
                                                  arg.content);
                 return narg;
             }
+            else if (arg instanceof Array) {
+                return self._translateArgs(arg);
+            }
+
             return arg;
         });
         return _args;
