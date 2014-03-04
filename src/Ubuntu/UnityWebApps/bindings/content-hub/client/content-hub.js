@@ -648,7 +648,7 @@ function createContentHubApi(backendBridge) {
              */
             importContent: function(type, peer, transferOptions, onSuccess, onError) {
                 backendBridge.call('ContentHub.apiImportContent',
-                                  [type, peer.serialize(), transferOptions, onError, onSuccess]);
+                                  [type, peer.serialize(), transferOptions, onSuccess, onError]);
             }
         },
 
