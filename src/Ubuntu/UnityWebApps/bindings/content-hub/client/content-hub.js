@@ -560,18 +560,7 @@ function createContentHubApi(backendBridge) {
         knownSourcesForType: function(type, callback) {
             backendBridge.call('ContentHub.knownSourcesForType',
                                [type],
-                               function(peers) {
-                                    var wrappedPeers = [];
-
-                                   // FIXME: do this above recursively in the (bridge.js)
-                                    for (var i = 0; i < peers.length; ++i) {
-                                        wrappedPeers.push(
-                                                    new ContentPeer(
-                                                        peers[i].objectid,
-                                                        peers[i].content));
-                                    }
-                                    callback (wrappedPeers);
-                               });
+                               callback);
         },
 
         /**
@@ -648,7 +637,7 @@ function createContentHubApi(backendBridge) {
              */
             importContent: function(type, peer, transferOptions, onSuccess, onError) {
                 backendBridge.call('ContentHub.apiImportContent',
-                                  [type, peer.serialize(), transferOptions, onError, onSuccess]);
+                                  [type, peer.serialize(), transferOptions, onSuccess, onError]);
             }
         },
 
