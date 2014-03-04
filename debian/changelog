@@ -1,3 +1,14 @@
+unity-webapps-qml (0.1+14.04.20140304.1-0ubuntu1) trusty; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Fix issue with the callback order for content hub's high level api.
+    The order is reversed
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 04 Mar 2014 21:03:42 +0000
+
 unity-webapps-qml (0.1+14.04.20140303-0ubuntu1) trusty; urgency=low
 
   [ Alexandre Abreu ]
