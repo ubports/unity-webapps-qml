@@ -44,6 +44,9 @@ getDesktopFilenameFor(const QString & name,
 } // namespace {
 
 
+const QString UnityWebapps::WEBAPPS_RUNNER_EXEC = "unity-webapps-runner";
+
+
 UnityWebapps::UnityWebapps(QObject *parent)
     : QObject(parent)
     , _model(0)
@@ -168,8 +171,6 @@ void UnityWebapps::buildAppInfos(const QString & name,
                                  const QString & desktopId,
                                  const QString & iconName)
 {
-    Q_UNUSED(domain);
-
     if (_appInfos != NULL)
     {
         qDebug() << "WARNING: Found existing application info for app " << name;
@@ -181,6 +182,7 @@ void UnityWebapps::buildAppInfos(const QString & name,
     _appInfos->setDisplayName(displayName);
     _appInfos->setDesktopId(desktopId);
     _appInfos->setIconName(iconName);
+    _appInfos->setDomain(domain);
     _appInfos->setModel(_model);
 
     Q_EMIT appInfosChanged(_appInfos);
@@ -193,18 +195,14 @@ bool UnityWebapps::initInternal(const QString& name,
                                 const QString& url)
 {
     Q_UNUSED(name);
-
-    bool successful = false;
+    Q_UNUSED(iconUrl);
 
     if ( ! isValidInitForWebappAndModel(domain, displayName, url))
     {
         qDebug() << "Invalid init() call from javascript for webapp " << name << " and current model";
         return false;
     }
-
-    successful = ensureDesktopExists(displayName, domain, iconUrl);
-
-    return successful;
+    return true;
 }
 
 bool UnityWebapps::handleDesktopFileUpdates() const
@@ -263,38 +261,6 @@ QString UnityWebapps::getLocalDesktopFilepath(const QString & desktopId)
             + desktopId;
 }
 
-bool UnityWebapps::ensureDesktopExists(const QString& displayName,
-                                       const QString& domain,
-                                       const QString& iconName)
-{
-    // we bail out earlier (until we can do it w/ a builtin func) when
-    // in a confined environment.
-    if (isConfined ())
-        return true;
-
-    if ( ! handleDesktopFileUpdates())
-        return true;
-
-    QString desktopId = getDesktopFilenameFor(displayName, domain);
-
-    QDir localDesktopFile (getLocalDesktopFilepath (desktopId));
-    if (localDesktopFile.exists())
-    {
-        return true;
-    }
-
-    GDesktopAppInfo *appinfo =
-            g_desktop_app_info_new(desktopId.toLatin1());
-
-    bool success = true;
-    if ( ! appinfo)
-    {
-        success = createLocalDesktopFileFor(desktopId, displayName, domain, iconName);
-    }
-
-    return success;
-}
-
 QString UnityWebapps::generateActionEntryFor(const QString& actionName,
                                              const QString& name,
                                              const QString& showIn,
@@ -313,7 +279,8 @@ QString UnityWebapps::generateActionEntryFor(const QString& actionName,
 QString UnityWebapps::getUrlLaunchExec(const QString & webappName,
                                        const QString & url)
 {
-    return QString("webbrowser-app --webapp='%1' %2")
+    return QString("%1 --webapp='%2' %3")
+            .arg(WEBAPPS_RUNNER_EXEC)
             .arg(webappName.toUtf8().toBase64().data())
             .arg(url);
 }
@@ -471,6 +438,7 @@ QString UnityWebapps::getDesktopFileContent()
     QString webappName = appInfos()->displayName();
     QString iconName = appInfos()->iconName();
     QString desktopId = appInfos()->desktopId();
+    QString domain = appInfos()->domain();
 
     QString appId = QString(desktopId).replace(".desktop", "");
     QString content = QString("[Desktop Entry]\n"
@@ -479,16 +447,19 @@ QString UnityWebapps::getDesktopFileContent()
                                "Icon=%2\n"
                                "Actions=S1;S2;S3;S4;S5;S6;S7;S8;S9;S10;\n"
                                "StartupWMClass=%3\n"
-                               "Exec=webbrowser-app --app-id='%4' --webapp='%5' --maximized --enable-back-forward %u\n\n"
-                               "%6")
+                               "Exec=%4 --app-id='%5' -n '%6' -d '%7' --chrome %u\n\n"
+                               "%8")
             .arg(webappName)
             .arg(UnityWebappsQML::getIconPathFor(iconName))
             .arg(appId)
+            .arg(WEBAPPS_RUNNER_EXEC)
             .arg(appId)
             .arg(QString(webappName.toUtf8().toBase64().data()))
+            .arg(domain)
             .arg( ! webappName.isEmpty()
                  ? generateActionsEntry(webappName)
                  : QString(""));
+
     return content;
 }
 

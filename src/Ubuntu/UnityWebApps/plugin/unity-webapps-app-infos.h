@@ -29,6 +29,7 @@ class UnityWebappsAppInfos : public QObject
     Q_OBJECT
     Q_PROPERTY(QString appName READ appName WRITE setAppName NOTIFY appNameChanged)
     Q_PROPERTY(QString displayName READ displayName WRITE setDisplayName NOTIFY displayNameChanged)
+    Q_PROPERTY(QString domain READ domain WRITE setDomain NOTIFY domainChanged)
     Q_PROPERTY(QString iconName READ iconName WRITE setIconName NOTIFY iconNameChanged)
     Q_PROPERTY(QString desktopId READ desktopId WRITE setDesktopId NOTIFY desktopIdChanged)
     Q_PROPERTY(UnityWebappsAppModel* model READ model WRITE setModel NOTIFY modelChanged)
@@ -45,6 +46,9 @@ public:
     void setDisplayName(const QString& name);
     QString displayName() const;
 
+    void setDomain(const QString& domain);
+    QString domain() const;
+
     void setIconName(const QString& name);
     QString iconName() const;
 
@@ -58,9 +62,10 @@ public:
 Q_SIGNALS:
 
     void appNameChanged(const QString& name);
-    void desktopIdChanged(const QString& name);
-    void displayNameChanged(const QString& name);
-    void iconNameChanged(const QString& name);
+    void desktopIdChanged(const QString& desktopId);
+    void displayNameChanged(const QString& displayName);
+    void iconNameChanged(const QString& iconName);
+    void domainChanged(const QString& domain);
     void modelChanged(UnityWebappsAppModel * model);
 
 
@@ -70,6 +75,7 @@ private:
     QString _iconName;
     QString _displayName;
     QString _desktopId;
+    QString _domain;
     UnityWebappsAppModel * _model;
 };
 

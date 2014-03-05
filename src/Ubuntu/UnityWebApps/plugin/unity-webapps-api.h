@@ -160,6 +160,8 @@ private:
     UnityWebappsAppModel *_model;
     UnityWebappsAppInfos *_appInfos;
     bool _handleDesktopFileUpdates;
+
+    static const QString WEBAPPS_RUNNER_EXEC;
 };
 
 #endif // __UNITY_WEBAPPS_API_H__
