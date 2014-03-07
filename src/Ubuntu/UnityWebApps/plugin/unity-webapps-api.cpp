@@ -436,8 +436,15 @@ QString UnityWebapps::extractFromGlobalDesktopFile(const QString & desktopFilena
     if (desktopFilename.isEmpty())
         return QString();
 
-    const QString DESKTOP_FILE_LOCATION =
-            "/usr/share/applications";
+    QString DESKTOP_FILE_LOCATION = "/usr/share/applications";
+
+    // Allow an override for more granular & flexible testing purposes
+    if (qgetenv("UNITY_WEBAPPS_QML_GLOBAL_DESKTOP_FILE_LOCATION").data() != NULL)
+    {
+        DESKTOP_FILE_LOCATION = QString(qgetenv("UNITY_WEBAPPS_QML_GLOBAL_DESKTOP_FILE_LOCATION"));
+
+        qDebug() << "Using " << DESKTOP_FILE_LOCATION << " as a global desktop file location search path";
+    }
 
     QFileInfo fileInfo(QString("%1/%2")
                        .arg(DESKTOP_FILE_LOCATION)
