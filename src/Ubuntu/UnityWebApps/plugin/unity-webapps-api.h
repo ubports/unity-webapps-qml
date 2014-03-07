@@ -99,11 +99,9 @@ private:
 
     QString getLocalDesktopFilepath(const QString & desktopId);
 
-    bool ensureDesktopExists(const QString& webappName,
-                             const QString& domain,
-                             const QString& iconName);
-
     void updateDesktopFileContent();
+
+    QString extractFromGlobalDesktopFile(const QString & desktopFilename);
 
     QString generateActionEntryFor(const QString& actionName,
                                    const QString & webappName,

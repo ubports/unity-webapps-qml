@@ -25,6 +25,7 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QUrl>
+#include <QSettings>
 
 #include <gio/gdesktopappinfo.h>
 
@@ -430,6 +431,41 @@ void UnityWebapps::removeLauncherActions()
         updateDesktopFileContent();
 }
 
+QString UnityWebapps::extractFromGlobalDesktopFile(const QString & desktopFilename)
+{
+    if (desktopFilename.isEmpty())
+        return QString();
+
+    const QString DESKTOP_FILE_LOCATION =
+            "/usr/share/applications";
+
+    QFileInfo fileInfo(QString("%1/%2")
+                       .arg(DESKTOP_FILE_LOCATION)
+                       .arg(desktopFilename));
+
+    if ( ! fileInfo.exists() || ! fileInfo.isFile() || ! fileInfo.isReadable())
+        return QString();
+
+    QSettings desktopFileSettings(fileInfo.absoluteFilePath(), QSettings::IniFormat);
+    desktopFileSettings.beginGroup("Desktop Entry");
+
+    QVariant execValue = desktopFileSettings.value("Exec");
+
+    QString execLine;
+    if (execValue.type() == QVariant::StringList)
+    {
+         execLine = execValue.toStringList().join(",");
+    }
+    else
+    {
+        execLine = execValue.toString();
+    }
+
+    desktopFileSettings.endGroup();
+
+    return execLine;
+}
+
 QString UnityWebapps::getDesktopFileContent()
 {
     if ( ! appInfos())
@@ -441,21 +477,30 @@ QString UnityWebapps::getDesktopFileContent()
     QString domain = appInfos()->domain();
 
     QString appId = QString(desktopId).replace(".desktop", "");
+
+    QString execCommandLine =
+            extractFromGlobalDesktopFile(appInfos()->desktopId());
+    if (execCommandLine.isEmpty())
+    {
+        execCommandLine =
+                QString("%4 -n '%5' -d '%6' %u")
+                .arg(WEBAPPS_RUNNER_EXEC)
+                .arg(QString(webappName.toUtf8().toBase64().data()))
+                .arg(domain);
+    }
+
     QString content = QString("[Desktop Entry]\n"
                                "Name=%1\n"
                                "Type=Application\n"
                                "Icon=%2\n"
                                "Actions=S1;S2;S3;S4;S5;S6;S7;S8;S9;S10;\n"
                                "StartupWMClass=%3\n"
-                               "Exec=%4 --app-id='%5' -n '%6' -d '%7' --chrome %u\n\n"
-                               "%8")
+                               "Exec=%4\n\n"
+                               "%5")
             .arg(webappName)
             .arg(UnityWebappsQML::getIconPathFor(iconName))
             .arg(appId)
-            .arg(WEBAPPS_RUNNER_EXEC)
-            .arg(appId)
-            .arg(QString(webappName.toUtf8().toBase64().data()))
-            .arg(domain)
+            .arg(execCommandLine)
             .arg( ! webappName.isEmpty()
                  ? generateActionsEntry(webappName)
                  : QString(""));
@@ -515,35 +560,6 @@ void UnityWebapps::ensureLocalApplicationsPathExists()
         shareDir.mkpath(".");
     }
 }
-
-bool UnityWebapps::createLocalDesktopFileFor (const QString& desktopId,
-                                              const QString& webappName,
-                                              const QString& domain,
-                                              const QString& iconName)
-{
-    Q_UNUSED(domain);
-    Q_UNUSED(webappName);
-    Q_UNUSED(iconName);
-
-    bool success = false;
-
-    ensureLocalApplicationsPathExists();
-
-    QString desktopFilePath = QDir::cleanPath(getLocalDesktopFilepath(desktopId));
-    QFile f(desktopFilePath);
-    if ( ! f.open(QIODevice::WriteOnly))
-    {
-        qCritical() << "Could not create desktop file: " << desktopFilePath;
-        return success;
-    }
-    f.write(getDesktopFileContent().toUtf8());
-    f.close();
-
-    success = true;
-
-    return success;
-}
-
 
 // QMLParserStatus
 void UnityWebapps::classBegin()
