@@ -36,7 +36,7 @@ UnityWebappsAppInfos::~UnityWebappsAppInfos()
 
 void UnityWebappsAppInfos::setAppName(const QString& name)
 {
-    if ( ! _appName.compare(name))
+    if (_appName == name)
         return;
 
     _appName = name;
@@ -50,7 +50,7 @@ QString UnityWebappsAppInfos::appName() const
 
 void UnityWebappsAppInfos::setDisplayName(const QString& name)
 {
-    if ( ! _displayName.compare(name))
+    if (_displayName == name)
         return;
 
     _displayName = name;
@@ -64,7 +64,7 @@ QString UnityWebappsAppInfos::displayName() const
 
 void UnityWebappsAppInfos::setDomain(const QString& domain)
 {
-    if (0 == _domain.compare(domain))
+    if (_domain == domain)
         return;
 
     _domain = domain;
@@ -78,7 +78,7 @@ QString UnityWebappsAppInfos::domain() const
 
 void UnityWebappsAppInfos::setDesktopId(const QString& desktopId)
 {
-    if (0 == _desktopId.compare(desktopId))
+    if (_desktopId == desktopId)
         return;
 
     _desktopId = desktopId;
@@ -92,7 +92,7 @@ QString UnityWebappsAppInfos::desktopId() const
 
 void UnityWebappsAppInfos::setIconName(const QString& name)
 {
-    if (0 == _iconName.compare(name))
+    if (_iconName == name)
         return;
 
     _iconName = name;

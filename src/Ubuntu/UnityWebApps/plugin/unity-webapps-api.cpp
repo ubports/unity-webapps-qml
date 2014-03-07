@@ -443,7 +443,7 @@ QString UnityWebapps::extractFromGlobalDesktopFile(const QString & desktopFilena
                        .arg(DESKTOP_FILE_LOCATION)
                        .arg(desktopFilename));
 
-    if ( ! fileInfo.exists() || ! fileInfo.isFile() || ! fileInfo.isReadable())
+    if ( ! fileInfo.isFile() || ! fileInfo.isReadable())
         return QString();
 
     QSettings desktopFileSettings(fileInfo.absoluteFilePath(), QSettings::IniFormat);
@@ -451,6 +451,10 @@ QString UnityWebapps::extractFromGlobalDesktopFile(const QString & desktopFilena
 
     QVariant execValue = desktopFileSettings.value("Exec");
 
+    // The exec line sometimes contains comma separated args in the
+    // command line, e.g. --webappUrlPatterns=1,2,3. In this case
+    // QSettings interprets this as a StringList instead of giving us
+    // the raw value.
     QString execLine;
     if (execValue.type() == QVariant::StringList)
     {
