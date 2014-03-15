@@ -6,32 +6,18 @@ window.onload = function() {
     var pictureContentType = hub.ContentType.Pictures;
 
     var sourcePeers = {};
-    hub.knownSourcesForType(
-        pictureContentType
+    hub.getPeers(
+        {contentType: hub.ContentType.Pictures}
         , function (peers) {
+            if ( ! peers.length)
+                return;
+
             for (var j = 0; j < peers.length; ++j) {
                 addPeerElement(peers[j].appId(), peers[j].name());
                 sourcePeers[peers[j].appId()] = peers[j];
             }
-
-            console.log('peers defaultSourceForType: ' + peers)
-
-            hub.defaultSourceForType(
-                pictureContentType
-                , function(peer) {
-                    if (peer) {
-                        addPeerElement(peer.appId(), peer.name());
-                        sourcePeers[peer.appId()] = peer;
-                    }
-
-                    if (Object.keys(sourcePeers).length === 0) {
-                        nopeers();
-                        return;
-                    }
-                    document.getElementById('importdiv').style.display = 'block';
-                    document.getElementById('lowLevelImportdiv').style.display = 'block';
-                  }
-            );
+            document.getElementById('importdiv').style.display = 'block';
+            document.getElementById('lowLevelImportdiv').style.display = 'block';
         });
 
     document.getElementById('import').addEventListener('click', doSimpleApiImport);
@@ -132,7 +118,7 @@ window.onload = function() {
 
         hub.api.importContent(pictureContentType
                       , peer
-                      , {importToLocalStore: true}
+                      , {scope: hub.ContentScope.App}
                       , function(items) {
                           for (var i = 0; i < items.length; ++i) {
                               addResult(items[i]);
@@ -159,40 +145,31 @@ window.onload = function() {
             return;
         }
 
-        hub.importContentForPeer(
-            pictureContentType,
-            peer,
-            function(transfer) {
+        hub.getStore(hub.ContentScope.App, function(store) {
+            peer.requestForStore(store, function(transfer) {
+                transfer.start(function(state) {
+                    if (transferState.Aborted === state) {
+                        transfer.finalize();
+                        peer.destroy();
+                        transfer.destroy();
+                        aborted();
+                        return;
+                    }
 
-                hub.defaultStoreForType(pictureContentType, function(store) {
-                    transfer.setStore(store, function() {
-
-                        transfer.start(function(state) {
-                            if (transferState.Aborted === state) {
-                                transfer.finalize();
-                                peer.destroy();
-                                transfer.destroy();
-                                aborted();
-                                return;
+                    if (transferState.Charged === state) {
+                        transfer.items(function(items) {
+                            for (var i = 0; i < items.length; ++i) {
+                                addResult(items[i]);
                             }
-
-                            if (transferState.Charged === state) {
-                                transfer.items(function(items) {
-                                    for (var i = 0; i < items.length; ++i) {
-                                        addResult(items[i]);
-                                    }
-                                    transfer.finalize();
-                                    peer.destroy();
-                                    transfer.destroy();
-                                });
-                            }
+                            transfer.finalize();
+                            peer.destroy();
+                            transfer.destroy();
                         });
-                    });
-
+                    }
                 });
 
-            }
-        );
+            });
+        });
     };
 };
 
