@@ -206,7 +206,7 @@ UbuntuBindingBackendDelegate.prototype = {
     },
 
     parentView: function() {
-        return this._parent.bindee;
+        return this._parent ? this._parent.bindee : null;
     },
 
     isObjectProxyInfo: function(info) {
