@@ -59,5 +59,4 @@ contains( TEMPLATE, lib ) {
 # End of File
 
 OTHER_FILES += \
-    ../../src/Ubuntu/UnityWebApps/Settings.qml \
-    ../../src/Ubuntu/UnityWebApps/contenthubfactory.qml
+    ../../src/Ubuntu/UnityWebApps/Settings.qml
