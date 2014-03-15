@@ -205,6 +205,10 @@ UbuntuBindingBackendDelegate.prototype = {
         return this._parent;
     },
 
+    parentView: function() {
+        return this._parent.bindee;
+    },
+
     isObjectProxyInfo: function(info) {
         return 'type' in info &&
             info.type === 'object-proxy' &&
@@ -1916,7 +1920,7 @@ function createContentHubApi(backendDelegate) {
                 statement += " contentType: ContentType." + filters.contentType + "";
             }
             if (filters.handler) {
-                statement += "; contentType: ContentHandler." + filters.handler + "";
+                statement += "; handler: ContentHandler." + filters.handler + "";
             }
             statement += " }";
 
@@ -1943,6 +1947,56 @@ function createContentHubApi(backendDelegate) {
             var store = new ContentStore();
             store.setScope(scope);
             callback(store.serialize());
+        },
+
+        launchContentPeerPicker: function(filters, onPeerSelected, onCancelPressed) {
+            if ( ! filters){
+                callback(null);
+                return;
+            }
+
+            var parentItem = backendDelegate.parentView();
+            if ( ! parentItem || ! parentItem.visible || ! parentItem.height || ! parentItem.width) {
+                console.debug("Cannot launch the content peer picker UI, invalid parent item: " + parentItem);
+                onCancelPressed();
+                return;
+            }
+
+            var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerPicker {";
+            var filterParams = {};
+            if (filters.contentType) {
+                statement += " contentType: ContentType." + filters.contentType + "";
+            }
+            if (filters.handler) {
+                statement += "; handler: ContentHandler." + filters.handler + "";
+            }
+            if (filters.showTitle) {
+                statement += "; showTitle: " + filters.showTitle === false ? "false" : "true";
+            }
+            statement += "; visible: true; }";
+
+            if (parentItem.parent)
+                parentItem.visible = false;
+            var contentPeerPicker = Qt.createQmlObject(statement,
+                                                       parentItem.parent ? parentItem.parent : parentItem);
+            function _onPeerSelected() {
+                var peer = new ContentPeer(contentPeerPicker.peer);
+                contentPeerPicker.visible = false;
+                parentItem.visible = true;
+                onPeerSelected(peer.serialize());
+                contentPeerPicker.onPeerSelected.disconnect(_onPeerSelected);
+                contentPeerPicker.destroy();
+            }
+            function _onCancelPressed() {
+                contentPeerPicker.visible = false;
+                parentItem.visible = true;
+                onCancelPressed();
+                contentPeerPicker.onPeerSelected.disconnect(_onCancelPressed);
+                contentPeerPicker.destroy();
+            }
+
+            contentPeerPicker.onPeerSelected.connect(_onPeerSelected);
+            contentPeerPicker.onCancelPressed.connect(_onCancelPressed);
         },
 
         apiImportContent: function(type, peer, transferOptions, onSuccess, onFailure) {

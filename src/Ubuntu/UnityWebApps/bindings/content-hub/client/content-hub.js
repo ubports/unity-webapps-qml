@@ -762,7 +762,7 @@ function createContentHubApi(backendBridge) {
         /**
          * Creates a ContentPeer object for the given source type.
          *
-         * @method defaultSourceForType
+         * @method getPeers
          * @param filters {Object} A dictionary of parameters to filter the result. The filtering keys are:
          * - contentType: desired ContentType
          * - handler: desired ContentHandler
@@ -786,6 +786,22 @@ function createContentHubApi(backendBridge) {
             backendBridge.call('ContentHub.getStore',
                                [scope],
                                callback);
+        },
+
+        /**
+         * Launches the content peer picker ui that allows the user to select a peer.
+         *
+         * @method launchContentPeerPicker
+         * @param filters {Object} A dictionary of parameters to filter the result. The filtering keys are:
+         * - contentType: desired ContentType
+         * - handler: desired ContentHandler
+         * - showTitle: boolean value indicating if the title should be visible
+         * @param onPeerSelected {Function(ContentPeer)} Called when the user has selected a peer
+         * @param onCancelPressed {Function()} Called when the user has pressed cancel
+         */
+        launchContentPeerPicker: function(filters, onPeerSelected, onCancelPressed) {
+            backendBridge.call('ContentHub.launchContentPeerPicker',
+                               [filters, onPeerSelected, onCancelPressed]);
         },
 
         /**
