@@ -99,11 +99,9 @@ private:
 
     QString getLocalDesktopFilepath(const QString & desktopId);
 
-    bool ensureDesktopExists(const QString& webappName,
-                             const QString& domain,
-                             const QString& iconName);
-
     void updateDesktopFileContent();
+
+    QString extractFromGlobalDesktopFile(const QString & desktopFilename);
 
     QString generateActionEntryFor(const QString& actionName,
                                    const QString & webappName,
@@ -160,6 +158,8 @@ private:
     UnityWebappsAppModel *_model;
     UnityWebappsAppInfos *_appInfos;
     bool _handleDesktopFileUpdates;
+
+    static const QString WEBAPPS_RUNNER_EXEC;
 };
 
 #endif // __UNITY_WEBAPPS_API_H__

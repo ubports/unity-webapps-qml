@@ -25,6 +25,7 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QUrl>
+#include <QSettings>
 
 #include <gio/gdesktopappinfo.h>
 
@@ -42,6 +43,9 @@ getDesktopFilenameFor(const QString & name,
 }
 
 } // namespace {
+
+
+const QString UnityWebapps::WEBAPPS_RUNNER_EXEC = "unity-webapps-runner";
 
 
 UnityWebapps::UnityWebapps(QObject *parent)
@@ -168,8 +172,6 @@ void UnityWebapps::buildAppInfos(const QString & name,
                                  const QString & desktopId,
                                  const QString & iconName)
 {
-    Q_UNUSED(domain);
-
     if (_appInfos != NULL)
     {
         qDebug() << "WARNING: Found existing application info for app " << name;
@@ -181,6 +183,7 @@ void UnityWebapps::buildAppInfos(const QString & name,
     _appInfos->setDisplayName(displayName);
     _appInfos->setDesktopId(desktopId);
     _appInfos->setIconName(iconName);
+    _appInfos->setDomain(domain);
     _appInfos->setModel(_model);
 
     Q_EMIT appInfosChanged(_appInfos);
@@ -193,18 +196,14 @@ bool UnityWebapps::initInternal(const QString& name,
                                 const QString& url)
 {
     Q_UNUSED(name);
-
-    bool successful = false;
+    Q_UNUSED(iconUrl);
 
     if ( ! isValidInitForWebappAndModel(domain, displayName, url))
     {
         qDebug() << "Invalid init() call from javascript for webapp " << name << " and current model";
         return false;
     }
-
-    successful = ensureDesktopExists(displayName, domain, iconUrl);
-
-    return successful;
+    return true;
 }
 
 bool UnityWebapps::handleDesktopFileUpdates() const
@@ -263,38 +262,6 @@ QString UnityWebapps::getLocalDesktopFilepath(const QString & desktopId)
             + desktopId;
 }
 
-bool UnityWebapps::ensureDesktopExists(const QString& displayName,
-                                       const QString& domain,
-                                       const QString& iconName)
-{
-    // we bail out earlier (until we can do it w/ a builtin func) when
-    // in a confined environment.
-    if (isConfined ())
-        return true;
-
-    if ( ! handleDesktopFileUpdates())
-        return true;
-
-    QString desktopId = getDesktopFilenameFor(displayName, domain);
-
-    QDir localDesktopFile (getLocalDesktopFilepath (desktopId));
-    if (localDesktopFile.exists())
-    {
-        return true;
-    }
-
-    GDesktopAppInfo *appinfo =
-            g_desktop_app_info_new(desktopId.toLatin1());
-
-    bool success = true;
-    if ( ! appinfo)
-    {
-        success = createLocalDesktopFileFor(desktopId, displayName, domain, iconName);
-    }
-
-    return success;
-}
-
 QString UnityWebapps::generateActionEntryFor(const QString& actionName,
                                              const QString& name,
                                              const QString& showIn,
@@ -313,7 +280,8 @@ QString UnityWebapps::generateActionEntryFor(const QString& actionName,
 QString UnityWebapps::getUrlLaunchExec(const QString & webappName,
                                        const QString & url)
 {
-    return QString("webbrowser-app --webapp='%1' %2")
+    return QString("%1 --webapp='%2' %3")
+            .arg(WEBAPPS_RUNNER_EXEC)
             .arg(webappName.toUtf8().toBase64().data())
             .arg(url);
 }
@@ -463,6 +431,52 @@ void UnityWebapps::removeLauncherActions()
         updateDesktopFileContent();
 }
 
+QString UnityWebapps::extractFromGlobalDesktopFile(const QString & desktopFilename)
+{
+    if (desktopFilename.isEmpty())
+        return QString();
+
+    QString DESKTOP_FILE_LOCATION = "/usr/share/applications";
+
+    // Allow an override for more granular & flexible testing purposes
+    if (qgetenv("UNITY_WEBAPPS_QML_GLOBAL_DESKTOP_FILE_LOCATION").data() != NULL)
+    {
+        DESKTOP_FILE_LOCATION = QString(qgetenv("UNITY_WEBAPPS_QML_GLOBAL_DESKTOP_FILE_LOCATION"));
+
+        qDebug() << "Using " << DESKTOP_FILE_LOCATION << " as a global desktop file location search path";
+    }
+
+    QFileInfo fileInfo(QString("%1/%2")
+                       .arg(DESKTOP_FILE_LOCATION)
+                       .arg(desktopFilename));
+
+    if ( ! fileInfo.isFile() || ! fileInfo.isReadable())
+        return QString();
+
+    QSettings desktopFileSettings(fileInfo.absoluteFilePath(), QSettings::IniFormat);
+    desktopFileSettings.beginGroup("Desktop Entry");
+
+    QVariant execValue = desktopFileSettings.value("Exec");
+
+    // The exec line sometimes contains comma separated args in the
+    // command line, e.g. --webappUrlPatterns=1,2,3. In this case
+    // QSettings interprets this as a StringList instead of giving us
+    // the raw value.
+    QString execLine;
+    if (execValue.type() == QVariant::StringList)
+    {
+         execLine = execValue.toStringList().join(",");
+    }
+    else
+    {
+        execLine = execValue.toString();
+    }
+
+    desktopFileSettings.endGroup();
+
+    return execLine;
+}
+
 QString UnityWebapps::getDesktopFileContent()
 {
     if ( ! appInfos())
@@ -471,24 +485,37 @@ QString UnityWebapps::getDesktopFileContent()
     QString webappName = appInfos()->displayName();
     QString iconName = appInfos()->iconName();
     QString desktopId = appInfos()->desktopId();
+    QString domain = appInfos()->domain();
 
     QString appId = QString(desktopId).replace(".desktop", "");
+
+    QString execCommandLine =
+            extractFromGlobalDesktopFile(appInfos()->desktopId());
+    if (execCommandLine.isEmpty())
+    {
+        execCommandLine =
+                QString("%4 -n '%5' -d '%6' %u")
+                .arg(WEBAPPS_RUNNER_EXEC)
+                .arg(QString(webappName.toUtf8().toBase64().data()))
+                .arg(domain);
+    }
+
     QString content = QString("[Desktop Entry]\n"
                                "Name=%1\n"
                                "Type=Application\n"
                                "Icon=%2\n"
                                "Actions=S1;S2;S3;S4;S5;S6;S7;S8;S9;S10;\n"
                                "StartupWMClass=%3\n"
-                               "Exec=webbrowser-app --app-id='%4' --webapp='%5' --maximized --enable-back-forward %u\n\n"
-                               "%6")
+                               "Exec=%4\n\n"
+                               "%5")
             .arg(webappName)
             .arg(UnityWebappsQML::getIconPathFor(iconName))
             .arg(appId)
-            .arg(appId)
-            .arg(QString(webappName.toUtf8().toBase64().data()))
+            .arg(execCommandLine)
             .arg( ! webappName.isEmpty()
                  ? generateActionsEntry(webappName)
                  : QString(""));
+
     return content;
 }
 
@@ -544,35 +571,6 @@ void UnityWebapps::ensureLocalApplicationsPathExists()
         shareDir.mkpath(".");
     }
 }
-
-bool UnityWebapps::createLocalDesktopFileFor (const QString& desktopId,
-                                              const QString& webappName,
-                                              const QString& domain,
-                                              const QString& iconName)
-{
-    Q_UNUSED(domain);
-    Q_UNUSED(webappName);
-    Q_UNUSED(iconName);
-
-    bool success = false;
-
-    ensureLocalApplicationsPathExists();
-
-    QString desktopFilePath = QDir::cleanPath(getLocalDesktopFilepath(desktopId));
-    QFile f(desktopFilePath);
-    if ( ! f.open(QIODevice::WriteOnly))
-    {
-        qCritical() << "Could not create desktop file: " << desktopFilePath;
-        return success;
-    }
-    f.write(getDesktopFileContent().toUtf8());
-    f.close();
-
-    success = true;
-
-    return success;
-}
-
 
 // QMLParserStatus
 void UnityWebapps::classBegin()
