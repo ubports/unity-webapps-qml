@@ -1738,7 +1738,7 @@ function createContentHubApi(backendDelegate) {
                     handler: self._object.handler,
                     contentType: self._object.contentType,
                     selectionType: self._object.selectionType,
-                    defaultPeer: self._object.defaultPeer,
+                    isDefaultPeer: self._object.isDefaultPeer,
                 },
             }
         },
@@ -1795,9 +1795,9 @@ function createContentHubApi(backendDelegate) {
             callback(this._object.name);
         },
 
-        defaultPeer: function(callback) {
+        isDefaultPeer: function(callback) {
             this._validate();
-            callback(this._object.defaultPeer);
+            callback(this._object.isDefaultPeer);
         },
 
         // methods

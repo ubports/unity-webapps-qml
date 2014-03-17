@@ -262,8 +262,8 @@ function createContentHubApi(backendBridge) {
              ? content.contentType : null;
         this._selectionType = content && content.selectionType
              ? content.selectionType : null;
-        this._defaultPeer = content && content.defaultPeer
-             ? content.defaultPeer : null;
+        this._isDefaultPeer = content && content.isDefaultPeer
+             ? content.isDefaultPeer : null;
     };
     ContentPeer.prototype = {
         // object methods
@@ -408,15 +408,15 @@ function createContentHubApi(backendBridge) {
          *
          * If the callback parameter is not set, the current "local" value is retrieved.
          *
-         * @method defaultPeer
+         * @method isDefaultPeer
          * @param callback (optional) {Function(Bool)}
          */
-        defaultPeer: function(callback) {
+        isDefaultPeer: function(callback) {
             if (callback && typeof(callback) === 'function') {
-                this._proxy.call('defaultPeer', [], callback);
+                this._proxy.call('isDefaultPeer', [], callback);
                 return;
             }
-            return this._defaultPeer;
+            return this._isDefaultPeer;
         },
 
         // methods
