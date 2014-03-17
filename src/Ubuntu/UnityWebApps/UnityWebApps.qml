@@ -402,6 +402,18 @@ Item {
     /*!
       \internal
 
+     */
+    function __injectResourceIfExtraApisAreEnabled(getResourceFunc) {
+        if (getResourceFunc && typeof getResourceFunc === 'function' && injectExtraUbuntuApis) {
+            return getResourceFunc();
+        }
+        return null;
+    }
+
+
+    /*!
+      \internal
+
       PRIVATE FUNCTION: __makeBackendProxies
 
       Binds the API dispatched calls to the Unity backends.
@@ -625,11 +637,17 @@ Item {
                 }
             },
 
-            OnlineAccounts: UnityBackends.createOnlineAccountsApi(UnityBackends.backendDelegate),
+            OnlineAccounts: __injectResourceIfExtraApisAreEnabled(function() {
+                return UnityBackends.createOnlineAccountsApi(UnityBackends.backendDelegate)
+            }),
 
-            Alarm: UnityBackends.createAlarmApi(UnityBackends.backendDelegate),
+            Alarm: __injectResourceIfExtraApisAreEnabled(function() {
+                return UnityBackends.createAlarmApi(UnityBackends.backendDelegate)
+            }),
 
-            ContentHub: UnityBackends.createContentHubApi(UnityBackends.backendDelegate),
+            ContentHub:  __injectResourceIfExtraApisAreEnabled(function() {
+                return UnityBackends.createContentHubApi(UnityBackends.backendDelegate)
+            }),
 
             Launcher: {
                 setCount: function (count) {
