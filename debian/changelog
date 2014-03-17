@@ -1,3 +1,14 @@
+unity-webapps-qml (0.1+14.04.20140317.1-0ubuntu1) trusty; urgency=low
+
+  [ Alexandre Abreu ]
+  * Fix desktop file generation: dont do useless generation when not
+    needed,. use the proper webapps-runner w/ the --chrome option. make
+    sure that the webapp 'domain' is available (LP: #1288805)
+  * Make sure that priviledged APIs are only injected in the proper
+    context (LP: #1293702)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 17 Mar 2014 21:40:30 +0000
+
 unity-webapps-qml (0.1+14.04.20140313-0ubuntu1) trusty; urgency=low
 
   * New rebuild forced
