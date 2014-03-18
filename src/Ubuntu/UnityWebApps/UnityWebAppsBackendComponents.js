@@ -1888,7 +1888,7 @@ function createContentHubApi(backendDelegate) {
 
         // QAbtractListModel prototype
         count: function(callback) {
-            if (this._modelAdaptor) {
+            if (!this._modelAdaptor) {
                 callback(-1);
                 return;
             }
@@ -1917,10 +1917,10 @@ function createContentHubApi(backendDelegate) {
             var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerModel {";
             var filterParams = {};
             if (filters.contentType) {
-                statement += " contentType: ContentType." + filters.contentType + "";
+                statement += " contentType: ContentType." + filters.contentType + ";";
             }
             if (filters.handler) {
-                statement += "; handler: ContentHandler." + filters.handler + "";
+                statement += " handler: ContentHandler." + filters.handler + ";";
             }
             statement += " }";
 

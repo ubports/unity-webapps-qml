@@ -262,8 +262,7 @@ function createContentHubApi(backendBridge) {
              ? content.contentType : null;
         this._selectionType = content && content.selectionType
              ? content.selectionType : null;
-        this._isDefaultPeer = content && content.isDefaultPeer
-             ? content.isDefaultPeer : null;
+        this._isDefaultPeer = content && content.isDefaultPeer;
     };
     ContentPeer.prototype = {
         // object methods
