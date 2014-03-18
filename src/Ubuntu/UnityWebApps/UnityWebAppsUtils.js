@@ -63,16 +63,36 @@ function OxideWebviewAdapter(webview, disposer) {
 }
 OxideWebviewAdapter.prototype = {
     injectUserScripts: function(userScriptUrls) {
-        // TODO
+        var context = this.webview.context;
+        var scripts = [];
+        for (var i = 0; i < userScriptUrls.length; ++i) {
+            var scriptStart = "import com.canonical.Oxide 0.1 as Oxide; Oxide.UserScript { worldId:";
+            var scriptEnd = "};";
+            scripts.push(Qt.createQmlObject(scriptStart + '"Unity"; url:' +  userScriptsUrls[i] + scriptEnd, null));
+        }
+        context.userScripts = scripts;
     },
     sendToPage: function (message) {
-        // TODO
+        this.webview.rootFrame.sendMessageNoReply("Unity", "host-msg", message);
     },
     loadingStartedConnect: function (onLoadingStarted) {
-        // TODO
+        function handler(loadEvent) {
+            var typeStarted = 0; //LoadEvent.TypeStarted
+            if (loadEvent.type == typeStarted) {
+                onLoadingStarted();
+            }
+        }
+        this.webview.loadingChanged.connect(handler);
+        this.disposer.addDisposer(makeSignalDisconnecter(this.webview.loadingChanged, handler));
     },
     messageReceivedConnect: function (onMessageReceived) {
-        // TODO
+        function handler(msg, frame) {
+            onMessageReceived(JSON.parse(msg.args));
+        }
+        var script = 'import com.canonical.Oxide 0.1 as Oxide; Oxide.MessageHandler { msgId:"Unity-Message"; worldIds:["Unity"]; };';
+        var messageHandler = Qt.createQmlObject(script, null);
+        messageHandler.callback = handler;
+        this.webview.messageHandlers = [ messageHandler ];
     }
 }
 
