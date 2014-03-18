@@ -22,9 +22,10 @@ var UBUNTU_WEBAPPS_BINDING_API_CALL_MESSAGE = "ubuntu-webapps-binding-call";
 var UBUNTU_WEBAPPS_BINDING_OBJECT_METHOD_CALL_MESSAGE = "ubuntu-webapps-binding-call-object-method";
 
 
-function QtWebviewAdapter(webview, disposer) {
+function QtWebviewAdapter(webview, disposer, makeSignalDisconnecter) {
     this.webview = webview;
     this.disposer = disposer;
+    this.makeSignalDisconnecter = makeSignalDisconnecter;
 }
 QtWebviewAdapter.prototype = {
     injectUserScripts: function(userScriptUrls) {
@@ -45,22 +46,23 @@ QtWebviewAdapter.prototype = {
             }
         };
         this.webview.loadingChanged.connect(handler);
-        this.disposer.addDisposer(makeSignalDisconnecter(this.webview.loadingChanged, handler));
+        this.disposer.addDisposer(this.makeSignalDisconnecter(this.webview.loadingChanged, handler));
     },
     messageReceivedConnect: function (onMessageReceived) {
         function handler(raw) {
             onMessageReceived(JSON.parse(raw.data));
         };
         this.webview.experimental.messageReceived.connect(handler);
-        this.disposer.addDisposer(makeSignalDisconnecter(this.webview.experimental.messageReceived, handler));
+        this.disposer.addDisposer(this.makeSignalDisconnecter(this.webview.experimental.messageReceived, handler));
     }
 }
 
 
-function OxideWebviewAdapter(webview, disposer) {
+function OxideWebviewAdapter(webview, disposer, makeSignalDisconnecter) {
     this.webview = webview;
     this.disposer = disposer;
-    this._WEBAPPS_USER_SCRIPT_CONTEXT = "UnityWebappsApi";
+    this.makeSignalDisconnecter = makeSignalDisconnecter;
+    this._WEBAPPS_USER_SCRIPT_CONTEXT = "oxide://UnityWebappsApi";
 }
 OxideWebviewAdapter.prototype = {
     injectUserScripts: function(userScriptUrls) {
@@ -68,11 +70,11 @@ OxideWebviewAdapter.prototype = {
 
         for (var i = 0; i < userScriptUrls.length; ++i) {
             var scriptStart = "import com.canonical.Oxide 0.1 as Oxide; Oxide.UserScript { context:";
-            var scriptEnd = "};";
+            var scriptEnd = "}";
             context.addUserScript(
                 Qt.createQmlObject(scriptStart +
                                    '"' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"' +
-                                   '; url:' +  userScriptsUrls[i] + scriptEnd, null));
+                                   '; url: "' +  userScriptUrls[i] + '";' + scriptEnd, this.webview));
         }
     },
     sendToPage: function (message) {
@@ -87,7 +89,7 @@ OxideWebviewAdapter.prototype = {
             }
         }
         this.webview.loadingChanged.connect(handler);
-        this.disposer.addDisposer(makeSignalDisconnecter(this.webview.loadingChanged, handler));
+        this.disposer.addDisposer(this.makeSignalDisconnecter(this.webview.loadingChanged, handler));
     },
     messageReceivedConnect: function (onMessageReceived) {
         function handler(msg, frame) {
@@ -95,18 +97,20 @@ OxideWebviewAdapter.prototype = {
         }
 
         var script = 'import com.canonical.Oxide 0.1 as Oxide; ' +
-                ' Oxide.MessageHandler { msgId:"UnityWebappApi-Message"; contexts:["' +
+                ' Oxide.ScriptMessageHandler { msgId:"UnityWebappApi-Message"; contexts:["' +
                 this._WEBAPPS_USER_SCRIPT_CONTEXT +
-                '"]; };';
-
-        var messageHandler = Qt.createQmlObject(script, null);
+                '"]; ' +
+                '}';
+        console.log(script)
+        var messageHandler = Qt.createQmlObject(script, this.webview);
         messageHandler.callback = handler;
         this.webview.messageHandlers = [ messageHandler ];
     }
 }
 
-function WebviewAdapterFactory(disposer) {
+function WebviewAdapterFactory(disposer, makeSignalDisconnecter) {
     this.disposer = disposer;
+    this.makeSignalDisconnecter = makeSignalDisconnecter;
 };
 WebviewAdapterFactory.prototype = {
     create: function(webview) {
@@ -114,10 +118,10 @@ WebviewAdapterFactory.prototype = {
             return null
         if (webview.experimental) {
             // assume qtwebkit
-            return new QtWebviewAdapter(webview, this.disposer);
+            return new QtWebviewAdapter(webview, this.disposer, this.makeSignalDisconnecter);
         }
         // assume oxide
-        return new OxideWebviewAdapter(webview, this.disposer);
+        return new OxideWebviewAdapter(webview, this.disposer, this.makeSignalDisconnecter);
     }
 };
 
@@ -166,7 +170,7 @@ function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
             };
         };
 
-        var waf = new WebviewAdapterFactory(disposer);
+        var waf = new WebviewAdapterFactory(disposer, makeSignalDisconnecter);
         var proxy = waf.create(webViewId);
 
         // inject common function
@@ -188,6 +192,10 @@ function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
 
     })(new SignalConnectionDisposer());
 }
+
+// Just to allow a smooth transition w/o breaking all the projects
+// remove qtwebkit name reference
+var makeProxiesForWebViewBindee = makeProxiesForQtWebViewBindee;
 
 
 /**
