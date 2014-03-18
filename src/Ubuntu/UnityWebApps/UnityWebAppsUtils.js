@@ -60,20 +60,24 @@ QtWebviewAdapter.prototype = {
 function OxideWebviewAdapter(webview, disposer) {
     this.webview = webview;
     this.disposer = disposer;
+    this._WEBAPPS_USER_SCRIPT_CONTEXT = "UnityWebappsApi";
 }
 OxideWebviewAdapter.prototype = {
     injectUserScripts: function(userScriptUrls) {
         var context = this.webview.context;
-        var scripts = [];
+
         for (var i = 0; i < userScriptUrls.length; ++i) {
-            var scriptStart = "import com.canonical.Oxide 0.1 as Oxide; Oxide.UserScript { worldId:";
+            var scriptStart = "import com.canonical.Oxide 0.1 as Oxide; Oxide.UserScript { context:";
             var scriptEnd = "};";
-            scripts.push(Qt.createQmlObject(scriptStart + '"Unity"; url:' +  userScriptsUrls[i] + scriptEnd, null));
+            context.addUserScript(
+                Qt.createQmlObject(scriptStart +
+                                   '"' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"' +
+                                   '; url:' +  userScriptsUrls[i] + scriptEnd, null));
         }
-        context.userScripts = scripts;
     },
     sendToPage: function (message) {
-        this.webview.rootFrame.sendMessageNoReply("Unity", "host-msg", message);
+        this.webview.rootFrame.sendMessageNoReply(
+                 this._WEBAPPS_USER_SCRIPT_CONTEXT, "UnityWebappApi-Host-Message", message);
     },
     loadingStartedConnect: function (onLoadingStarted) {
         function handler(loadEvent) {
@@ -89,7 +93,12 @@ OxideWebviewAdapter.prototype = {
         function handler(msg, frame) {
             onMessageReceived(JSON.parse(msg.args));
         }
-        var script = 'import com.canonical.Oxide 0.1 as Oxide; Oxide.MessageHandler { msgId:"Unity-Message"; worldIds:["Unity"]; };';
+
+        var script = 'import com.canonical.Oxide 0.1 as Oxide; ' +
+                ' Oxide.MessageHandler { msgId:"UnityWebappApi-Message"; contexts:["' +
+                this._WEBAPPS_USER_SCRIPT_CONTEXT +
+                '"]; };';
+
         var messageHandler = Qt.createQmlObject(script, null);
         messageHandler.callback = handler;
         this.webview.messageHandlers = [ messageHandler ];
