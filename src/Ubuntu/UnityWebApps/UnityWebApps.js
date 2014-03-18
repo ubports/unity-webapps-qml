@@ -63,11 +63,11 @@ var UnityWebApps = (function () {
         _bind: function () {
             var self = this;
 
-            var cb = this._onLoadingStartedCallback.bind(self);
-            self._bindeeProxies.loadingStartedConnect(cb);
-
-            cb = this._onMessageReceivedCallback.bind(self);
+            var cb = this._onMessageReceivedCallback.bind(self);
             self._bindeeProxies.messageReceivedConnect(cb);
+
+            cb = this._onLoadingStartedCallback.bind(self);
+            self._bindeeProxies.loadingStartedConnect(cb);
         },
 
         /**

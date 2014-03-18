@@ -16,7 +16,9 @@ function UnityOxideBackendMessagingProxy() {
 UnityOxideBackendMessagingProxy.prototype = {
     postMessage: function(content) {
         // a little bit of a dup from whats in UnityWebAppsUtils.js
-        oxide.postMessage("UnityWebappApi-Message", content)
+        var message = JSON.parse(content);
+        oxide.sendMessage("UnityWebappApi-Message", message)
+        oxide.sendMessage('UnityWebappApi-Message', {data: 'sendinf message: ' + JSON.stringify(message)})
     },
     addMessageHandler: function(callback) {
         if (callback && typeof callback === 'function')

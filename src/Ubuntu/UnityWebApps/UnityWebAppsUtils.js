@@ -71,14 +71,15 @@ OxideWebviewAdapter.prototype = {
         for (var i = 0; i < userScriptUrls.length; ++i) {
             var scriptStart = "import com.canonical.Oxide 0.1 as Oxide; Oxide.UserScript { context:";
             var scriptEnd = "}";
-            context.addUserScript(
-                Qt.createQmlObject(scriptStart +
-                                   '"' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"' +
-                                   '; url: "' +  userScriptUrls[i] + '";' + scriptEnd, this.webview));
+            var statement = scriptStart +
+                    '"' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"' +
+                    '; url: "' +  userScriptUrls[i] + '";' + scriptEnd;
+            console.debug(statement)
+            context.addUserScript(Qt.createQmlObject(statement, this.webview));
         }
     },
     sendToPage: function (message) {
-        this.webview.rootFrame.sendMessageNoReply(
+        this.webview.rootFrame.sendMessage(
                  this._WEBAPPS_USER_SCRIPT_CONTEXT, "UnityWebappApi-Host-Message", message);
     },
     loadingStartedConnect: function (onLoadingStarted) {
@@ -93,11 +94,15 @@ OxideWebviewAdapter.prototype = {
     },
     messageReceivedConnect: function (onMessageReceived) {
         function handler(msg, frame) {
-            onMessageReceived(JSON.parse(msg.args));
+            try {
+                console.debug("Message: " + JSON.stringify(msg.args));
+            }
+            catch (e) { console.debug(e); }
+            onMessageReceived(msg.args);
         }
 
         var script = 'import com.canonical.Oxide 0.1 as Oxide; ' +
-                ' Oxide.ScriptMessageHandler { msgId:"UnityWebappApi-Message"; contexts:["' +
+                ' Oxide.ScriptMessageHandler { msgId: "UnityWebappApi-Message"; contexts: ["' +
                 this._WEBAPPS_USER_SCRIPT_CONTEXT +
                 '"]; ' +
                 '}';
