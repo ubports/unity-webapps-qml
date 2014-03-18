@@ -117,9 +117,7 @@ UnityBindingBridge.prototype = {
      */
     _startMessagePump: function() {
         var self = this;
-        this._backendMessagingProxy.addMessageHandler(function (event) {
-            var message = JSON.parse(event.data);
-
+        this._backendMessagingProxy.addMessageHandler(function (message) {
             if (isUbuntuBindingCallbackCall (message)) {
                 try {
                     self._dispatchCallbackCall (message.id, message.args);

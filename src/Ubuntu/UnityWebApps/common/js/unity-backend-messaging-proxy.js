@@ -18,12 +18,12 @@ UnityOxideBackendMessagingProxy.prototype = {
         // a little bit of a dup from whats in UnityWebAppsUtils.js
         var message = JSON.parse(content);
         oxide.sendMessage("UnityWebappApi-Message", message)
-        oxide.sendMessage('UnityWebappApi-Message', {data: 'sendinf message: ' + JSON.stringify(message)})
     },
     addMessageHandler: function(callback) {
-        if (callback && typeof callback === 'function')
-            // a little bit of a dup from whats in UnityWebAppsUtils.js
-            oxide.addMessageHandler("UnityWebappApi-Host-Message", callback);
+        // a little bit of a dup from whats in UnityWebAppsUtils.js
+        oxide.addMessageHandler("UnityWebappApi-Host-Message", function(content) {
+            callback(content.args);
+        });
     },
 };
 

@@ -50,7 +50,7 @@ QtWebviewAdapter.prototype = {
     },
     messageReceivedConnect: function (onMessageReceived) {
         function handler(raw) {
-            onMessageReceived(JSON.parse(raw.data));
+            onMessageReceived(JSON.parse(JSON.parse(raw.data).data));
         };
         this.webview.experimental.messageReceived.connect(handler);
         this.disposer.addDisposer(this.makeSignalDisconnecter(this.webview.experimental.messageReceived, handler));
@@ -73,19 +73,18 @@ OxideWebviewAdapter.prototype = {
             var scriptEnd = "}";
             var statement = scriptStart +
                     '"' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"' +
-                    '; url: "' +  userScriptUrls[i] + '";' + scriptEnd;
-            console.debug(statement)
+                    '; matchAllFrames: false; url: "' +  userScriptUrls[i] + '";' + scriptEnd;
             context.addUserScript(Qt.createQmlObject(statement, this.webview));
         }
     },
     sendToPage: function (message) {
-        this.webview.rootFrame.sendMessage(
-                 this._WEBAPPS_USER_SCRIPT_CONTEXT, "UnityWebappApi-Host-Message", message);
+        this.webview.rootFrame.sendMessageNoReply(
+                 this._WEBAPPS_USER_SCRIPT_CONTEXT, "UnityWebappApi-Host-Message", JSON.parse(message));
     },
     loadingStartedConnect: function (onLoadingStarted) {
         function handler(loadEvent) {
             var typeStarted = 0; //LoadEvent.TypeStarted
-            if (loadEvent.type == typeStarted) {
+            if (loadEvent.type === typeStarted) {
                 onLoadingStarted();
             }
         }
@@ -94,10 +93,6 @@ OxideWebviewAdapter.prototype = {
     },
     messageReceivedConnect: function (onMessageReceived) {
         function handler(msg, frame) {
-            try {
-                console.debug("Message: " + JSON.stringify(msg.args));
-            }
-            catch (e) { console.debug(e); }
             onMessageReceived(msg.args);
         }
 
@@ -106,7 +101,6 @@ OxideWebviewAdapter.prototype = {
                 this._WEBAPPS_USER_SCRIPT_CONTEXT +
                 '"]; ' +
                 '}';
-        console.log(script)
         var messageHandler = Qt.createQmlObject(script, this.webview);
         messageHandler.callback = handler;
         this.webview.messageHandlers = [ messageHandler ];
