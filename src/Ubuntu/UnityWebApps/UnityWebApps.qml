@@ -22,6 +22,10 @@ import "UnityWebApps.js" as UnityWebAppsJs
 import "UnityWebAppsUtils.js" as UnityWebAppsJsUtils
 import "UnityWebAppsBackendComponents.js" as UnityBackends
 
+import "./bindings/alarm-api/backend/alarm-api.js" as AlarmApiBackend
+import "./bindings/content-hub/backend/content-hub.js" as ContentHubApiBackend
+import "./bindings/online-accounts/backend/online-accounts.js" as OnlineAccountsApiBackend
+
 
 /*!
     \qmltype UnityWebApps
@@ -637,17 +641,11 @@ Item {
                 }
             },
 
-            OnlineAccounts: __injectResourceIfExtraApisAreEnabled(function() {
-                return UnityBackends.createOnlineAccountsApi(UnityBackends.backendDelegate)
-            }),
+            OnlineAccounts: OnlineAccountsApiBackend.createOnlineAccountsApi(UnityBackends.backendDelegate),
 
-            Alarm: __injectResourceIfExtraApisAreEnabled(function() {
-                return UnityBackends.createAlarmApi(UnityBackends.backendDelegate)
-            }),
+            Alarm: AlarmApiBackend.createAlarmApi(UnityBackends.backendDelegate),
 
-            ContentHub:  __injectResourceIfExtraApisAreEnabled(function() {
-                return UnityBackends.createContentHubApi(UnityBackends.backendDelegate)
-            }),
+            ContentHub: ContentHubApiBackend.createContentHubApi(UnityBackends.backendDelegate),
 
             Launcher: {
                 setCount: function (count) {

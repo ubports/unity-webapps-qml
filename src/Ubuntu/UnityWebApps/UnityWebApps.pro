@@ -21,10 +21,12 @@ PRE_TARGETDEPS += \
 #
 # deployment directives
 #
-JS_FILES = $$system(ls *.js) \
-    $${UNITY_API_JS_FILE} \
+PLUGIN_JS_FILES = $$system(ls *.js) \
+    $${UNITY_API_JS_FILE}
+
+CLIENT_JS_FILES = \
     $$system(ls ./common/*/*.js) \
-    $$system(ls ./bindings/*/*/*.js)
+    $$system(ls ./bindings/*/client/*.js)
 
 QML_FILES = $$system(ls *.qml)
 
@@ -32,7 +34,8 @@ QMLDIR_FILE = qmldir
 QMAKE_SUBSTITUTES += qmldir.in
 
 OTHER_FILES += $$QML_FILES \
-    $$JS_FILES \
+    $$PLUGIN_JS_FILES \
+    $$CLIENT_JS_FILES \
     qmldir.in \
     unity-webapps-api.js.in \
     $${UNITY_API_JS_FILE}
@@ -44,9 +47,26 @@ installPath = $$[QT_INSTALL_QML]/$$replace(API_URI, \\., /)
 
 qmldir_file.path = $$installPath
 qmldir_file.files = $$QMLDIR_FILE
+
 qml_files.path = $$installPath
 qml_files.files = $$QML_FILES
-js_files.path = $$installPath
-js_files.files = $$JS_FILES
 
-INSTALLS += qmldir_file qml_files js_files
+js_files.path = $$installPath
+js_files.files = $$PLUGIN_JS_FILES
+
+content_hub_binding_backend_js_files.path = $$installPath/bindings/content-hub/backend/
+content_hub_binding_backend_js_files.files = ./bindings/content-hub/backend/content-hub.js
+
+alarm_binding_backend_js_files.path = $$installPath/bindings/alarm-api/backend/
+alarm_binding_backend_js_files.files = ./bindings/alarm-api/backend/alarm-api.js
+
+online_accounts_binding_backend_js_files.path = $$installPath/bindings/online-accounts/backend/
+online_accounts_binding_backend_js_files.files = ./bindings/online-accounts/backend/online-accounts.js
+
+INSTALLS += qmldir_file \
+    qml_files \
+    js_files \
+    content_hub_binding_backend_js_files \
+    alarm_binding_backend_js_files \
+    online_accounts_binding_backend_js_files
+
