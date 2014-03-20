@@ -35,6 +35,9 @@ UnityQtWebkitBackendMessagingProxy.prototype = {
     },
     addMessageHandler: function(callback) {
         if (callback && typeof callback === 'function')
-            navigator.qt.onmessage = callback;
+            navigator.qt.onmessage = function(message) {
+                var content = JSON.parse(message.data);
+                callback(content);
+            };
     },
 };

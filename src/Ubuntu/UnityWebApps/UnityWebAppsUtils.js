@@ -50,7 +50,7 @@ QtWebviewAdapter.prototype = {
     },
     messageReceivedConnect: function (onMessageReceived) {
         function handler(raw) {
-            onMessageReceived(JSON.parse(JSON.parse(raw.data).data));
+            onMessageReceived(JSON.parse(raw.data));
         };
         this.webview.experimental.messageReceived.connect(handler);
         this.disposer.addDisposer(this.makeSignalDisconnecter(this.webview.experimental.messageReceived, handler));
