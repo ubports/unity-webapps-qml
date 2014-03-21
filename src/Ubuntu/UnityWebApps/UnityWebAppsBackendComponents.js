@@ -201,6 +201,14 @@ UbuntuBindingBackendDelegate.prototype = {
         return {object: this._objects[id], id: id};
     },
 
+    parent: function() {
+        return this._parent;
+    },
+
+    parentView: function() {
+        return this._parent ? this._parent.bindee : null;
+    },
+
     isObjectProxyInfo: function(info) {
         return 'type' in info &&
             info.type === 'object-proxy' &&
@@ -1308,13 +1316,31 @@ function createContentHubApi(backendDelegate) {
     // TODO find a better way
     function _nameToContentType(name) {
         var contentTypePerName = {
+            "All": ContentHubBridge.ContentType.All,
+            "Unknown": ContentHubBridge.ContentType.Unknown,
             "Pictures": ContentHubBridge.ContentType.Pictures,
-            "Documents": ContentHubBridge.ContentType.Pictures,
-            "Music": ContentHubBridge.ContentType.Pictures,
+            "Documents": ContentHubBridge.ContentType.Documents,
+            "Music": ContentHubBridge.ContentType.Music,
+            "Contacts": ContentHubBridge.ContentType.Contacts,
         };
         return name in contentTypePerName ?
                     contentTypePerName[name]
                   : ContentHubBridge.ContentType.Unknown;
+    };
+    function _contentTypeToName(state) {
+        if (state === ContentHubBridge.ContentType.All)
+            return "All";
+        else if (state === ContentHubBridge.ContentType.Unknown)
+            return "Unknown";
+        else if (state === ContentHubBridge.ContentType.Pictures)
+            return "Pictures";
+        else if (state === ContentHubBridge.ContentType.Documents)
+            return "Documents";
+        else if (state === ContentHubBridge.ContentType.Music)
+            return "Music";
+        else if (state === ContentHubBridge.ContentType.Contacts)
+            return "Contacts";
+        return "Unknown";
     };
 
     function _nameToContentTransferSelection(name) {
@@ -1334,10 +1360,31 @@ function createContentHubApi(backendDelegate) {
         return "Single";
     };
 
+    function _nameToContentHandler(name) {
+        var contentHandlerPerName = {
+            "Source": ContentHubBridge.ContentHandler.Source,
+            "Destination": ContentHubBridge.ContentHandler.Destination,
+            "Share": ContentHubBridge.ContentHandler.Share,
+        };
+        return name in contentHandlerPerName ?
+                    contentHandlerPerName[name]
+                  : ContentHubBridge.ContentHandler.Source;
+    };
+    function _contentHandlerToName(state) {
+        if (state === ContentHubBridge.ContentHandler.Source)
+            return "Source";
+        else if (state === ContentHubBridge.ContentHandler.Destination)
+            return "Destination";
+        else if (state === ContentHubBridge.ContentHandler.Share)
+            return "Share";
+        return "Source";
+    };
+
     function _nameToContentTransferDirection(name) {
         var contentTypePerName = {
             "Import": ContentHubBridge.ContentTransfer.Import,
             "Export": ContentHubBridge.ContentTransfer.Export,
+            "Share": ContentHubBridge.ContentTransfer.Share,
         };
         return name in contentTypePerName ?
                     contentTypePerName[name]
@@ -1348,7 +1395,29 @@ function createContentHubApi(backendDelegate) {
             return "Import";
         else if (state === ContentHubBridge.ContentTransfer.Export)
             return "Export";
+        else if (state === ContentHubBridge.ContentTransfer.Share)
+            return "Share";
         return "Import";
+    };
+
+    function _nameToContentScope(name) {
+        var contentScopePerName = {
+            "System": ContentHubBridge.ContentScope.System,
+            "User": ContentHubBridge.ContentScope.User,
+            "App": ContentHubBridge.ContentScope.App,
+        };
+        return name in contentScopePerName ?
+                    contentScopePerName[name]
+                  : ContentHubBridge.ContentScope.App;
+    };
+    function _contentScopeToName(state) {
+        if (state === ContentHubBridge.ContentScope.System)
+            return "System";
+        else if (state === ContentHubBridge.ContentScope.User)
+            return "User";
+        else if (state === ContentHubBridge.ContentScope.App)
+            return "App";
+        return "App";
     };
 
     function _nameToContentTransferState(name) {
@@ -1426,6 +1495,8 @@ function createContentHubApi(backendDelegate) {
                 content: {
                     store: self._object.store,
                     state: self._object.state,
+                    selectionType: self._object.selectionType,
+                    direction: self._object.direction,
                 }
             }
         },
@@ -1460,6 +1531,15 @@ function createContentHubApi(backendDelegate) {
             this._object.state = _nameToContentTransferState(state);
             if (callback && typeof(callback) === 'function')
                 callback();
+        },
+        onStateChanged: function(callback) {
+            if (!callback || typeof(callback) !== 'function')
+                return;
+            this._validate();
+            var self = this;
+            this._object.onStateChanged.connect(function() {
+                callback(_contentTransferStateToName(self._object.state));
+            });
         },
 
         selectionType: function(callback) {
@@ -1504,15 +1584,10 @@ function createContentHubApi(backendDelegate) {
                 item.object.name = items[i].name;
                 item.object.url = items[i].url;
 
-                console.debug('setItems: adding item ' + item.object.name.toString()
-                              + ', ' + item.object.url.toString());
-
                 contentItems.push(item.object);
             }
 
             this._object.items = contentItems;
-
-            console.debug('setItems: grand total of ' + this._object.items.length + ' added');
 
             if (callback && typeof(callback) === 'function')
                 callback();
@@ -1593,11 +1668,23 @@ function createContentHubApi(backendDelegate) {
 
                 content: {
                     uri: self._object.uri,
+                    scope: _contentScopeToName(self._object.scope),
                 }
             }
         },
 
         // properties
+
+        scope: function(callback) {
+            this._validate();
+            callback(_contentScopeToName(this._object.scope));
+        },
+        setScope: function(scope, callback) {
+            this._validate();
+            this._object.scope = _nameToContentScope(scope);
+            if (callback && typeof(callback) === 'function')
+                callback();
+        },
 
         //immutable
         uri: function(callback) {
@@ -1648,22 +1735,164 @@ function createContentHubApi(backendDelegate) {
                 content: {
                     appId: self._object.appId,
                     name: self._object.name,
+                    handler: self._object.handler,
+                    contentType: self._object.contentType,
+                    selectionType: self._object.selectionType,
+                    isDefaultPeer: self._object.isDefaultPeer,
                 },
             }
         },
 
         // properties
 
-        // immutable
         appId: function(callback) {
             this._validate();
             callback(this._object.appId);
+        },
+        setAppId: function(appId, callback) {
+            this._validate();
+            this._object.appId = appId;
+            if (callback && typeof(callback) === 'function')
+                callback();
+        },
+
+        handler: function(callback) {
+            this._validate();
+            callback(_contentHandlerToName(this._object.handler));
+        },
+        setHandler: function(handler, callback) {
+            this._validate();
+            this._object.handler = _nameToContentHandler(handler);
+            if (callback && typeof(callback) === 'function')
+                callback();
+        },
+
+        contentType: function(callback) {
+            this._validate();
+            callback(_contentTypeToName(this._object.contentType));
+        },
+        setContentType: function(contentType, callback) {
+            this._validate();
+            this._object.contentType = _nameToContentType(contentType);
+            if (callback && typeof(callback) === 'function')
+                callback();
+        },
+
+        selectionType: function(callback) {
+            this._validate();
+            callback(_contentTransferSelectionToName(this._object.selectionType));
+        },
+        setSelectionType: function(selectionType, callback) {
+            this._validate();
+            this._object.selectionType = _nameToContentTransferSelection(selectionType);
+            if (callback && typeof(callback) === 'function')
+                callback();
         },
 
         // immutable
         name: function(callback) {
             this._validate();
             callback(this._object.name);
+        },
+
+        isDefaultPeer: function(callback) {
+            this._validate();
+            callback(this._object.isDefaultPeer);
+        },
+
+        // methods
+
+        request: function(callback) {
+            this._validate();
+            var transfer = new ContentTransfer(this._object.request());
+
+            if (callback && typeof(callback) === 'function')
+                callback(transfer.serialize());
+        },
+
+        requestForStore: function(store, callback) {
+            if ( ! store) {
+                callback(null);
+                return;
+            }
+
+            if (! backendDelegate.isObjectProxyInfo(store)) {
+                console.debug('requestForStore: invalid store object proxy')
+                callback("Invalid store");
+                return;
+            }
+
+            var _store = backendDelegate.objectFromId(store.objectid);
+            if ( ! _store) {
+                callback("Invalid store object (NULL)");
+                return;
+            }
+            this._validate();
+
+            var transfer = new ContentTransfer(this._object.request(_store));
+            if (callback && typeof(callback) === 'function')
+                callback(transfer.serialize());
+        },
+
+        // internal
+
+        internal: {
+            request: function(self) {
+                return self._object.request();
+            }
+        }
+    };
+
+    function ContentPeerModel(filterParams) {
+        var result = backendDelegate.createQmlObject(
+                    PLUGIN_URI, VERSION, 'ContentPeerModel', filterParams);
+        this._id = result.id;
+        this._object = result.object;
+
+        this._modelAdaptor = backendDelegate.createModelAdaptorFor(this._object);
+        this._roles = this._modelAdaptor.roles();
+    };
+    ContentPeerModel.prototype = {
+        _validate: function() {
+            if (! this._object)
+                throw new TypeError("Invalid object null");
+        },
+
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            this._modelAdaptor.destroy();
+            backendDelegate.deleteId(this._id);
+        },
+
+        // properties
+        setContentType: function(contentType, callback) {
+            this._validate();
+            this._object.contentType = contentType;
+            if (callback)
+                callback();
+        },
+
+        setHandler: function(handler, callback) {
+            this._validate();
+            this._object.handler = handler;
+            if (callback)
+                callback();
+        },
+
+        peers: function() {
+            this._validate();
+            return this._object.peers;
+        },
+
+        // QAbtractListModel prototype
+        count: function(callback) {
+            if (!this._modelAdaptor) {
+                callback(-1);
+                return;
+            }
+            callback(this._modelAdaptor.rowCount());
         },
     };
 
@@ -1679,33 +1908,95 @@ function createContentHubApi(backendDelegate) {
     }
 
     return {
-        defaultSourceForType: function(type, callback) {
-            var _type = _nameToContentType(type);
-            var peer = _contenthub.defaultSourceForType(_type)
-            var source = new ContentPeer(peer);
-            callback(source.serialize());
+        getPeers: function(filters, callback) {
+            if ( ! filters){
+                callback(null);
+                return;
+            }
+
+            var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerModel {";
+            var filterParams = {};
+            if (filters.contentType) {
+                statement += " contentType: ContentType." + filters.contentType + ";";
+            }
+            if (filters.handler) {
+                statement += " handler: ContentHandler." + filters.handler + ";";
+            }
+            statement += " }";
+
+            var peerModel = Qt.createQmlObject(statement, backendDelegate.parent());
+            var onPeersFound = function() {
+                var peers = peerModel.peers;
+
+                var wrappedPeers = [];
+                for (var i = 0; i < peers.length; ++i) {
+                    var wrappedPeer = new ContentPeer(peers[i]);
+                    wrappedPeers.push(wrappedPeer.serialize());
+                }
+                peerModel.onFindPeersCompleted.disconnect(onPeersFound);
+                callback(wrappedPeers);
+            };
+            peerModel.onFindPeersCompleted.connect(onPeersFound);
         },
 
-        defaultStoreForType: function(type, callback) {
-            var store = new ContentStore(_contenthub.defaultStoreForType(_nameToContentType(type)));
+        getStore: function(scope, callback) {
+            if ( ! scope){
+                callback(null);
+                return;
+            }
+            var store = new ContentStore();
+            store.setScope(scope);
             callback(store.serialize());
         },
 
-        importContent: function(type, callback) {
-            var transfer = new ContentTransfer(_contenthub.importContent(_nameToContentType(type)));
-            callback(transfer.serialize());
-        },
-
-        knownSourcesForType: function(type, callback) {
-            var peers = _contenthub.knownSourcesForType(_nameToContentType(type));
-            var wrappedPeers = [];
-
-            for (var i = 0; i < peers.length; ++i) {
-                var wrappedPeer = new ContentPeer(peers[i]);
-                wrappedPeers.push(wrappedPeer.serialize());
+        launchContentPeerPicker: function(filters, onPeerSelected, onCancelPressed) {
+            if ( ! filters){
+                callback(null);
+                return;
             }
 
-            callback(wrappedPeers);
+            var parentItem = backendDelegate.parentView();
+            if ( ! parentItem || ! parentItem.visible || ! parentItem.height || ! parentItem.width) {
+                console.debug("Cannot launch the content peer picker UI, invalid parent item: " + parentItem);
+                onCancelPressed();
+                return;
+            }
+
+            var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerPicker {";
+            var filterParams = {};
+            if (filters.contentType) {
+                statement += " contentType: ContentType." + filters.contentType + "";
+            }
+            if (filters.handler) {
+                statement += "; handler: ContentHandler." + filters.handler + "";
+            }
+            if (filters.showTitle) {
+                statement += "; showTitle: " + filters.showTitle === false ? "false" : "true";
+            }
+            statement += "; visible: true; }";
+
+            if (parentItem.parent)
+                parentItem.visible = false;
+            var contentPeerPicker = Qt.createQmlObject(statement,
+                                                       parentItem.parent ? parentItem.parent : parentItem);
+            function _onPeerSelected() {
+                var peer = new ContentPeer(contentPeerPicker.peer);
+                contentPeerPicker.visible = false;
+                parentItem.visible = true;
+                onPeerSelected(peer.serialize());
+                contentPeerPicker.onPeerSelected.disconnect(_onPeerSelected);
+                contentPeerPicker.destroy();
+            }
+            function _onCancelPressed() {
+                contentPeerPicker.visible = false;
+                parentItem.visible = true;
+                onCancelPressed();
+                contentPeerPicker.onPeerSelected.disconnect(_onCancelPressed);
+                contentPeerPicker.destroy();
+            }
+
+            contentPeerPicker.onPeerSelected.connect(_onPeerSelected);
+            contentPeerPicker.onCancelPressed.connect(_onCancelPressed);
         },
 
         apiImportContent: function(type, peer, transferOptions, onSuccess, onFailure) {
@@ -1714,59 +2005,44 @@ function createContentHubApi(backendDelegate) {
                 onError("Invalid peer");
                 return;
             }
+
             var _type = _nameToContentType(type);
             var _peer = backendDelegate.objectFromId(peer.objectid);
             if ( ! _peer) {
                 onError("Invalid peer object (NULL)");
                 return;
             }
-
-            var transfer = _contenthub.importContent(_type, _peer);
-            console.log('*** Transfer object: ' + transfer + '')
-            if (transferOptions.multipleFiles) {
-                transfer.selectionType = ContentHubBridge.ContentTransfer.Multiple;
+            var _transfer = null;
+            if (transferOptions.scope) {
+                var store = new ContentStore();
+                store.setScope(transferOptions.scope);
+                _transfer = _peer.request(store._object);
             }
             else {
-                transfer.selectionType = ContentHubBridge.ContentTransfer.Single;
+                _transfer = _peer.request();
             }
 
-            if (transferOptions.importToLocalStore) {
-                var store = _contenthub.defaultStoreForType(_type);
-                transfer.setStore(store);
+            if (transferOptions.multipleFiles) {
+                _transfer.selectionType = ContentHubBridge.ContentTransfer.Multiple;
+            }
+            else {
+                _transfer.selectionType = ContentHubBridge.ContentTransfer.Single;
             }
 
-            var _transfer = new ContentTransfer(transfer)
-            transfer.stateChanged.connect(function() {
-                console.log('** Transfer state change: ' + transfer + ', state: ' + _contentTransferStateToName(transfer.state));
-                if (transfer.state === ContentHubBridge.ContentTransfer.Aborted) {
+            var transfer = new ContentTransfer(_transfer)
+            _transfer.stateChanged.connect(function() {
+                if (_transfer.state === ContentHubBridge.ContentTransfer.Aborted) {
                     onFailure("Aborted");
                     return;
                 }
-                else if (transfer.state === ContentHubBridge.ContentTransfer.Charged) {
-                    console.log('*** Transfer complete: got: ' + transfer.items.length + ' items (' + transfer + ')')
-                    for (var i = 0; i < transfer.items.length; ++i) {
-                        console.log('** item ' + i + ' : ' + transfer.items[i].url);
-                    }
-
-                    var d = _transfer.internal.serializeItems(transfer);
+                else if (_transfer.state === ContentHubBridge.ContentTransfer.Charged) {
+                    var d = transfer.internal.serializeItems(_transfer);
                     onSuccess(d);
-                    transfer.finalize();
+                    _transfer.finalize();
                     return;
                 }
             });
-            transfer.start();
-        },
-
-        importContentForPeer: function(type, peerProxy, callback) {
-            if (! backendDelegate.isObjectProxyInfo(peerProxy)) {
-                console.debug('importContentForPeer: invalid peer object proxy')
-                callback();
-                return;
-            }
-            var peer = backendDelegate.objectFromId(peerProxy.objectid);
-            var transfer = new ContentTransfer(_contenthub.importContent(_nameToContentType(type), peer));
-
-            callback(transfer.serialize());
+            _transfer.start();
         },
 
         onExportRequested: function(callback) {
