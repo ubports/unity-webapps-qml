@@ -1,0 +1,31 @@
+import QtQuick 2.0
+import QtWebKit 3.0 
+import QtWebKit.experimental 1.0
+import Ubuntu.Components 0.1
+import Ubuntu.UnityWebApps 0.1
+
+Item {
+  id: root
+  focus: true
+
+  width: units.gu(100)
+  height: units.gu(100)
+
+  WebView {
+    id: webview
+    anchors.fill: parent
+    url: \"file://$$OUT_PWD/application-api/www/index.html\"
+
+    experimental.preferences.navigatorQtObjectEnabled: true
+    experimental.preferences.developerExtrasEnabled: true
+
+    function getUnityWebappsProxies() {
+        return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webview);
+    }
+
+    UnityWebApps {
+        id: webapps
+        bindee: webview
+    }
+  }
+}
