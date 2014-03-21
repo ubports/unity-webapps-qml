@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+14.04.20140321.1-0ubuntu1) trusty; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Add support for the new content hub api
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 21 Mar 2014 00:42:46 +0000
+
 unity-webapps-qml (0.1+14.04.20140317.1-0ubuntu1) trusty; urgency=low
 
   [ Alexandre Abreu ]
