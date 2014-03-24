@@ -20,4 +20,13 @@ window.onload = function() {
     api.ApplicationApi.onScreenOrientationChanged(function(name) {
         setResult('orirntation: ' + name);
     });
+    api.ApplicationApi.onAboutToQuit(function(name) {
+        setResult('onAboutToQuit: ' + name);
+    });
+    api.ApplicationApi.onDeactivated(function(name) {
+        setResult('onDeactivated: ' + name);
+    });
+    api.ApplicationApi.onActivated(function(name) {
+        setResult('onActivated: ' + name);
+    });
 };

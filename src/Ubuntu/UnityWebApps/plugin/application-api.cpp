@@ -34,15 +34,22 @@ nameFromScreenOrientation (Qt::ScreenOrientation orientation)
 {
     switch (orientation)
     {
+    case Qt::InvertedLandscapeOrientation:
     case Qt::LandscapeOrientation:
         return QString("Landscape");
+
     case Qt::PortraitOrientation:
+    case Qt::InvertedPortraitOrientation:
         return QString("Portrait");
+
+    case Qt::PrimaryOrientation:
+        return QString("Primary");
+
     default:
         break;
     }
 
-    return QString();
+    return QString("Unknown");
 }
 
 }
