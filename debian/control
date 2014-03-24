@@ -27,6 +27,7 @@ Vcs-Bzr: lp:unity-webapps-qml
 Package: unity-webapps-qml
 Architecture: any
 Depends: libqt5webkit5-qmlwebkitplugin,
+         liboxideqt-qmlplugin,
          qtdeclarative5-qtquick2-plugin,
          qtdeclarative5-unity-action-plugin,
          qtdeclarative5-ubuntu-ui-toolkit-plugin,
