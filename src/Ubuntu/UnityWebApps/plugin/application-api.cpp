@@ -148,7 +148,7 @@ QString ApplicationApi::getApplicationScreenOrientation() const
 
 QString ApplicationApi::getInputMethod() const
 {
-    return QGuiApplication::inputMethod()->objectName();
+    return QString(getenv("QT_IM_MODULE"));
 }
 
 void ApplicationApi::setInputMethodVisible(bool visible)

@@ -50,6 +50,12 @@ function createApplicationApi(backendDelegate) {
             if (callback && typeof(callback) === 'function')
                 callback(applicationApiInstance.getInputMethod());
         },
+        onInputMethodVisibilityChanged: function(callback) {
+            if (callback && typeof(callback) === 'function')
+                    Qt.inputMethod.onVisibleChanged.connect(function() {
+                        callback(Qt.inputMethod.visible)
+                    });
+        },
 
         applicationName: function(callback) {
             if (callback && typeof(callback) === 'function')

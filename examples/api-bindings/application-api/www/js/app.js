@@ -12,7 +12,10 @@ window.onload = function() {
         setResult(name);
     });
     api.ApplicationApi.getInputMethod(function(name) {
-        setResult('input method: ' + name);
+        if (name.length == 0)
+            setResult('input method: no OSK available');
+        else
+            setResult('input method: ' + name);
     });
     api.ApplicationApi.getScreenOrientation(function(name) {
         setResult(name);
@@ -28,5 +31,13 @@ window.onload = function() {
     });
     api.ApplicationApi.onActivated(function(name) {
         setResult('onActivated: ' + name);
+    });
+    api.ApplicationApi.onInputMethodVisibilityChanged(function(visibility) {
+        setResult('onInputMethodVisibilityChanged: ' + visibility);
+    });
+    document.getElementById('inputMethodVisibleButton').addEventListener('click', function() {
+        api.ApplicationApi.setInputMethodVisible(true, function() {
+            setResult('setInputMethodVisible: true');
+        });
     });
 };

@@ -72,6 +72,9 @@ function createApplicationApi(backendBridge) {
 
             // The alarm is a repeating one, either daily, weekly on a given day or on selected days.
             Portrait: "Portrait",
+
+            // The alarm is a repeating one, either
+            Unknwon: "Unknown",
         },
 
         /**
@@ -130,16 +133,20 @@ function createApplicationApi(backendBridge) {
                                , [callback]);
         },
 
-        setInputMethodVisible: function(visible) {
+        setInputMethodVisible: function(visible, callback) {
             backendBridge.call('ApplicationApi.setInputMethodVisible'
-                               , [visible]
-                               , callback);
+                               , [visible, callback]);
         },
 
         getInputMethod: function(callback) {
             backendBridge.call('ApplicationApi.getInputMethod'
                                , []
                                , callback);
+        },
+
+        onInputMethodVisibilityChanged: function(callback) {
+            backendBridge.call('ApplicationApi.onInputMethodVisibilityChanged'
+                               , [callback]);
         }
     };
 };
