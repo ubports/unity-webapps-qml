@@ -266,7 +266,6 @@ void ApplicationApi::signalReceived(int type)
 
     bool killed = (type == SIGTERM);
 
-    // TODO sync emit?
     Q_EMIT applicationAboutToQuit(killed);
 
     QCoreApplication::quit();
