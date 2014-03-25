@@ -1101,7 +1101,7 @@ function createAlarmApi(backendDelegate) {
         }
         if ( ! id) {
             id = backendDelegate.storeQmlObject(alarm,
-                    PLUGIN_URI, VERSION, 'Account');
+                    PLUGIN_URI, VERSION, 'Alarm');
         }
 
         this._id = id;

@@ -33,6 +33,7 @@
     //@include ./bindings/alarm-api/client/alarm-api.js
     //@include ./bindings/content-hub/client/content-hub.js
     //@include ./bindings/online-accounts/client/online-accounts.js
+    //@include ./bindings/download-manager/client/download-api.js
     //@include ./common/js/unity-binding-proxy.js
     //@include ./common/js/unity-binding-bridge.js
 
@@ -279,6 +280,7 @@
             OnlineAccounts: createOnlineAccountsApi(backend),
             AlarmApi: createAlarmApi(backend),
             ContentHub: createContentHubApi(backend),
+            DownloadApi: createDownloadApi(backend),
         };
 
         return api;
