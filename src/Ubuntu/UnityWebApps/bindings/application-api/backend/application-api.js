@@ -17,6 +17,7 @@
  */
 
 .import Ubuntu.UnityWebApps 0.1 as UnityWebAppsBridge
+.import Ubuntu.Components 0.1 as ComponentsBridge
 
 
 /**
@@ -66,6 +67,18 @@ function createApplicationApi(backendDelegate) {
             if (callback && typeof(callback) === 'function')
                 applicationApiInstance.applicationAboutToQuit.connect(function(killed) {
                     callback(killed);
+                });
+        },
+
+        setupUriHandler: function(callback) {
+            if (callback && typeof(callback) === 'function')
+                var urihandler = ComponentsBridge.UriHandler;
+                urihandler.opened.connect(function(uris, data) {
+                    var translatedUris = []
+                    for (var idx in uris) {
+                        translatedUris.push(uris[idx])
+                    }
+                    callback(translatedUris);
                 });
         },
 

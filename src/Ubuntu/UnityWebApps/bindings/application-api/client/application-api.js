@@ -106,7 +106,7 @@ function createApplicationApi(backendBridge) {
          * Sets up a callback that is to be called when the application is about to quit.
          *
          * @method onAboutToQuit
-         * @param callback {Function(Bool)} Function to be called when the application is about to quit.
+         * @param callback {Function()} Function to be called when the application is about to quit.
          */
         onAboutToQuit: function(callback) {
             backendBridge.call('ApplicationApi.onAboutToQuit'
@@ -155,6 +155,17 @@ function createApplicationApi(backendBridge) {
          */
         onScreenOrientationChanged: function(callback) {
             backendBridge.call('ApplicationApi.onScreenOrientationChanged'
+                               , [callback]);
+        },
+
+        /**
+         * Sets up a URI handler. The application can be sent URIs to open.
+         *
+         * @method setupUriHandler
+         * @param callback {Function([String])} Function to be called with the current list of uris to open
+         */
+        setupUriHandler: function(callback) {
+            backendBridge.call('ApplicationApi.setupUriHandler'
                                , [callback]);
         },
 

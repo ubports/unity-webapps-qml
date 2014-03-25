@@ -45,7 +45,12 @@ window.onload = function() {
     api.ApplicationApi.onInputMethodVisibilityChanged(function(visibility) {
         setResult('onInputMethodVisibilityChanged: ' + visibility);
     });
-/*
+
+    api.ApplicationApi.setupUriHandler(function(uris) {
+        setResult('setupUriHandler: ' + JSON.stringify(uris));
+    });
+
+    /*
     document.getElementById('inputMethodVisibleButton').addEventListener('click', function() {
         api.ApplicationApi.setInputMethodVisible(true, function() {
             setResult('setInputMethodVisible: true');
