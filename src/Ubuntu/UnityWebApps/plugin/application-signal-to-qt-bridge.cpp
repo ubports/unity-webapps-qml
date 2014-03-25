@@ -25,6 +25,17 @@
 #include <signal.h>
 #include <unistd.h>
 
+/**
+ * @brief The ApplicationSignalToQtBridgePrivate class
+ *
+ * It does the job described here:
+ *
+ * https://qt-project.org/doc/qt-5.0/qtdoc/unix-signals.html
+ *
+ * and bridges Unix signal handlers & qt objects in a proper
+ * way.
+ *
+ */
 
 class ApplicationSignalToQtBridgePrivate: public QObject
 {
