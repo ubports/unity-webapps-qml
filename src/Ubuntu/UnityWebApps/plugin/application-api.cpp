@@ -148,7 +148,7 @@ ApplicationApi::ApplicationApi(QObject *parent) :
 
     // We explictly handle the SIGTERM signal case that is being sent
     // on Touch to an application being killed by the platform.
-    //
+    // Upstart sends this signal when the application is closed from app scope.
     d->_applicationSignalBridge->addSignalHandlerFor(SIGTERM);
 
     QScreen * screen = QGuiApplication::primaryScreen();
