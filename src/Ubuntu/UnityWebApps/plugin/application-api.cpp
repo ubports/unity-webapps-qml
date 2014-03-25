@@ -146,6 +146,9 @@ ApplicationApi::ApplicationApi(QObject *parent) :
                      this,
                      &ApplicationApi::signalReceived);
 
+    // We explictly handle the SIGTERM signal case that is being sent
+    // on Touch to an application being killed by the platform.
+    //
     d->_applicationSignalBridge->addSignalHandlerFor(SIGTERM);
 
     QScreen * screen = QGuiApplication::primaryScreen();
