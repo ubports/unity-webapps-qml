@@ -26,62 +26,51 @@ function createApplicationApi(backendBridge) {
     var PLUGIN_URI = 'ApplicationApi';
 
 /**
- * The AlarmApi object
+ * The ApplicationApi object
 
- * @class AlarmApi
+ * @class ApplicationApi
  * @constructor
  * @example
 
-       var date = new Date();
-       <set a valid date in the future>
-
        var api = external.getUnityObject('1.0');
-       api.AlarmApi.api.createAndSaveAlarmFor(
-          date,
-          api.AlarmApi.AlarmType.OneTime,
-          api.AlarmApi.AlarmDayOfWeek.AutoDetect,
-          "alarm triggered",
-          function(errorid) {
-              console.log(api.AlarmApi.api.errorToMessage(errorid));
-          });
+       api.ApplicationApi.applicationName(function(name) {
+         console.log('Application name: ' + name);
+       });
  */
     return {
         /**
-           Enumeration of the available types of Alarm.
+           Enumeration of the available types of ScreenOrientation.
 
              Values:
 
-               OneTime: The alarm occurs only once
+               Landscape: The application screen is in landscape mode
 
-               Repeating: The alarm is a repeating one,
-                   either daily, weekly on a given day
-                   or on selected days
+               Portrait: The application screen is in portrait mode
+
+               Unknown: The application screen is in an unknown mode
 
            @static
-           @property AlarmType {Object}
+           @property ScreenOrientation {Object}
 
            @example
 
                var api = external.getUnityObject('1.0');
-               var alarmtype = api.AlarmApi.AlarmType;
-               // use alarmtype.OneTime or alarmtype.Repeating
+               var orientation = api.ApplicationApi.ScreenOrientation;
+               // use orientation.Landscape or orientation.Portrait
          */
         ScreenOrientation: {
-            // The alarm occurs only once.
             Landscape: "Landscape",
 
-            // The alarm is a repeating one, either daily, weekly on a given day or on selected days.
             Portrait: "Portrait",
 
-            // The alarm is a repeating one, either
             Unknwon: "Unknown",
         },
 
         /**
-         * Creates a Alarm object.
+         * Retrieves the disk location where the application is allowed to write its data in.
          *
-         * @method createAlarm
-         * @param callback {Function(Alarm)} Function called with the created Alarm.
+         * @method getApplicationWritableLocation
+         * @param callback {Function(String)} Function called with the location.
          */
         getApplicationWritableLocation: function(callback) {
             backendBridge.call('ApplicationApi.getApplicationWritableLocation'
@@ -90,10 +79,10 @@ function createApplicationApi(backendBridge) {
         },
 
         /**
-         * Creates a Alarm object.
+         * Retrieves the disk location where the application name.
          *
-         * @method createAlarm
-         * @param callback {Function(Alarm)} Function called with the created Alarm.
+         * @method applicationName
+         * @param callback {Function(String)} Function called with the application name.
          */
         applicationName: function(callback) {
             backendBridge.call('ApplicationApi.applicationName'
@@ -101,49 +90,92 @@ function createApplicationApi(backendBridge) {
                                , callback);
         },
 
+        /**
+         * Retrieves current platform information.
+         *
+         * @method getPlatformInfos
+         * @param callback {Function(Object)} Function called with the platform information name.
+         */
         getPlatformInfos: function(callback) {
             backendBridge.call('ApplicationApi.getPlatformInfos'
                                , []
                                , callback);
         },
 
+        /**
+         * Sets up a callback that is to be called when the application is about to quit.
+         *
+         * @method onAboutToQuit
+         * @param callback {Function(Bool)} Function to be called when the application is about to quit.
+         */
         onAboutToQuit: function(callback) {
             backendBridge.call('ApplicationApi.onAboutToQuit'
                                , [callback]);
         },
 
+        /**
+         * Sets up a callback that is to be called when the application has been deactivated (background).
+         *
+         * @method onDeactivated
+         * @param callback {Function()} Function to be called when the application has been deactivated.
+         */
         onDeactivated: function(callback) {
             backendBridge.call('ApplicationApi.onDeactivated'
                                , [callback]);
         },
 
+        /**
+         * Sets up a callback that is to be called when the application has been activated (from background).
+         *
+         * @method onActivated
+         * @param callback {Function()} Function to be called when the application has been activated.
+         */
         onActivated: function(callback) {
             backendBridge.call('ApplicationApi.onActivated'
                                , [callback]);
         },
 
+        /**
+         * Retrieves the current screen orientation.
+         *
+         * @method getScreenOrientation
+         * @param callback {Function(ScreenOrientation)} Function to be called with the current screen orientation.
+         */
         getScreenOrientation: function(callback) {
             backendBridge.call('ApplicationApi.getScreenOrientation'
                                , []
                                , callback);
         },
 
+        /**
+         * Sets up a callback that is to be called when the application's screen has changed its orientation.
+         *
+         * @method onScreenOrientationChanged
+         * @param callback {Function(ScreenOrientation)} Function to be called when the application's screen orientation has changed.
+         */
         onScreenOrientationChanged: function(callback) {
             backendBridge.call('ApplicationApi.onScreenOrientationChanged'
                                , [callback]);
         },
 
-        setInputMethodVisible: function(visible, callback) {
-            backendBridge.call('ApplicationApi.setInputMethodVisible'
-                               , [visible, callback]);
-        },
-
+        /**
+         * Retrieves the current input method.
+         *
+         * @method getScreenOrientation
+         * @param callback {Function(String)} Function to be called with the current input method
+         */
         getInputMethod: function(callback) {
             backendBridge.call('ApplicationApi.getInputMethod'
                                , []
                                , callback);
         },
 
+        /**
+         * Sets up a callback that is to be called when the On Screen Keyboard visibility has changed.
+         *
+         * @method onInputMethodVisibilityChanged
+         * @param callback {Function(Bool)} Function to be called when the On Screen Keyboard visibility has changed (received the visibility as an arg).
+         */
         onInputMethodVisibilityChanged: function(callback) {
             backendBridge.call('ApplicationApi.onInputMethodVisibilityChanged'
                                , [callback]);

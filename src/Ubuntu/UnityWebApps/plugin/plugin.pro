@@ -41,7 +41,8 @@ SOURCES += \
     unity-webapps-icon-utils.cpp \
     callback.cpp \
     abstract-item-model-adaptor.cpp \
-    application-api.cpp
+    application-api.cpp \
+    application-signal-to-qt-bridge.cpp
 
 HEADERS += \
     qml-plugin.h \
@@ -59,7 +60,8 @@ HEADERS += \
     unity-webapps-icon-utils.h \
     callback.h \
     abstract-item-model-adaptor.h \
-    application-api.h
+    application-api.h \
+    application-signal-to-qt-bridge.h
 
 DEFINES += \
     API_URI=\\\"$${API_URI}\\\"

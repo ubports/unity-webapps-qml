@@ -64,7 +64,9 @@ function createApplicationApi(backendDelegate) {
 
         onAboutToQuit: function(callback) {
             if (callback && typeof(callback) === 'function')
-                applicationApiInstance.applicationAboutToQuit.connect(callback);
+                applicationApiInstance.applicationAboutToQuit.connect(function(killed) {
+                    callback(killed);
+                });
         },
 
         onDeactivated: function(callback) {

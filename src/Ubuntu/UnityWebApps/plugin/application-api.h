@@ -21,7 +21,7 @@
 
 #include <QObject>
 
-class ApplicationApiEventListener;
+class ApplicationApiPrivate;
 
 class ApplicationApi : public QObject
 {
@@ -34,6 +34,7 @@ class ApplicationApi : public QObject
 
 public:
     explicit ApplicationApi(QObject *parent = 0);
+    ~ApplicationApi();
 
     QString applicationName() const;
 
@@ -48,8 +49,9 @@ public:
 
 
 Q_SIGNALS:
+
     void applicationNameChanged();
-    void applicationAboutToQuit();
+    void applicationAboutToQuit(bool killed);
     void applicationDeactivated();
     void applicationActivated();
     void applicationScreenOrientationChanged(QString);
@@ -61,11 +63,13 @@ public Q_SLOTS:
     void deactivated();
     void activated();
     void screenOrientationChanged(Qt::ScreenOrientation);
+    void signalReceived(int type);
 
 
 private:
 
-    ApplicationApiEventListener * _applicationEventListener;
+    ApplicationApiPrivate *d_ptr;
+    Q_DECLARE_PRIVATE(ApplicationApi)
 };
 
 #endif // UNITY_WEBAPPS_APPLICATIONAPI_H

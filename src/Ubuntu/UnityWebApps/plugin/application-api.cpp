@@ -18,12 +18,15 @@
 
 #include "application-api.h"
 
+#include "application-signal-to-qt-bridge.h"
+
 #include <QDebug>
 #include <QGuiApplication>
 #include <QScreen>
 #include <QDir>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QStandardPaths>
+#include <signal.h>
 
 
 namespace
@@ -54,7 +57,6 @@ nameFromScreenOrientation (Qt::ScreenOrientation orientation)
 
 }
 
-
 class ApplicationApiEventListener : public QObject
 {
     Q_OBJECT
@@ -65,6 +67,11 @@ public:
     {
         if (QGuiApplication::instance())
             QGuiApplication::instance()->installEventFilter(this);
+    }
+    ~ApplicationApiEventListener()
+    {
+        if (QGuiApplication::instance())
+            QGuiApplication::instance()->removeEventFilter(this);
     }
 
     bool eventFilter(QObject *obj,
@@ -90,32 +97,101 @@ Q_SIGNALS:
     void deactivated();
 };
 
+
+class ApplicationApiPrivate: public QObject
+{
+    Q_OBJECT
+
+public:
+    ApplicationApiPrivate(QObject * parent)
+        : QObject(parent),
+          _applicationEventListener(new ApplicationApiEventListener(this)),
+          _applicationSignalBridge(new ApplicationSignalToQtBridge(this))
+    {}
+    ~ApplicationApiPrivate()
+    {
+        delete _applicationEventListener;
+        delete _applicationSignalBridge;
+    }
+
+    ApplicationApiEventListener * _applicationEventListener;
+    ApplicationSignalToQtBridge * _applicationSignalBridge;
+};
+
+
 ApplicationApi::ApplicationApi(QObject *parent) :
     QObject(parent),
-    _applicationEventListener(new ApplicationApiEventListener(parent))
+    d_ptr(new ApplicationApiPrivate(this))
 
 {
+    Q_D(ApplicationApi);
+
     QObject::connect(QCoreApplication::instance(),
                      &QCoreApplication::aboutToQuit,
                      this,
                      &ApplicationApi::aboutToQuit);
 
-    QObject::connect(_applicationEventListener,
+    QObject::connect(d->_applicationEventListener,
                      &ApplicationApiEventListener::activated,
                      this,
                      &ApplicationApi::activated);
 
-    QObject::connect(_applicationEventListener,
+    QObject::connect(d->_applicationEventListener,
                      &ApplicationApiEventListener::deactivated,
                      this,
                      &ApplicationApi::deactivated);
 
-    QScreen * screen = QGuiApplication::primaryScreen();
-    QObject::connect(screen,
-                     &QScreen::orientationChanged,
+    QObject::connect(d->_applicationSignalBridge,
+                     &ApplicationSignalToQtBridge::onSignalRaised,
                      this,
-                     &ApplicationApi::screenOrientationChanged);
+                     &ApplicationApi::signalReceived);
 
+    d->_applicationSignalBridge->addSignalHandlerFor(SIGTERM);
+
+    QScreen * screen = QGuiApplication::primaryScreen();
+    if (screen)
+    {
+        QObject::connect(screen,
+                         &QScreen::orientationChanged,
+                         this,
+                         &ApplicationApi::screenOrientationChanged);
+    }
+}
+
+ApplicationApi::~ApplicationApi()
+{
+    Q_D(ApplicationApi);
+
+    QObject::disconnect(QCoreApplication::instance(),
+                       &QCoreApplication::aboutToQuit,
+                       this,
+                       &ApplicationApi::aboutToQuit);
+
+    QObject::disconnect(d->_applicationEventListener,
+                       &ApplicationApiEventListener::activated,
+                       this,
+                       &ApplicationApi::activated);
+
+    QObject::disconnect(d->_applicationEventListener,
+                       &ApplicationApiEventListener::deactivated,
+                       this,
+                       &ApplicationApi::deactivated);
+
+    QObject::disconnect(d->_applicationSignalBridge,
+                        &ApplicationSignalToQtBridge::onSignalRaised,
+                        this,
+                        &ApplicationApi::signalReceived);
+
+    QScreen * screen = QGuiApplication::primaryScreen();
+    if (screen)
+    {
+        QObject::disconnect(screen,
+                           &QScreen::orientationChanged,
+                           this,
+                           &ApplicationApi::screenOrientationChanged);
+    }
+
+    delete d_ptr;
 }
 
 QString ApplicationApi::applicationName() const
@@ -167,7 +243,7 @@ QString ApplicationApi::getApplicationPlatform() const
 
 void ApplicationApi::aboutToQuit()
 {
-    Q_EMIT applicationAboutToQuit();
+    Q_EMIT applicationAboutToQuit(false);
 }
 
 void ApplicationApi::activated()
@@ -178,6 +254,19 @@ void ApplicationApi::activated()
 void ApplicationApi::deactivated()
 {
     Q_EMIT applicationDeactivated();
+}
+
+void ApplicationApi::signalReceived(int type)
+{
+    if (type != SIGTERM  && type != SIGINT)
+        return;
+
+    bool killed = (type == SIGTERM);
+
+    // TODO sync emit?
+    Q_EMIT applicationAboutToQuit(killed);
+
+    QCoreApplication::quit();
 }
 
 void ApplicationApi::screenOrientationChanged(Qt::ScreenOrientation orientation)
