@@ -63,11 +63,11 @@ var UnityWebApps = (function () {
         _bind: function () {
             var self = this;
 
-            var cb = this._onLoadingStartedCallback.bind(self);
-            self._bindeeProxies.loadingStartedConnect(cb);
-
-            cb = this._onMessageReceivedCallback.bind(self);
+            var cb = this._onMessageReceivedCallback.bind(self);
             self._bindeeProxies.messageReceivedConnect(cb);
+
+            cb = this._onLoadingStartedCallback.bind(self);
+            self._bindeeProxies.loadingStartedConnect(cb);
         },
 
         /**
@@ -77,12 +77,12 @@ var UnityWebApps = (function () {
         _onLoadingStartedCallback: function () {
             var scripts = [this._injected_unity_api_path];
             for(var i = 0; i < this._userscripts.length; ++i) {
-
-                console.debug('Injecting webapps script[' + i + '] : '
-                              + Qt.resolvedUrl(this._userscripts[i]));
-
                 scripts.push(Qt.resolvedUrl(this._userscripts[i]));
             }
+
+            for (i = 0; i < scripts.length; ++i)
+                console.debug('Injecting webapps script[' + i + '] : '
+                              + scripts[i]);
 
             this._bindeeProxies.injectUserScripts(scripts);
         },
@@ -192,16 +192,14 @@ var UnityWebApps = (function () {
         _makeWebpageCallback: function (callbackid) {
             var self = this;
             return function () {
-                var sendToPage = self._bindeeProxies.sendToPage;
-
                 // TODO add validation higher
-                if (!sendToPage || !(sendToPage instanceof Function))
+                if (!self._bindeeProxies.sendToPage || !(self._bindeeProxies.sendToPage instanceof Function))
                     return;
 
                 var callback_args = Array.prototype.slice.call(arguments);
                 var message = UnityWebAppsUtils.formatUnityWebappsCallbackCall(callbackid, callback_args);
 
-                sendToPage(JSON.stringify(message));
+                self._bindeeProxies.sendToPage(JSON.stringify(message));
             };
         },
 

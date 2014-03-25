@@ -21,6 +21,109 @@
 var UBUNTU_WEBAPPS_BINDING_API_CALL_MESSAGE = "ubuntu-webapps-binding-call";
 var UBUNTU_WEBAPPS_BINDING_OBJECT_METHOD_CALL_MESSAGE = "ubuntu-webapps-binding-call-object-method";
 
+
+function QtWebviewAdapter(webview, disposer, makeSignalDisconnecter) {
+    this.webview = webview;
+    this.disposer = disposer;
+    this.makeSignalDisconnecter = makeSignalDisconnecter;
+}
+QtWebviewAdapter.prototype = {
+    injectUserScripts: function(userScriptUrls) {
+        var scripts = this.webview.experimental.userScripts;
+        for (var i = 0; i < userScriptUrls.length; ++i) {
+            scripts.push(userScriptUrls[i]);
+        }
+        this.webview.experimental.userScripts = scripts;
+    },
+    sendToPage: function (message) {
+        this.webview.experimental.postMessage(message);
+    },
+    loadingStartedConnect: function (onLoadingStarted) {
+        function handler(loadRequest) {
+            var LoadStartedStatus = 0;
+            if (loadRequest.status === LoadStartedStatus) {
+                onLoadingStarted();
+            }
+        };
+        this.webview.loadingChanged.connect(handler);
+        this.disposer.addDisposer(this.makeSignalDisconnecter(this.webview.loadingChanged, handler));
+    },
+    messageReceivedConnect: function (onMessageReceived) {
+        function handler(raw) {
+            onMessageReceived(JSON.parse(raw.data));
+        };
+        this.webview.experimental.messageReceived.connect(handler);
+        this.disposer.addDisposer(this.makeSignalDisconnecter(this.webview.experimental.messageReceived, handler));
+    }
+}
+
+
+function OxideWebviewAdapter(webview, disposer, makeSignalDisconnecter) {
+    this.webview = webview;
+    this.disposer = disposer;
+    this.makeSignalDisconnecter = makeSignalDisconnecter;
+    this._WEBAPPS_USER_SCRIPT_CONTEXT = "oxide://UnityWebappsApi";
+}
+OxideWebviewAdapter.prototype = {
+    injectUserScripts: function(userScriptUrls) {
+        var context = this.webview.context;
+
+        for (var i = 0; i < userScriptUrls.length; ++i) {
+            var scriptStart = "import com.canonical.Oxide 0.1 as Oxide; Oxide.UserScript { context:";
+            var scriptEnd = "}";
+            var statement = scriptStart +
+                    '"' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"' +
+                    '; matchAllFrames: false; url: "' +  userScriptUrls[i] + '";' + scriptEnd;
+            context.addUserScript(Qt.createQmlObject(statement, this.webview));
+        }
+    },
+    sendToPage: function (message) {
+        this.webview.rootFrame.sendMessageNoReply(
+                 this._WEBAPPS_USER_SCRIPT_CONTEXT, "UnityWebappApi-Host-Message", JSON.parse(message));
+    },
+    loadingStartedConnect: function (onLoadingStarted) {
+        function handler(loadEvent) {
+            var typeStarted = 0; //LoadEvent.TypeStarted
+            if (loadEvent.type === typeStarted) {
+                onLoadingStarted();
+            }
+        }
+        this.webview.loadingChanged.connect(handler);
+        this.disposer.addDisposer(this.makeSignalDisconnecter(this.webview.loadingChanged, handler));
+    },
+    messageReceivedConnect: function (onMessageReceived) {
+        function handler(msg, frame) {
+            onMessageReceived(msg.args);
+        }
+
+        var script = 'import com.canonical.Oxide 0.1 as Oxide; ' +
+                ' Oxide.ScriptMessageHandler { msgId: "UnityWebappApi-Message"; contexts: ["' +
+                this._WEBAPPS_USER_SCRIPT_CONTEXT +
+                '"]; ' +
+                '}';
+        var messageHandler = Qt.createQmlObject(script, this.webview);
+        messageHandler.callback = handler;
+        this.webview.messageHandlers = [ messageHandler ];
+    }
+}
+
+function WebviewAdapterFactory(disposer, makeSignalDisconnecter) {
+    this.disposer = disposer;
+    this.makeSignalDisconnecter = makeSignalDisconnecter;
+};
+WebviewAdapterFactory.prototype = {
+    create: function(webview) {
+        if (! webview)
+            return null
+        if (webview.experimental) {
+            // assume qtwebkit
+            return new QtWebviewAdapter(webview, this.disposer, this.makeSignalDisconnecter);
+        }
+        // assume oxide
+        return new OxideWebviewAdapter(webview, this.disposer, this.makeSignalDisconnecter);
+    }
+};
+
 /**
  * Creates a simple proxy object that bridges
  *  a UnityWebapps component with a given webview.
@@ -66,53 +169,32 @@ function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
             };
         };
 
-        return {
-            injectUserScripts: function(userScriptUrls) {
-                var scripts = webViewId.experimental.userScripts;
-                for (var i = 0; i < userScriptUrls.length; ++i) {
-                    scripts.push(userScriptUrls[i]);
-                }
+        var waf = new WebviewAdapterFactory(disposer, makeSignalDisconnecter);
+        var proxy = waf.create(webViewId);
 
-                webViewId.experimental.userScripts = scripts;
-            },
-            navigateTo: function(url) {
-                webViewId.url = url;
-            },
-            sendToPage: function (message) {
-                webViewId.experimental.postMessage(message);
-            },
-            loadingStartedConnect: function (onLoadingStarted) {
-                function handler(loadRequest) {
-                    // bad bad,...
-                    var LoadStartedStatus = 0;
-                    if (loadRequest.status === LoadStartedStatus) {
-                        onLoadingStarted();
-                    }
-                };
-                webViewId.loadingChanged.connect(handler);
+        // inject common function
 
-                disposer.addDisposer(makeSignalDisconnecter(webViewId.loadingChanged, handler));
-            },
-            messageReceivedConnect: function (onMessageReceived) {
-                function handler(raw) {
-                    onMessageReceived(JSON.parse(raw.data));
-                };
-                webViewId.experimental.messageReceived.connect(handler);
-
-                disposer.addDisposer(makeSignalDisconnecter(webViewId.experimental.messageReceived, handler));
-            },
-            // called from the UnityWebApps side
-            onAppRaised: function () {
-                if (handlers && handlers.onAppRaised)
-                    handlers.onAppRaised();
-            },
-            // called from the UnityWebApps side
-            cleanup: function() {
-                disposer.disposeAndCleanupAll();
-            }
+        proxy.navigateTo = function(url) {
+            webViewId.url = url;
         };
+        // called from the UnityWebApps side
+        proxy.onAppRaised = function () {
+            if (handlers && handlers.onAppRaised)
+                handlers.onAppRaised();
+        };
+        // called from the UnityWebApps side
+        proxy.cleanup = function() {
+            disposer.disposeAndCleanupAll();
+        };
+
+        return proxy;
+
     })(new SignalConnectionDisposer());
 }
+
+// Just to allow a smooth transition w/o breaking all the projects
+// remove qtwebkit name reference
+var makeProxiesForWebViewBindee = makeProxiesForQtWebViewBindee;
 
 
 /**
