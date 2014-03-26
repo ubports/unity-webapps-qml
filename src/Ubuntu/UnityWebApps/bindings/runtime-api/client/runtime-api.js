@@ -190,7 +190,7 @@ function createRuntimeApi(backendBridge) {
 
        var api = external.getUnityObject('1.0');
        api.RuntimeApi.getApplication(function(application) {
-         console.log('Application name: ' + application.name);
+         console.log('Application name: ' + application.getApplicationName());
        });
  */
     return {
