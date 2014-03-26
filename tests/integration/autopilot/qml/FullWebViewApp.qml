@@ -65,8 +65,6 @@ Window {
         experimental.preferences.navigatorQtObjectEnabled: true
         experimental.preferences.developerExtrasEnabled: true
 
-        onLoadingChanged: console.debug('onLoadingChanged: loading changed: ' + loadRequest.url + ', status: ' + loadRequest.status)
-
         function getUnityWebappsProxies() {
             return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
         }
