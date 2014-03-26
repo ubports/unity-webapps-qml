@@ -7,7 +7,7 @@ import Ubuntu.UnityWebApps 0.1
 MainView {
   id: root
   focus: true
-  applicationName: \"application-api\"
+  applicationName: \"runtime-api\"
 
   width: units.gu(100)
   height: units.gu(100)
@@ -15,7 +15,7 @@ MainView {
   WebView {
     id: webview
     anchors.fill: parent
-    url: \"file://$$OUT_PWD/application-api/www/index.html\"
+    url: \"file://$$OUT_PWD/runtime-api/www/index.html\"
 
     experimental.preferences.navigatorQtObjectEnabled: true
     experimental.preferences.developerExtrasEnabled: true

@@ -56,12 +56,12 @@ qml_files.files = $$QML_FILES
 js_files.path = $$installPath
 js_files.files = $$PLUGIN_JS_FILES
 
-application_api_binding_backend_js_files.path = $$installPath/bindings/application-api/backend/
-application_api_binding_backend_js_files.files = ./bindings/application-api/backend/application-api.js
+runtime_api_binding_backend_js_files.path = $$installPath/bindings/runtime-api/backend/
+runtime_api_binding_backend_js_files.files = ./bindings/runtime-api/backend/runtime-api.js
 
 INSTALLS += qmldir_file \
     qml_files \
     js_files \
-    application_api_binding_backend_js_files \
+    runtime_api_binding_backend_js_files \
 
 

@@ -21,7 +21,7 @@ import Ubuntu.UnityWebApps 0.1 as UbuntuUnityWebApps
 import "UnityWebApps.js" as UnityWebAppsJs
 import "UnityWebAppsUtils.js" as UnityWebAppsJsUtils
 import "UnityWebAppsBackendComponents.js" as UnityBackends
-import "./bindings/application-api/backend/application-api.js" as ApplicationApiBackend
+import "./bindings/runtime-api/backend/runtime-api.js" as RuntimeApiBackend
 
 
 /*!
@@ -632,7 +632,7 @@ Item {
 
             ContentHub: UnityBackends.createContentHubApi(UnityBackends.backendDelegate),
 
-            ApplicationApi: ApplicationApiBackend.createApplicationApi(UnityBackends.backendDelegate),
+            RuntimeApi: RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate),
 
             Launcher: {
                 setCount: function (count) {

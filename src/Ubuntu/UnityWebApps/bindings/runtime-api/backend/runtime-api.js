@@ -22,16 +22,50 @@
 
 /**
  *
- * Application API backend binding
+ * Runtime API backend binding
  *
  */
-function createApplicationApi(backendDelegate) {
+function createRuntimeApi(backendDelegate) {
     var PLUGIN_URI = 'Ubuntu.UnityWebApps';
     var VERSION = 0.1;
 
     var applicationApiInstance = UnityWebAppsBridge.ApplicationApi;
 
-    return {
+    function Application() {
+        // no need to have a specific id since this class is mostly a passtrough one
+        this._id = 0;
+    };
+    Application.prototype = {
+
+        // object methods
+        serialize: function() {
+            var self = this;
+            return {
+                type: 'object-proxy',
+                apiid: 'RuntimeApi',
+                objecttype: 'Application',
+                objectid: this._id,
+
+                content: {
+                    name: applicationApiInstance.applicationName,
+                    platform: applicationApiInstance.applicationPlatform,
+                    writableLocation: applicationApiInstance.applicationDataPath,
+                    screenOrientation: applicationApiInstance.screenOrientation,
+                }
+            }
+        },
+
+        getApplicationName: function(callback) {
+            if (callback && typeof(callback) === 'function')
+                callback(applicationApiInstance.applicationName);
+        },
+        onApplicationNameChanged: function(callback) {
+            if (callback && typeof(callback) === 'function')
+                    applicationApiInstance.applicationNameChanged.connect(function() {
+                        callback(applicationApiInstance.applicationName);
+                    });
+        },
+
         getApplicationWritableLocation: function(callback) {
             if (callback && typeof(callback) === 'function')
                 callback(applicationApiInstance.applicationDataPath);
@@ -59,11 +93,6 @@ function createApplicationApi(backendDelegate) {
                     Qt.inputMethod.onVisibleChanged.connect(function() {
                         callback(Qt.inputMethod.visible)
                     });
-        },
-
-        getApplicationName: function(callback) {
-            if (callback && typeof(callback) === 'function')
-                callback(applicationApiInstance.applicationName);
         },
 
         onAboutToQuit: function(callback) {
@@ -103,10 +132,40 @@ function createApplicationApi(backendDelegate) {
             if (callback && typeof(callback) === 'function')
                 applicationApiInstance.applicationScreenOrientationChanged.connect(callback);
         },
+    };
+
+    function _constructorFromName(className) {
+        var constructorPerName = {
+            "Application": Application,
+        };
+        return className in constructorPerName
+                ? constructorPerName[className]
+                : null;
+    }
+
+    return {
+        getApplication: function(callback) {
+            var application = new Application();
+            callback(application.serialize());
+        },
 
         // Internal
 
         dispatchToObject: function(infos) {
+            var args = infos.args;
+            var callback = infos.callback;
+            var method_name = infos.method_name;
+            var objectid = infos.objectid;
+            var class_name = infos.class_name;
+
+            if (callback)
+                args.push(callback);
+
+            var Constructor = _constructorFromName(class_name);
+
+            var instance = new Constructor(objectid);
+
+            instance[method_name].apply(instance, args);
         }
     };
 }
