@@ -11,13 +11,13 @@ window.onload = function() {
     setResult('last killed: ' + last);
 
     var api = external.getUnityObject('1.0');
-    api.ApplicationApi.applicationName(function(name) {
+    api.ApplicationApi.getApplicationName(function(name) {
         setResult('application name: ' + name);
     });
-    api.ApplicationApi.getPlatformInfos(function(name) {
-        setResult(name);
+    api.ApplicationApi.getPlatformInfo(function(info) {
+        setResult(info.name);
     });
-    api.ApplicationApi.getInputMethod(function(name) {
+    api.ApplicationApi.getInputMethodName(function(name) {
         if (name.length == 0)
             setResult('input method: no OSK available');
         else
@@ -36,11 +36,11 @@ window.onload = function() {
 
         setResult('onAboutToQuit: ' + killed);
     });
-    api.ApplicationApi.onDeactivated(function(name) {
-        setResult('onDeactivated: ' + name);
+    api.ApplicationApi.onDeactivated(function() {
+        setResult('Application deactivated');
     });
-    api.ApplicationApi.onActivated(function(name) {
-        setResult('onActivated: ' + name);
+    api.ApplicationApi.onActivated(function() {
+        setResult('Application activated');
     });
     api.ApplicationApi.onInputMethodVisibilityChanged(function(visibility) {
         setResult('onInputMethodVisibilityChanged: ' + visibility);

@@ -21,10 +21,13 @@ PRE_TARGETDEPS += \
 #
 # deployment directives
 #
-JS_FILES = $$system(ls *.js) \
-    $${UNITY_API_JS_FILE} \
+PLUGIN_JS_FILES = \
+    $$system(ls *.js) \
+    $${UNITY_API_JS_FILE}
+
+CLIENT_JS_FILES = \
     $$system(ls ./common/*/*.js) \
-    $$system(ls ./bindings/*/*/*.js)
+    $$system(ls ./bindings/*/client/*.js)
 
 QML_FILES = $$system(ls *.qml)
 
@@ -32,7 +35,9 @@ QMLDIR_FILE = qmldir
 QMAKE_SUBSTITUTES += qmldir.in
 
 OTHER_FILES += $$QML_FILES \
-    $$JS_FILES \
+    $$PLUGIN_JS_FILES \
+    $$CLIENT_JS_FILES \
+    $$system(ls ./bindings/*/backend/*.js) \
     qmldir.in \
     unity-webapps-api.js.in \
     $${UNITY_API_JS_FILE}
@@ -44,9 +49,19 @@ installPath = $$[QT_INSTALL_QML]/$$replace(API_URI, \\., /)
 
 qmldir_file.path = $$installPath
 qmldir_file.files = $$QMLDIR_FILE
+
 qml_files.path = $$installPath
 qml_files.files = $$QML_FILES
-js_files.path = $$installPath
-js_files.files = $$JS_FILES
 
-INSTALLS += qmldir_file qml_files js_files
+js_files.path = $$installPath
+js_files.files = $$PLUGIN_JS_FILES
+
+application_api_binding_backend_js_files.path = $$installPath/bindings/application-api/backend/
+application_api_binding_backend_js_files.files = ./bindings/application-api/backend/application-api.js
+
+INSTALLS += qmldir_file \
+    qml_files \
+    js_files \
+    application_api_binding_backend_js_files \
+
+

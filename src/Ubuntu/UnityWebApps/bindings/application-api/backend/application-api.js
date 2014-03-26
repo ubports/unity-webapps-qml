@@ -37,9 +37,12 @@ function createApplicationApi(backendDelegate) {
                 callback(applicationApiInstance.applicationDataPath);
         },
 
-        getPlatformInfos: function(callback) {
-            if (callback && typeof(callback) === 'function')
-                callback(applicationApiInstance.applicationPlatform);
+        getPlatformInfo: function(callback) {
+            if (callback && typeof(callback) === 'function') {
+                var info = {};
+                info.name = applicationApiInstance.applicationPlatform;
+                callback(info);
+            }
         },
 
         setInputMethodVisible: function(visible, callback) {
@@ -47,9 +50,9 @@ function createApplicationApi(backendDelegate) {
             if (callback && typeof(callback) === 'function')
                 callback();
         },
-        getInputMethod: function(callback) {
+        getInputMethodName: function(callback) {
             if (callback && typeof(callback) === 'function')
-                callback(applicationApiInstance.getInputMethod());
+                callback(applicationApiInstance.getInputMethodName());
         },
         onInputMethodVisibilityChanged: function(callback) {
             if (callback && typeof(callback) === 'function')
@@ -58,7 +61,7 @@ function createApplicationApi(backendDelegate) {
                     });
         },
 
-        applicationName: function(callback) {
+        getApplicationName: function(callback) {
             if (callback && typeof(callback) === 'function')
                 callback(applicationApiInstance.applicationName);
         },

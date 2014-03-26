@@ -38,12 +38,16 @@ nameFromScreenOrientation (Qt::ScreenOrientation orientation)
     switch (orientation)
     {
     case Qt::InvertedLandscapeOrientation:
+        return QString("InvertedLandscape");
+
     case Qt::LandscapeOrientation:
         return QString("Landscape");
 
     case Qt::PortraitOrientation:
-    case Qt::InvertedPortraitOrientation:
         return QString("Portrait");
+
+    case Qt::InvertedPortraitOrientation:
+        return QString("InvertedPortrait");
 
     case Qt::PrimaryOrientation:
         return QString("Primary");
@@ -197,7 +201,7 @@ ApplicationApi::~ApplicationApi()
     delete d_ptr;
 }
 
-QString ApplicationApi::applicationName() const
+QString ApplicationApi::getApplicationName() const
 {
     if ( ! qgetenv("APP_ID").isEmpty())
         return qgetenv("APP_ID");
@@ -225,7 +229,7 @@ QString ApplicationApi::getApplicationScreenOrientation() const
     return nameFromScreenOrientation(screen->primaryOrientation());
 }
 
-QString ApplicationApi::getInputMethod() const
+QString ApplicationApi::getInputMethodName() const
 {
     return QString(getenv("QT_IM_MODULE"));
 }

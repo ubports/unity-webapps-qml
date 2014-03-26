@@ -33,7 +33,7 @@ function createApplicationApi(backendBridge) {
  * @example
 
        var api = external.getUnityObject('1.0');
-       api.ApplicationApi.applicationName(function(name) {
+       api.ApplicationApi.getApplicationName(function(name) {
          console.log('Application name: ' + name);
        });
  */
@@ -45,7 +45,11 @@ function createApplicationApi(backendBridge) {
 
                Landscape: The application screen is in landscape mode
 
+               InvertedLandscape: The application screen is in inverted landscape mode
+
                Portrait: The application screen is in portrait mode
+
+               InvertedPortrait: The application screen is in inverted portrait mode
 
                Unknown: The application screen is in an unknown mode
 
@@ -61,7 +65,11 @@ function createApplicationApi(backendBridge) {
         ScreenOrientation: {
             Landscape: "Landscape",
 
+            InvertedLandscape: "InvertedLandscape",
+
             Portrait: "Portrait",
+
+            InvertedPortrait: "InvertedPortrait",
 
             Unknwon: "Unknown",
         },
@@ -84,8 +92,8 @@ function createApplicationApi(backendBridge) {
          * @method applicationName
          * @param callback {Function(String)} Function called with the application name.
          */
-        applicationName: function(callback) {
-            backendBridge.call('ApplicationApi.applicationName'
+        getApplicationName: function(callback) {
+            backendBridge.call('ApplicationApi.getApplicationName'
                                , []
                                , callback);
         },
@@ -94,10 +102,11 @@ function createApplicationApi(backendBridge) {
          * Retrieves current platform information.
          *
          * @method getPlatformInfos
-         * @param callback {Function(Object)} Function called with the platform information name.
+         * @param callback {Function(Object)} Function called with the platform information as a dictionary with the following keys:
+         *  - name: the platform name
          */
-        getPlatformInfos: function(callback) {
-            backendBridge.call('ApplicationApi.getPlatformInfos'
+        getPlatformInfo: function(callback) {
+            backendBridge.call('ApplicationApi.getPlatformInfo'
                                , []
                                , callback);
         },
@@ -170,13 +179,15 @@ function createApplicationApi(backendBridge) {
         },
 
         /**
-         * Retrieves the current input method.
+         * Retrieves the current input method's name. The name varies depending on the platform
+         * e.g. maliit can be part of the name for a maliit based Virtual Keyboard (possibly mangled
+         * with e.g. 'phablet'), when a keyboard is there the name can be empty, ...
          *
-         * @method getScreenOrientation
-         * @param callback {Function(String)} Function to be called with the current input method
+         * @method getInputMethodName
+         * @param callback {Function(String)} Function to be called with the current input method name
          */
-        getInputMethod: function(callback) {
-            backendBridge.call('ApplicationApi.getInputMethod'
+        getInputMethodName: function(callback) {
+            backendBridge.call('ApplicationApi.getInputMethodName'
                                , []
                                , callback);
         },

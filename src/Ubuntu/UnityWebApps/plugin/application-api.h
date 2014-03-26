@@ -26,7 +26,7 @@ class ApplicationApiPrivate;
 class ApplicationApi : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString applicationName READ applicationName NOTIFY applicationNameChanged)
+    Q_PROPERTY(QString applicationName READ getApplicationName NOTIFY applicationNameChanged)
     Q_PROPERTY(QString screenOrientation READ getApplicationScreenOrientation NOTIFY applicationScreenOrientationChanged)
     Q_PROPERTY(QString applicationDataPath READ getApplicationDataPath)
     Q_PROPERTY(QString applicationPlatform READ getApplicationPlatform)
@@ -36,7 +36,7 @@ public:
     explicit ApplicationApi(QObject *parent = 0);
     ~ApplicationApi();
 
-    QString applicationName() const;
+    QString getApplicationName() const;
 
     QString getApplicationDataPath() const;
 
@@ -44,7 +44,7 @@ public:
 
     QString getApplicationScreenOrientation() const;
 
-    Q_INVOKABLE QString getInputMethod() const;
+    Q_INVOKABLE QString getInputMethodName() const;
     Q_INVOKABLE void setInputMethodVisible(bool);
 
 
