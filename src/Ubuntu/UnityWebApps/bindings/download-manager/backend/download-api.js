@@ -64,9 +64,9 @@ function createDownloadApi(backendDelegate) {
             this._validate();
             this._object.resume();
         },
-        download: function() {
+        download: function(url) {
             this._validate();
-            this._object.download();
+            this._object.download(url);
         },
 
 
@@ -100,8 +100,9 @@ function createDownloadApi(backendDelegate) {
         isCompletedChanged: function(callback) {
             this._validate();
             if (callback && typeof(callback) === 'function') {
+                var self = this;
                 this._object.isCompletedChanged.connect(function() {
-                    callback(this._object.isCompleted);
+                    callback(self._object.isCompleted);
                 });
             }
         },
@@ -113,8 +114,9 @@ function createDownloadApi(backendDelegate) {
         downloadInProgressChanged: function(callback) {
             this._validate();
             if (callback && typeof(callback) === 'function') {
+                var self = this;
                 this._object.downloadInProgressChanged.connect(function() {
-                    callback(this._object.downloadInProgress);
+                    callback(self._object.downloadInProgress);
                 });
             }
         },
@@ -126,8 +128,9 @@ function createDownloadApi(backendDelegate) {
         progressChanged: function(callback) {
             this._validate();
             if (callback && typeof(callback) === 'function') {
+                var self = this;
                 this._object.progressChanged.connect(function() {
-                    callback(this._object.progress);
+                    callback(self._object.progress);
                 });
             }
         },
@@ -139,8 +142,9 @@ function createDownloadApi(backendDelegate) {
         downloadingChanged: function(callback) {
             this._validate();
             if (callback && typeof(callback) === 'function') {
+                var self = this;
                 this._object.downloadingChanged.connect(function() {
-                    callback(this._object.downloading);
+                    callback(self._object.downloading);
                 });
             }
         },
@@ -152,8 +156,9 @@ function createDownloadApi(backendDelegate) {
         errorChanged: function(callback) {
             this._validate();
             if (callback && typeof(callback) === 'function') {
+                var self = this;
                 this._object.errorChanged.connect(function() {
-                    callback(this._object.errorMessage);
+                    callback(self._object.errorMessage);
                 });
             }
         },
@@ -188,6 +193,112 @@ function createDownloadApi(backendDelegate) {
         }
     };
 
+    function DownloadManager(downloadManager, objectid) {
+        var id = objectid;
+        if ( ! downloadManager) {
+            var result = backendDelegate.createQmlObject(
+                        PLUGIN_URI, VERSION, 'DownloadManager');
+            id = result.id;
+            downloadManager = result.object;
+        }
+        if ( ! id) {
+            id = backendDelegate.storeQmlObject(downloadManager,
+                    PLUGIN_URI, VERSION, 'DownloadManager');
+        }
+
+        this._id = id;
+        this._object = downloadManager;
+    };
+    DownloadManager.prototype = {
+        _validate: function() {
+            if (! this._object)
+                throw new TypeError("Invalid object null");
+        },
+
+        destroy: function() {
+            if (! this._object)
+                return;
+            this._object.destroy();
+            backendDelegate.deleteId(this._id);
+        },
+
+        // object methods
+        serialize: function() {
+            return {
+                type: 'object-proxy',
+                apiid: 'DownloadApi',
+                objecttype: 'DownloadManager',
+                objectid: this._id,
+            }
+        },
+
+        // methods
+        download: function(url) {
+            this._validate();
+            this._object.download(url);
+        },
+
+        // properties
+        autoStart: function(callback) {
+            this._validate();
+            callback(this._object.autoStart);
+        },
+        setAutoStart: function(shouldAutoStart, callback) {
+            this._validate();
+            this._object.autoStart = shouldAutoStart;
+            if (callback && typeof(callback) === 'function')
+                callback();
+        },
+
+        cleanDownloads: function(callback) {
+            this._validate();
+            callback(this._object.cleanDownloads);
+        },
+        setCleanDownloads: function(clean, callback) {
+            this._validate();
+            this._object.cleanDownloads = clean;
+            if (callback && typeof(callback) === 'function')
+                callback();
+        },
+
+        errorMessage: function(callback) {
+            this._validate();
+            callback(this._object.errorMessage);
+        },
+        errorChanged: function(callback) {
+            this._validate();
+            if (callback && typeof(callback) === 'function') {
+                var self = this;
+                this._object.errorChanged.connect(function() {
+                    callback(self._object.errorMessage);
+                });
+            }
+        },
+
+        downloads: function(callback) {
+            this._validate();
+            if (callback && typeof(callback) === 'function') {
+                var downloadCount = this._object.downloads.length;
+                var downloads = [];
+                for (var i = 0; i < downloadCount; ++i) {
+                    var download =
+                        new SingleDownload(this._object.downloads[i]);
+                    downloads.push(download.serialize());
+                }
+                callback(downloads);
+            }
+        },
+        downloadsChanged: function(callback) {
+            this._validate();
+            if (callback && typeof(callback) === 'function') {
+                var self = this;
+                this._object.downloadsChanged.connect(function() {
+                    self.downloads(callback);
+                });
+            }
+        },
+    };
+
     function _constructorFromName(className) {
         var constructorPerName = {
             "SingleDownload": SingleDownload,
@@ -199,16 +310,34 @@ function createDownloadApi(backendDelegate) {
     }
 
     return {
+        createDownloadManager: function(options, callback) {
+            if (! callback || typeof callback !== 'function')
+                return;
+
+            var autoStart =
+                    options && options.autoStart === undefined
+                        ? false : options.autoStart;
+            var cleanDownloads =
+                    options && options.cleanDownloads === undefined
+                        ? false : options.cleanDownloads;
+
+            var manager = new DownloadManager();
+            manager.setAutoStart(autoStart);
+            manager.setCleanDownloads(cleanDownloads);
+
+            callback(manager.serialize());
+        },
+
         downloadFile: function(url, options, onCompleted, onProgress, onError) {
             var download = new SingleDownload();
 
             var allowMobileDownload =
-                    options && options.allowMobileDownload === undefined ? true : options.allowMobileDownload;
+                    options && options.allowMobileDownload === undefined ? false : options.allowMobileDownload;
             var throttle =
-                    options && options.throttle;
+                    options && options.throttle ? options.throttle : undefined;
 
-            download.setAutoStart(true);
-            download.setAllowMobileDownload(allowMobileDownload);
+            if (allowMobileDownload === true)
+                download.setAllowMobileDownload(allowMobileDownload);
 
             if (throttle !== undefined)
                 download.setThrottle(throttle);
@@ -222,15 +351,16 @@ function createDownloadApi(backendDelegate) {
             }
 
             if (onCompleted && typeof onCompleted === 'function') {
-                download.finished.connect(function(path) {
-                    onCompleted({status: "Success", path: path})
+                download.finished(function(path) {
+                    onCompleted({status: "Success", path: path, download: download.serialize()})
                 });
-                download.canceled.connect(function(success) {
-                    onCompleted({status: "Cancelled"})
+                download.canceled(function(success) {
+                    onCompleted({status: "Cancelled", download: download.serialize()})
                 });
             }
 
-            download.setUrl(url);
+            download.setAutoStart(true);
+            download.download(url);
         },
 
 
