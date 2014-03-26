@@ -44,9 +44,18 @@ installPath = $$[QT_INSTALL_QML]/$$replace(API_URI, \\., /)
 
 qmldir_file.path = $$installPath
 qmldir_file.files = $$QMLDIR_FILE
+
 qml_files.path = $$installPath
 qml_files.files = $$QML_FILES
+
 js_files.path = $$installPath
 js_files.files = $$JS_FILES
 
-INSTALLS += qmldir_file qml_files js_files
+download_api_binding_backend_js_files.path = $$installPath/bindings/download-manager/backend/
+download_api_binding_backend_js_files.files = ./bindings/download-manager/backend/download-api.js
+
+INSTALLS += qmldir_file \
+    qml_files \
+    js_files \
+    download_api_binding_backend_js_files
+
