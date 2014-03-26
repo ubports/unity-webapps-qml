@@ -25,6 +25,8 @@
 #include <QSignalSpy>
 #include <QJsonDocument>
 #include <QVariantMap>
+#include <QProcess>
+#include <QProcessEnvironment>
 
 #include "plugin/unity-webapps-api.h"
 #include "plugin/abstract-item-model-adaptor.h"
@@ -170,6 +172,23 @@ void PluginTest::testAbstractItemModelAdaptor()
 
     delete adaptor;
     delete model;
+}
+
+void PluginTest::testApplicationSignalHandler()
+{
+    QProcess testApp;
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+
+    env.insert("APP_ID", "application-api");
+
+    testApp.setProcessEnvironment(env);
+    testApp.start("qmlscene -I ../../../src ../../../examples/api-bindings/application-api/main.qml");
+    testApp.waitForStarted();
+
+    testApp.terminate();
+    testApp.waitForFinished();
+
+    QVERIFY(true);
 }
 
 #include "tst_plugin.moc"
