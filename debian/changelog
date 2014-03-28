@@ -1,3 +1,11 @@
+unity-webapps-qml (0.1+14.04.20140328.1-0ubuntu1) trusty; urgency=low
+
+  [ Alexandre Abreu ]
+  * Fixes to the runtime-api: have inputMethodName return its value,.
+    have the client register listeners for property changed, .
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 28 Mar 2014 16:27:28 +0000
+
 unity-webapps-qml (0.1+14.04.20140328-0ubuntu1) trusty; urgency=low
 
   [ Ubuntu daily release ]
