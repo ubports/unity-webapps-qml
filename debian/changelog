@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+14.04.20140328-0ubuntu1) trusty; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Add application api (LP: #1278485)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 28 Mar 2014 10:13:38 +0000
+
 unity-webapps-qml (0.1+14.04.20140325-0ubuntu1) trusty; urgency=low
 
   [ Alexandre Abreu ]
