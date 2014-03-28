@@ -16,12 +16,11 @@ window.onload = function() {
         setResult('application name: ' + application.getApplicationName());
         setResult('application info: ' + JSON.stringify(application.getPlatformInfo()));
 
-        application.getInputMethodName(function(name) {
-            if (name.length == 0)
-                setResult('input method: no OSK available');
-            else
-                setResult('input method: ' + name);
-        });
+        var inputMethodName = application.getInputMethodName();
+        if (inputMethodName.length === 0)
+            setResult('input method: no OSK available');
+        else
+            setResult('input method: ' + inputMethodName);
 
         setResult('screen orientation: ' + application.getScreenOrientation());
 

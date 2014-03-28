@@ -51,6 +51,7 @@ function createRuntimeApi(backendDelegate) {
                     platform: applicationApiInstance.applicationPlatform,
                     writableLocation: applicationApiInstance.applicationDataPath,
                     screenOrientation: applicationApiInstance.screenOrientation,
+                    inputMethodName: applicationApiInstance.getInputMethodName(),
                 }
             }
         },

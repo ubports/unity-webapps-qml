@@ -33,8 +33,22 @@ function createRuntimeApi(backendBridge) {
         this._platform = content.platform;
         this._writableLocation = content.writableLocation;
         this._screenOrientation = content.screenOrientation;
+        this._inputMethodName = content.inputMethodName;
+
+        this._setupPropertyListeners();
     };
     Application.prototype = {
+
+        /**
+         * Internal
+         */
+        _setupPropertyListeners: function() {
+            var self = this;
+            this._proxy.call('onApplicationNameChanged'
+                               , [function(name) {self._name = name;}]);
+            this._proxy.call('onScreenOrientationChanged'
+                               , [function(orientation) {self._screenOrientation = orientation;}]);
+        },
 
         /**
          * Retrieves the application name.
@@ -55,7 +69,7 @@ function createRuntimeApi(backendBridge) {
         onApplicationNameChanged: function(callback) {
             var self = this;
             this._proxy.call('onApplicationNameChanged'
-                               , [function(name) {self._name = name; callback(name); }]);
+                               , [callback]);
         },
 
         /**
@@ -131,7 +145,7 @@ function createRuntimeApi(backendBridge) {
         onScreenOrientationChanged: function(callback) {
             var self = this;
             this._proxy.call('onScreenOrientationChanged'
-                               , [function(orientation) {self._screenOrientation = orientation; callback(orientation); }]);
+                               , [callback]);
         },
 
         /**
@@ -151,12 +165,10 @@ function createRuntimeApi(backendBridge) {
          * with e.g. 'phablet'), when a keyboard is there the name can be empty, ...
          *
          * @method getInputMethodName
-         * @param callback {Function(String)} Function to be called with the current input method name
+         * @return {String} current input method name
          */
-        getInputMethodName: function(callback) {
-            this._proxy.call('getInputMethodName'
-                               , []
-                               , callback);
+        getInputMethodName: function() {
+            return this._inputMethodName;
         },
 
         /**

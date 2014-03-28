@@ -1,11 +1,10 @@
 function createMessagingProxyForCurrentWebRuntime() {
     if (navigator &&
             navigator.qt &&
-            navigator.qt.postMessage &&
-            navigator.qt.onmessage) {
+            navigator.qt.postMessage) {
         return new UnityQtWebkitBackendMessagingProxy();
     }
-    else if (oxide) {
+    else if (window.oxide) {
         return new UnityOxideBackendMessagingProxy();
     }
     return null;
