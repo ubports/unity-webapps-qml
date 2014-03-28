@@ -35,6 +35,7 @@ private Q_SLOTS:
     void testLoadPlugin();
     void testInit();
     void testAbstractItemModelAdaptor();
+    void testApplicationSignalHandler();
 };
 
 #endif // TST_PLUGIN_H
