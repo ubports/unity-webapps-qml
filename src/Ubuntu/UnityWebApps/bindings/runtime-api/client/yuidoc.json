@@ -1,0 +1,9 @@
+{
+    "name": "Runtime JS API",
+    "description": "Ubuntu App Platform Runtime JavaScript API docs",
+    "version": "0.1",
+    "options": {
+        "outdir": "./docsbuild",
+        "themedir": "../../yuidoc-theme"
+    }
+}
