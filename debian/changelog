@@ -1,3 +1,19 @@
+unity-webapps-qml (0.1+14.04.20140401.1-0ubuntu1) trusty; urgency=low
+
+  [ Alexandre Abreu ]
+  * Add some missing files striclty for doc generation for the runtime-
+    api
+  * There is currently an issue on Ubuntu Desktop with webapps running
+    in the container and bamf/unity that when a local desktop file
+    exists (and a webapp icon has been pinned to the launcher through
+    its global /usr/share desktop file), the webapp icons are duplicated
+    in the launcher. Various fixes have been made to mitigate the issue
+    in bamf but it seems to still be around. This is voluntarily
+    discarded for now and left around to get to the bottom of the issue
+    in a timely fashion. (LP: #1300864)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 01 Apr 2014 18:28:51 +0000
+
 unity-webapps-qml (0.1+14.04.20140328.1-0ubuntu1) trusty; urgency=low
 
   [ Alexandre Abreu ]
