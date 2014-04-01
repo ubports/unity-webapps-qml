@@ -1,6 +1,6 @@
 #/bin/bash
 set -e
-for api in alarm-api content-hub online-accounts ; do
+for api in alarm-api content-hub online-accounts runtime-api ; do
     echo $api
     cd $api/client
     mv ../../yuidoc-theme/partials/index.handlebars index.handlebars.orig
