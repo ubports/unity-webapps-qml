@@ -521,6 +521,17 @@ QString UnityWebapps::getDesktopFileContent()
 
 void UnityWebapps::updateDesktopFileContent ()
 {
+    // There is currently an issue on Ubuntu Desktop with webapps
+    // running in the container and bamf/unity that when
+    // a local desktop file exists (and a webapp icon has been pinned
+    // to the launcher through its global /usr/share desktop file),
+    // the webapp icons are duplicated in the launcher.
+    // Various fixes have been made to mitigate the issue in bamf
+    // but it seems to still be around.
+
+    // This is voluntarily discarded for now and left around to get
+    // to the bottom of the issue in a timely fashion.
+#if 0
     // we bail out earlier (until we can do it w/ a builtin func) when
     // in a confined environment.
     if (isConfined ())
@@ -546,6 +557,7 @@ void UnityWebapps::updateDesktopFileContent ()
 
     f.write(getDesktopFileContent().toUtf8());
     f.close();
+#endif
 }
 
 void UnityWebapps::ensureLocalApplicationsPathExists()
