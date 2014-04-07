@@ -69,7 +69,7 @@ OxideWebviewAdapter.prototype = {
         var context = this.webview.context;
 
         for (var i = 0; i < userScriptUrls.length; ++i) {
-            var scriptStart = "import com.canonical.Oxide 0.1 as Oxide; Oxide.UserScript { context:";
+            var scriptStart = "import com.canonical.Oxide 1.0 as Oxide; Oxide.UserScript { context:";
             var scriptEnd = "}";
             var statement = scriptStart +
                     '"' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"' +
@@ -96,7 +96,7 @@ OxideWebviewAdapter.prototype = {
             onMessageReceived(msg.args);
         }
 
-        var script = 'import com.canonical.Oxide 0.1 as Oxide; ' +
+        var script = 'import com.canonical.Oxide 1.0 as Oxide; ' +
                 ' Oxide.ScriptMessageHandler { msgId: "UnityWebappApi-Message"; contexts: ["' +
                 this._WEBAPPS_USER_SCRIPT_CONTEXT +
                 '"]; ' +
