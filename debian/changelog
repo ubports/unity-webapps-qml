@@ -1,3 +1,10 @@
+unity-webapps-qml (0.1+14.04.20140407-0ubuntu1) trusty; urgency=low
+
+  [ Alexandre Abreu ]
+  * Update the oxide bits to account for oxide moving to 1.0
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 07 Apr 2014 10:10:46 +0000
+
 unity-webapps-qml (0.1+14.04.20140401.1-0ubuntu1) trusty; urgency=low
 
   [ Alexandre Abreu ]
