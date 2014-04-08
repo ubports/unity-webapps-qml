@@ -1,3 +1,11 @@
+unity-webapps-qml (0.1+14.04.20140408-0ubuntu1) trusty; urgency=low
+
+  [ Timo Jyrinki ]
+  * Depend on liboxideqtcore0 to limit archs to be built to the set for
+    which webapps-qml is installable for.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 08 Apr 2014 07:31:32 +0000
+
 unity-webapps-qml (0.1+14.04.20140407-0ubuntu1) trusty; urgency=low
 
   [ Alexandre Abreu ]
