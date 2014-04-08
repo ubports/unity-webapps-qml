@@ -6,6 +6,8 @@ Build-Depends: debhelper (>= 9),
                gdb,
                libmessaging-menu-dev,
                libnotify-dev,
+# depend on oxide so that we don't build for archs that we can't install on
+               liboxideqtcore0,
                libqt5webkit5-dev,
                libunity-action-qt1-dev,
                libunity-dev,
