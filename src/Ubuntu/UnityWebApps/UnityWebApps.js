@@ -36,11 +36,11 @@ var UnityWebApps = (function () {
      * \param backends
      * \param userscriptContent
      */
-    function _UnityWebApps(parentItem, bindeeProxies, backends, userscripts) {
+    function _UnityWebApps(parentItem, bindeeProxies) {
         this._injected_unity_api_path = Qt.resolvedUrl('unity-webapps-api.js');
         this._bindeeProxies = bindeeProxies;
-        this._backends = backends;
-        this._userscripts = userscripts || [];
+        this._backends = null;
+        this._userscripts = [];
 
         this._bind();
     };
@@ -54,6 +54,14 @@ var UnityWebApps = (function () {
 
         proxies: function() {
             return this._bindeeProxies;
+        },
+
+        setUserScriptsToInject: function(userscripts) {
+            this._userscripts = userscripts;
+        },
+
+        setBackends: function(backends) {
+            this._backends = backends;
         },
 
         /**
@@ -168,6 +176,9 @@ var UnityWebApps = (function () {
          *
          */
         _dispatchApiCall: function (name, args) {
+            if ( ! this._backends)
+                return;
+
             var names = name.split('.');
             var reducetarget = this._backends;
             try {
