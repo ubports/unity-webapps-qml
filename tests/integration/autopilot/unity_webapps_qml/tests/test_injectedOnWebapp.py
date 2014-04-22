@@ -30,46 +30,46 @@ class UnityWebappsApiInjectedTestCaseBase(UnityWebappsTestCaseBase):
         self.launch_with_html_filepath(self.get_html_test_file())
 
     def test_getUnityObjectFound(self):
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject(1.0) != null;'), Eventually(NotEquals(None)))
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject("1.0") != null'), Eventually(Equals(True)))
 
     def test_actionsApiFound(self):
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject(1.0) != null;'), Eventually(NotEquals(None)))
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject("1.0") != null;'), Eventually(Equals(True)))
 
         expression = """
-            var unity = window.external.getUnityObject(1.0);
-            return unity.addAction != null && unity.clearAction && unity.clearActions != null;
+            var unity = window.external.getUnityObject("1.0");
+            return unity.addAction != null && unity.clearActions != null && unity.clearAction != null;
         """
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(NotEquals(None)))
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(Equals(True)))
 
     def test_notificationApiFound(self):
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject(1.0) != null;'), Eventually(NotEquals(None)))
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject("1.0") != null;'), Eventually(Equals(True)))
 
         expression = """
-            var unity = window.external.getUnityObject(1.0);
+            var unity = window.external.getUnityObject("1.0");
             return unity.Notification != null && unity.Notification.showNotification != null;
         """
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(NotEquals(None)))
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(Equals(True)))
 
     def test_messagingIndicatorApiFound(self):
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject(1.0) != null;'), Eventually(NotEquals(None)))
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject("1.0") != null;'), Eventually(Equals(True)))
 
         expression = """
-            var unity = window.external.getUnityObject(1.0);
+            var unity = window.external.getUnityObject("1.0");
             return unity.MessagingIndicator != null &&
                 unity.MessagingIndicator.addAction != null &&
                 unity.MessagingIndicator.clearIndicator != null &&
                 unity.MessagingIndicator.clearIndicators != null &&
                 unity.MessagingIndicator.showIndicator != null;
         """
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(NotEquals(None)))
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(Equals(True)))
 
     def test_ubuntuReadyEventSent(self):
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject(1.0) != null;'), Eventually(NotEquals(None)))
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject("1.0") != null;'), Eventually(Equals(True)))
 
         expression = """
             var api_ready_count = window.localStorage['ubuntu-webapps-api-ready-key'];
             return api_ready_count != null && api_ready_count > 0;
         """
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(NotEquals(None)))
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe(expression), Eventually(Equals(True)))
 
 

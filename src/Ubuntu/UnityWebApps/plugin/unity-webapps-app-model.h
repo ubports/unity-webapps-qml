@@ -57,7 +57,8 @@ public:
         Homepage,
         Scripts,
         ScriptsContent,
-        Chrome
+        Chrome,
+        UserAgentOverride
     };
 
     // QAbstractListModel implementation
@@ -100,6 +101,13 @@ public:
      * \brief
      */
     Q_INVOKABLE QStringList getChromeOptionsFor(const QString & webappName) const;
+
+
+    /*!
+     * \brief
+     */
+    Q_INVOKABLE QString userAgentOverrideFor(const QString & webappName) const;
+
 
     /*!
      * \brief

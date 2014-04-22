@@ -154,6 +154,8 @@ UnityWebappsAppModel::roleNames() const
         roles[Urls] = "urls";
         roles[ScriptsContent] = "content";
         roles[Scripts] = "scripts";
+        roles[Chrome] = "chrome";
+        roles[UserAgentOverride] = "useragent";
       }
     return roles;
 }
@@ -299,6 +301,22 @@ UnityWebappsAppModel::loadUserScript(const QDir& userscriptPath,
     READ_USER_SCRIPT(scripts,userscriptPath.absolutePath());
 
     return script;
+}
+
+QString
+UnityWebappsAppModel::userAgentOverrideFor(const QString & webappName) const
+{
+    if (!exists(webappName))
+        return QString();
+
+    int idx = getWebappIndex(webappName);
+    if (Q_UNLIKELY(idx == -1))
+    {
+        qDebug() << "Invalid index for a supposedly existing webapp: " << webappName;
+        return QString();
+    }
+
+    return data(idx, UserAgentOverride).toString();
 }
 
 QStringList
@@ -488,8 +506,12 @@ QVariant UnityWebappsAppModel::data(int row, int role) const
             }
             return scripts;
         }
+
     case ScriptsContent:
         return webapp.data.content;
+
+    case UserAgentOverride:
+        return webapp.data.manifest.userAgentOverride;
     }
 
     return QVariant();
