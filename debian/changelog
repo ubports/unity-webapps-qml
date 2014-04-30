@@ -1,3 +1,10 @@
+unity-webapps-qml (0.1+14.04.20140408-0ubuntu2) utopic; urgency=medium
+
+  * debian/control: alternatively depend on the OpenGLES version of
+    qtdeclarative5-ubuntu-ui-toolkit-plugin
+
+ -- Ricardo Salveti de Araujo <ricardo.salveti@canonical.com>  Tue, 29 Apr 2014 18:10:05 -0700
+
 unity-webapps-qml (0.1+14.04.20140408-0ubuntu1) trusty; urgency=low
 
   [ Timo Jyrinki ]
