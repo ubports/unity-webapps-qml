@@ -40,7 +40,7 @@ class UnityWebappsHudTestCase(UnityWebappsTestCaseBase):
         self.unity.hud.ensure_visible()
         self.addCleanup(self.unity.hud.ensure_hidden)
 
-        self.keyboard.type("This is an action")
+        self.keyboard.type("Hello")
         self.keyboard.press_and_release("Enter")
 
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('content').style.display;"), Eventually(Equals('none')))
@@ -48,7 +48,7 @@ class UnityWebappsHudTestCase(UnityWebappsTestCaseBase):
     def test_clearAction(self):
         self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('actionadded')))
         expr = """
-           var e = new CustomEvent ("unity-webapps-do-call", {"detail": JSON.stringify({"name": 'clearAction', 'args': ['This is an action']})});
+           var e = new CustomEvent ("unity-webapps-do-call", {"detail": JSON.stringify({"name": 'clearAction', 'args': ['Hello']})});
            document.dispatchEvent (e);
            return true;
         """
@@ -57,9 +57,8 @@ class UnityWebappsHudTestCase(UnityWebappsTestCaseBase):
         self.unity.hud.ensure_visible()
         self.addCleanup(self.unity.hud.ensure_hidden)
 
-        self.keyboard.type("This is an action")
+        self.keyboard.type("Hello")
         self.keyboard.press_and_release("Enter")
-
         self.assertThat(self.eval_expression_in_page_unsafe("return document.getElementById('content').style.display;"), NotEquals('none'))
 
     def test_clearActions(self):
@@ -72,7 +71,7 @@ class UnityWebappsHudTestCase(UnityWebappsTestCaseBase):
 
         self.eval_expression_in_page_unsafe(expr)
 
-        actions = ['This is an action', 'Another action']
+        actions = ['Hello', 'Another action']
         for action in actions:
             self.unity.hud.ensure_visible()
             self.addCleanup(self.unity.hud.ensure_hidden)

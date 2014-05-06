@@ -47,11 +47,10 @@ TestCase {
     function createWebAppsDispatcherWithSimpleBackend(mockedwebview) {
         var simple_backend = {This: { Is: { A: {Backend: function (args) { mockedWebView.called(args) } } } } };
 
-        var bindeeProxies = UnityWebAppsUtils.makeProxiesForQtWebViewBindee(mockedwebview);
-        return new UnityWebAppsJs.UnityWebApps(null,
-                                               bindeeProxies,
-                                               simple_backend,
-                                               []);
+        var bindeeProxies = UnityWebAppsUtils.makeProxiesForWebViewBindee(mockedwebview);
+        var bridge = new UnityWebAppsJs.UnityWebApps(null, bindeeProxies);
+        bridge.setBackends(simple_backend);
+        return bridge;
     }
 
     function test_cleanupOnce() {

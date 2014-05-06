@@ -4,6 +4,23 @@
 <title>Unity Webapps QML test</title>
 
 <script>
+
+var unity;
+function onInit() {
+  document.getElementById('content').innerHTML = 'initialized';
+}
+
+var UBUNTU_WEBAPPS_API_READY_KEY = 'ubuntu-webapps-api-ready-key';
+document.addEventListener('ubuntu-webapps-api-ready', function () {
+  if ( ! window.localStorage[UBUNTU_WEBAPPS_API_READY_KEY]) {
+    window.localStorage[UBUNTU_WEBAPPS_API_READY_KEY] = 0;
+  }
+  window.localStorage[UBUNTU_WEBAPPS_API_READY_KEY] ++;
+
+  unity = window.external.getUnityObject('1.0');
+  unity.init({name: 'unity-webapps-qml-launcher', onInit: onInit});
+}, false);
+
 </script>
 
 </head>

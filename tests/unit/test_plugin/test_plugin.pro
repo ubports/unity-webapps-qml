@@ -42,7 +42,8 @@ INCLUDEPATH += \
 OTHER_FILES += \
     $$system(ls ./data/*/*) \
     $$system(ls ./data/*/*/*) \
-    $$system(ls *.sh)
+    $$system(ls *.sh) \
+    data/manifests/valid-with-ua-override.json
 
 # manually add the 'check' target
 check.depends = $${TARGET}

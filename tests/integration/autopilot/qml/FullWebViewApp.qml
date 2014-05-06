@@ -37,6 +37,7 @@ Window {
 
     function evalInPageUnsafe(expr) {
         var tid = DomIntrospectionUtils.gentid();
+        console.log(DomIntrospectionUtils.wrapJsCommands(expr))
         webView.experimental.evaluateJavaScript(DomIntrospectionUtils.wrapJsCommands(expr),
             function(result) { console.log('Result: ' + result); root.resultUpdated(DomIntrospectionUtils.createResult(result)); });
     }
@@ -61,7 +62,7 @@ Window {
         width: parent.width
         height: parent.height
 
-        experimental.userScripts: [Qt.resolvedUrl("injected-script.js")]
+        experimental.userScripts: []
         experimental.preferences.navigatorQtObjectEnabled: true
         experimental.preferences.developerExtrasEnabled: true
 

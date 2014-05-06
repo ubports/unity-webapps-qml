@@ -96,5 +96,6 @@ class UnityWebappsTestCaseBase(UnityTestCase):
         prev_emissions = self.watcher.num_emissions
         webview.slots.evalInPageUnsafe(expr)
         self.assertThat(lambda: self.watcher.num_emissions, Eventually(GreaterThan(prev_emissions)))
-        return json.loads(webview.get_signal_emissions('resultUpdated(QString)')[-1][0])['result']
+        results = json.loads(webview.get_signal_emissions('resultUpdated(QString)')[-1][0])
+        return results.has_key('result') and results['result'] or None
 

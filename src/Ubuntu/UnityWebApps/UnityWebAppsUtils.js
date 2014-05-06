@@ -221,7 +221,7 @@ function isIterableObject(obj) {
  *   property is an object w/ a 'name' and 'type' (as in typeof()).
  */
 function formatUnityWebappsCall(type, serialized_args) {
-    return {target: "unity-webapps-call", name: type, args: serialized_args};
+    return {target: "ubuntu-webapps-binding-call", name: type, args: serialized_args};
 }
 
 

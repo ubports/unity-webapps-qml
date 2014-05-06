@@ -118,3 +118,11 @@ void ManifestParserTest::testParseChromeOptions()
         verifyChrome(filename, result);
     }
 }
+
+void ManifestParserTest::testParseUserOverride()
+{
+    UnityWebappsAppManifestParser parser;
+    ManifestFileInfoOption result =
+            parser.parse(manifestsDataPath + "/valid-with-ua-override.json");
+    QVERIFY(result.value().userAgentOverride == "My Override");
+}

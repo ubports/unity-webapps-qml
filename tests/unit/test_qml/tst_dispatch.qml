@@ -6,7 +6,7 @@ TestCase {
     name: "WebAppsDispatchTest"
 
     function setup() {
-        webapps.__reset();
+        webapps.__unbind();
         mockedWebView.disconnectAll();
     }
 
@@ -22,7 +22,6 @@ TestCase {
         webapps._opt_backendProxies = simple_backend;
         webapps.name = "test_properBackendDispatched";
         webapps.bindee = mockedWebView;
-        webapps.__bind(webapps.bindee, []);
 
         mockedWebView.messageReceived(UnityWebAppsUtils.formatUnityWebappsCall('This.Is.A.Backend', JSON.stringify([1, 2, "AAU"])));
 
@@ -51,7 +50,6 @@ TestCase {
         webapps._opt_backendProxies = simple_backend;
         webapps.name = "test_backendDispatchedWithProperArguments";
         webapps.bindee = mockedWebView;
-        webapps.__bind(webapps.bindee);
 
         mockedWebView.messageReceived(UnityWebAppsUtils.formatUnityWebappsCall('This.Is.A.Backend', JSON.stringify(params)));
 
@@ -70,7 +68,6 @@ TestCase {
         webapps._opt_backendProxies = invalid_backend;
         webapps.name = "test_invalidBackendNotDispatched";
         webapps.bindee = mockedWebView;
-        webapps.__bind(webapps.bindee);
 
         mockedWebView.messageReceived(UnityWebAppsUtils.formatUnityWebappsCall('This.Is.A.Backend', JSON.stringify([1, 2, "AAU"])));
 
@@ -100,7 +97,6 @@ TestCase {
         webapps._opt_backendProxies = backend;
         webapps.name = "test_callbacksAreWrapped";
         webapps.bindee = mockedWebView;
-        webapps.__bind(webapps.bindee);
 
         //We assume a bit about the implementation there ('callbackid')
         mockedWebView.messageReceived(UnityWebAppsUtils.formatUnityWebappsCall('This.Is.A.Backend', JSON.stringify([1, {'callbackid': 1}, "AAU"])));
