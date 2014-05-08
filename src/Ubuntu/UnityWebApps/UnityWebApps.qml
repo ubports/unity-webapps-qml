@@ -21,8 +21,8 @@ import Ubuntu.UnityWebApps 0.1 as UbuntuUnityWebApps
 import "UnityWebApps.js" as UnityWebAppsJs
 import "UnityWebAppsUtils.js" as UnityWebAppsJsUtils
 import "UnityWebAppsBackendComponents.js" as UnityBackends
-import "./bindings/runtime-api/backend/runtime-api.js" as RuntimeApiBackend
 
+import "./bindings/runtime-api/backend/runtime-api.js" as RuntimeApiBackend
 import "./bindings/alarm-api/backend/alarm-api.js" as AlarmApiBackend
 import "./bindings/content-hub/backend/content-hub.js" as ContentHubApiBackend
 import "./bindings/online-accounts/backend/online-accounts.js" as OnlineAccountsApiBackend
@@ -639,13 +639,21 @@ Item {
                 }
             },
 
-            OnlineAccounts: OnlineAccountsApiBackend.createOnlineAccountsApi(UnityBackends.backendDelegate),
+            OnlineAccounts: __injectResourceIfExtraApisAreEnabled(function() {
+                return OnlineAccountsApiBackend.createOnlineAccountsApi(UnityBackends.backendDelegate)
+            }),
 
-            Alarm: AlarmApiBackend.createAlarmApi(UnityBackends.backendDelegate),
+            Alarm: __injectResourceIfExtraApisAreEnabled(function() {
+                return AlarmApiBackend.createAlarmApi(UnityBackends.backendDelegate)
+            }),
 
-            ContentHub: ContentHubApiBackend.createContentHubApi(UnityBackends.backendDelegate),
+            ContentHub:  __injectResourceIfExtraApisAreEnabled(function() {
+                return ContentHubApiBackend.createContentHubApi(UnityBackends.backendDelegate)
+            }),
 
-            RuntimeApi: RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate),
+            RuntimeApi:  __injectResourceIfExtraApisAreEnabled(function() {
+                return RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate)
+            }),
 
             Launcher: {
                 setCount: function (count) {
