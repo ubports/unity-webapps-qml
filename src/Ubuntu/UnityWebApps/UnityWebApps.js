@@ -185,7 +185,7 @@ var UnityWebApps = (function () {
               // Assumes that we are calling a 'callable' from a succession of objects
               var t = names.reduce (
                 function (prev, cur) {
-                    return (typeof prev[cur] == "function") ?
+                   return (typeof prev[cur] == "function") ?
                                 (function(prev, cur) { return prev[cur].bind(prev); })(prev, cur)
                                 : prev[cur];
                 }, reducetarget);

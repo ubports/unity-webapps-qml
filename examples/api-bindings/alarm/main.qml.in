@@ -26,6 +26,7 @@ Item {
     UnityWebApps {
         id: webapps
         bindee: webview
+        injectExtraUbuntuApis: true
     }
   }
 }

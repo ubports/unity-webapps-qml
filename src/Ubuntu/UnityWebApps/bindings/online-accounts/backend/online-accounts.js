@@ -388,6 +388,25 @@ function createOnlineAccountsApi(backendDelegate) {
                 result[role] = this._modelAdaptor.itemAt(idx, role);
             }
             callback(result);
+        },
+
+        internal: {
+
+            // special case for an object wrapper
+            at: function(self, idx) {
+                self._validate();
+
+                var displayName = self._modelAdaptor.itemAt(idx, "displayName");
+                var providerId = self._modelAdaptor.itemAt(idx, "providerId");
+
+                return {displayName: displayName, providerId: providerId};
+            },
+
+            count: function(self) {
+                return self._modelAdaptor ?
+                            self._modelAdaptor.rowCount()
+                            : -1;
+            },
         }
     };
 
@@ -605,6 +624,16 @@ function createOnlineAccountsApi(backendDelegate) {
                 }
             }
             callback(accounts);
+        },
+
+        getProviders: function(callback) {
+            var providerModel = new ProviderModel();
+            var count = providerModel.internal.count(providerModel);
+            var providers = []
+            for (var i = 0; i < count; ++i) {
+                providers.push(providerModel.internal.at(providerModel, i));
+            }
+            callback(providers);
         },
 
         getAccountById: function(accountId, callback) {

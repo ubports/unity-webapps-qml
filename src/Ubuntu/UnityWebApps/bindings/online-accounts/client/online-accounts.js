@@ -1,4 +1,4 @@
-/**
+    /**
  * OnlineAccounts is the entry point to online accounts service access.
 
  * @module OnlineAccounts
@@ -185,6 +185,33 @@ function createOnlineAccountsApi(backendBridge) {
             getAccounts: function(filters, callback) {
                 backendBridge.call('OnlineAccounts.getAccounts'
                                    , [filters]
+                                   , callback);
+            },
+            /**
+             * Gets list of available providers.
+             *
+             * @method api.getProviders
+             * @param filters {Object} A dictionary of parameters to filter the result.
+             * @param callback {Function(List of AccountService objects)} Callback that receives the result or null.
+             *                                                            The result is a dictionary with the following keys:
+             *          - displayName: the display name for the corresponding provider
+             *          - providerId: the provider id
+             *
+             * @example
+               var api = external.getUnityObject(1.0);
+               var oa = api.OnlineAccounts;
+
+               oa.api.getProviders(function(result) {
+                 for (var i = 0; i < result.length; ++i) {
+                   console.log("displayName: " + result[i].displayName
+                               + ', providerId: ' + result[i].providerId);
+                 }
+               });
+
+             */
+            getProviders: function(callback) {
+                backendBridge.call('OnlineAccounts.getProviders'
+                                   , []
                                    , callback);
             },
         },
