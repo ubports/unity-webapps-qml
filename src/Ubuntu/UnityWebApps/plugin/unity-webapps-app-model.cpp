@@ -161,7 +161,7 @@ UnityWebappsAppModel::roleNames() const
 }
 
 UnityWebappsAppModel::WebappFileInfoOption
-UnityWebappsAppModel::getWebappFiles(QFileInfo webAppInstallLocation)
+UnityWebappsAppModel::getWebappFiles(const QFileInfo& webAppInstallLocation)
 {
     if (!webAppInstallLocation.isDir()) {
         qDebug() << "Invalid webapps path found (not a proper folder): "
@@ -171,32 +171,52 @@ UnityWebappsAppModel::getWebappFiles(QFileInfo webAppInstallLocation)
 
     QDir installationDir = QDir(webAppInstallLocation.absoluteFilePath());
 
-    //TODO search only for manifest.json
     // Search for manifest & userscript
-    QFileInfoList manifest =
-            installationDir.entryInfoList(QStringList("*.json"), QDir::Files);
-    if (manifest.count() != 1) {
+
+    QFileInfo manifestFileInfo =
+            installationDir.absolutePath() + QDir::separator() + QString("manifest.json");
+    if ( ! manifestFileInfo.isFile()) {
         qDebug() << "Folder not being considered for webapp (no manifest file found): "
-                 << installationDir.absolutePath();
+                 << manifestFileInfo.absoluteFilePath();
         return WebappFileInfoOption();
     }
 
+    QString userScriptFilename;
     QFileInfoList script =
             installationDir.entryInfoList(QStringList("*.user.js"), QDir::Files);
-    if (script.count() != 1) {
-        qDebug() << "Folder not being considered for webapp (no userscript found): "
-                 << installationDir.absolutePath();
-        return WebappFileInfoOption();
+    if (script.count() >= 1) {
+        // Arbitrarily considering the "first" one
+        userScriptFilename = script[0].absoluteFilePath();
     }
 
-    return WebappFileInfoOption (WebappFileInfo (manifest[0].absoluteFilePath(), script[0].absoluteFilePath()));
+    return WebappFileInfoOption (
+                WebappFileInfo (manifestFileInfo.absoluteFilePath(),
+                                userScriptFilename));
 }
 
 QFileInfoList
 UnityWebappsAppModel::getCandidateInstalledWebappsFolders (const QString& installationSearchPath)
 {
+    // If the search path was overriden (not the default system one), we add the local
+    // path to the list of searched paths. The idea is to remove some of the potentially
+    // overloaded cruft (notably on UbuntuTouch or for simple installs/tests) the needed
+    // webapp file setup.
+    // We still do some possibly unecessary work of looking up in any unity-webapp-* subdir
+    // but in the general case that shouldn't be too much of a hassle.
+
     QDir webappsDir(installationSearchPath);
-    return webappsDir.entryInfoList (QStringList(_webappDirPrefix + "*"), QDir::Dirs);
+    QFileInfoList
+        candidateWebappsFolders = webappsDir.entryInfoList (QStringList(_webappDirPrefix + "*")
+                                                            , QDir::Dirs);
+    if (installationSearchPath != getDefaultWebappsInstallationSearchPath())
+    {
+        QFileInfo localSearchPath(installationSearchPath);
+        if (localSearchPath.isDir())
+        {
+            candidateWebappsFolders.append(localSearchPath);
+        }
+    }
+    return candidateWebappsFolders;
 }
 
 void UnityWebappsAppModel::cleanup()
@@ -223,8 +243,6 @@ void UnityWebappsAppModel::load()
     {
         if (!candidateWebappFolder.isDir())
         {
-            qDebug() << "Candidate webapp folder not a webapp: "
-                     << candidateWebappFolder.absoluteFilePath();
             continue;
         }
 
@@ -232,8 +250,6 @@ void UnityWebappsAppModel::load()
                 getWebappFiles (candidateWebappFolder);
         if (!webappInfos.isvalid())
         {
-            qDebug() << "Invalid webapps path found: "
-                     << candidateWebappFolder.absoluteFilePath();
             continue;
         }
 
@@ -244,7 +260,7 @@ void UnityWebappsAppModel::load()
                 parser.parse (QFileInfo (webappInfos.value().manifestFilename));
         if (!manifest.isvalid())
         {
-            qDebug() << "Invalid webapps installation found: "
+            qDebug() << "Invalid webapps manifest found in: "
                      << candidateWebappFolder.absoluteFilePath();
             continue;
         }
@@ -430,9 +446,7 @@ void UnityWebappsAppModel::addWebApp(const QString& userscriptLocation,
 bool UnityWebappsAppModel::isValidInstall(const QString& searchPath)
 {
     return QFileInfo(searchPath).isDir()
-           && QDir(searchPath).exists()
-           && QFileInfo(searchPath + QDir::separator() + _commonScriptsDirName).isDir()
-           && QDir(searchPath + QDir::separator() + _commonScriptsDirName).exists();
+           && QDir(searchPath).exists();
 }
 
 int UnityWebappsAppModel::rowCount(const QModelIndex& parent) const

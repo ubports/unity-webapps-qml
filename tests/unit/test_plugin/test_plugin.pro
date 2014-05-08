@@ -43,7 +43,8 @@ OTHER_FILES += \
     $$system(ls ./data/*/*) \
     $$system(ls ./data/*/*/*) \
     $$system(ls *.sh) \
-    data/manifests/valid-with-ua-override.json
+    data/manifests/valid-with-ua-override.json \
+    data/manifests/valid-simplified-manifest.json
 
 # manually add the 'check' target
 check.depends = $${TARGET}
