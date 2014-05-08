@@ -198,6 +198,14 @@ UbuntuBindingBackendDelegate.prototype = {
         return {object: this._objects[id], id: id};
     },
 
+    parent: function() {
+        return this._parent;
+    },
+
+    parentView: function() {
+        return this._parent ? this._parent.bindee : null;
+    },
+
     isObjectProxyInfo: function(info) {
         return 'type' in info &&
             info.type === 'object-proxy' &&
@@ -402,4 +410,5 @@ function clearAll () {
         _backends['messaging'] = null;
     }
 };
+
 

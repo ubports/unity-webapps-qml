@@ -42,6 +42,10 @@ function createContentHubApi(backendBridge) {
              ? content.store : null;
         this._state = content && content.state
              ? content.state : null;
+        this._selectionType = content && content.selectionType
+             ? content.selectionType : null;
+        this._direction = content && content.direction
+             ? content.direction : null;
     };
     ContentTransfer.prototype = {
         // object methods
@@ -77,7 +81,7 @@ function createContentHubApi(backendBridge) {
          *
          * @method setStore
          * @param store {ContentStore}
-         * @param callback (optional) {Function()}
+         * @param callback (optional) {Function()} called when the store has been updated
          */
         setStore: function(store, callback) {
             this._proxy.call('setStore', [store.serialize(), callback]);
@@ -108,6 +112,15 @@ function createContentHubApi(backendBridge) {
         setState: function(state, callback) {
             this._proxy.call('setState', [state, callback]);
         },
+        /**
+         * Notifies the listener when the state of the transfer changes.
+         *
+         * @method onStateChanged
+         * @param callback {Function(ContentTransfer.State)}
+         */
+        onStateChanged: function(callback) {
+            this._proxy.call('onStateChanged', [callback]);
+        },
 
         /**
          * Retrieves the current selection type.
@@ -116,7 +129,11 @@ function createContentHubApi(backendBridge) {
          * @param callback {Function(ContentTransfer.SelectionType)}
          */
         selectionType: function(callback) {
-            this._proxy.call('selectionType', [], callback);
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('selectionType', [], callback);
+                return;
+            }
+            return this._selectionType;
         },
         /**
          * Sets the selection type (single or multiple).
@@ -126,17 +143,24 @@ function createContentHubApi(backendBridge) {
          * @param callback {Function()} called when the state has been updated
          */
         setSelectionType: function(selectionType, callback) {
+            this._selectionType = selectionType;
             this._proxy.call('setSelectionType', [selectionType, callback]);
         },
 
         /**
          * Retrieves the current transfer direction.
          *
+         * If the callback parameter is not set, the current "local" value is retrieved.
+         *
          * @method direction
-         * @param callback {Function(ContentTransfer.Direction)}
+         * @param callback (optional) {Function(ContentTransfer.Direction)}
          */
         direction: function(callback) {
-            this._proxy.call('direction', [], callback);
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('direction', [], callback);
+                return;
+            }
+            return this._direction;
         },
         /**
          * Sets the transfer direction (import or export).
@@ -146,6 +170,7 @@ function createContentHubApi(backendBridge) {
          * @param callback {Function()} called when the state has been updated
          */
         setDirection: function(direction, callback) {
+            this._direction = direction;
             this._proxy.call('setDirection', [direction, callback]);
         },
 
@@ -231,6 +256,13 @@ function createContentHubApi(backendBridge) {
              ? content.appId : null;
         this._name = content && content.name
              ? content.name : null;
+        this._handler = content && content.handler
+             ? content.handler : null;
+        this._contentType = content && content.contentType
+             ? content.contentType : null;
+        this._selectionType = content && content.selectionType
+             ? content.selectionType : null;
+        this._isDefaultPeer = content && content.isDefaultPeer;
     };
     ContentPeer.prototype = {
         // object methods
@@ -246,14 +278,13 @@ function createContentHubApi(backendBridge) {
 
         // properties
 
-        // immutable
-
         /**
          * Retrieves the app Id of the associated peer.
          *
          * If the callback parameter is not set, the current "local" value is retrieved.
          *
          * @method appId
+         * @return {String} Application Id for this peer
          * @param callback (optional) {Function(String)}
          */
         appId: function(callback) {
@@ -263,8 +294,97 @@ function createContentHubApi(backendBridge) {
             }
             return this._appId;
         },
+        /**
+         * Sets the app Id of the associated peer.
+         *
+         * @method setAppId
+         * @param appId {String}
+         * @param callback {Function()} called when the appId has been updated
+         */
+        setAppId: function(appId, callback) {
+            this._proxy.call('setAppId', [appId, callback]);
+        },
 
-        // immutable
+        /**
+         * Retrieves the specific ContentHandler for this peer.
+         *
+         * If the callback parameter is not set, the current "local" value is retrieved.
+         *
+         * @method handler
+         * @return {String} ContentHandler for this peer
+         * @param callback (optional) {Function(String)}
+         */
+        handler: function(callback) {
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('handler', [], callback);
+                return;
+            }
+            return this._handler;
+        },
+        /**
+         * Sets specific ContentHandler for this peer.
+         *
+         * @method setHandler
+         * @param handler {ContentHandler}
+         * @param callback {Function()} called when the appId has been updated
+         */
+        setHandler: function(handler, callback) {
+            this._proxy.call('setHandler', [handler, callback]);
+        },
+
+        /**
+         * Retrieves the specific ContentType for this peer.
+         *
+         * If the callback parameter is not set, the current "local" value is retrieved.
+         *
+         * @method contentType
+         * @return {String} ContentType for this peer
+         * @param callback (optional) {Function(String)}
+         */
+        contentType: function(callback) {
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('contentType', [], callback);
+                return;
+            }
+            return this._contentType;
+        },
+        /**
+         * Sets specific ContentType for this peer.
+         *
+         * @method setContentType
+         * @param contentType {ContentType}
+         * @param callback {Function()} called when the content type has been updated
+         */
+        setContentType: function(contentType, callback) {
+            this._proxy.call('setContentType', [contentType, callback]);
+        },
+
+        /**
+         * Retrieves the specific SelectionType for this peer.
+         *
+         * If the callback parameter is not set, the current "local" value is retrieved.
+         *
+         * @method selectionType
+         * @return {String} ContentTransfer.SelectionType for this peer
+         * @param callback (optional) {Function(String)}
+         */
+        selectionType: function(callback) {
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('selectionType', [], callback);
+                return;
+            }
+            return this._selectionType;
+        },
+        /**
+         * Sets specific SelectionType for this peer.
+         *
+         * @method setSelectionType
+         * @param selectionType {ContentTransfer.SelectionType}
+         * @param callback {Function()} called when the content type has been updated
+         */
+        setSelectionType: function(selectionType, callback) {
+            this._proxy.call('setSelectionType', [selectionType, callback]);
+        },
 
         /**
          * Retrieves the name of the associated peer.
@@ -280,6 +400,45 @@ function createContentHubApi(backendBridge) {
                 return;
             }
             return this._name;
+        },
+
+        /**
+         * Returns true if the peer is a default one, false otherwise.
+         *
+         * If the callback parameter is not set, the current "local" value is retrieved.
+         *
+         * @method isDefaultPeer
+         * @param callback (optional) {Function(Bool)}
+         */
+        isDefaultPeer: function(callback) {
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('isDefaultPeer', [], callback);
+                return;
+            }
+            return this._isDefaultPeer;
+        },
+
+        // methods
+
+        /**
+         * Request to import data from this ContentPeer.
+         *
+         * @method request
+         * @param callback {Function(ContentTransfer)} Called with the resulting content transfer
+         */
+        request: function(callback) {
+            this._proxy.call('request', [], callback);
+        },
+
+        /**
+         * Request to import data from this ContentPeer and use a ContentStore for permanent storage.
+         *
+         * @method requestForStore
+         * @param store {ContentStore} Store used as a permanent storage
+         * @param callback {Function(ContentTransfer)} Called with the resulting content transfer
+         */
+        requestForStore: function(store, callback) {
+            this._proxy.call('requestForStore', [store.serialize()], callback);
         },
 
         // extras
@@ -321,6 +480,8 @@ function createContentHubApi(backendBridge) {
 
         this._uri = content && content.uri
              ? content.uri : null;
+        this._scope = content && content.scope
+             ? content.scope : null;
     };
     ContentStore.prototype = {
         // object methods
@@ -343,6 +504,7 @@ function createContentHubApi(backendBridge) {
          * If the callback parameter is not set, the current "local" value is retrieved.
          *
          * @method uri
+         * @return {String} current uri
          * @param callback (optional) {Function(String)}
          */
         uri: function(callback) {
@@ -351,6 +513,33 @@ function createContentHubApi(backendBridge) {
                 return;
             }
             return this._uri;
+        },
+
+        /**
+         * Retrieves the current scope.
+         *
+         * If the callback parameter is not set, the current "local" value is retrieved.
+         *
+         * @method scope
+         * @return {ContentScope} current scope
+         * @param callback (optional) {Function(ContentScope)}
+         */
+        scope: function(callback) {
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('scope', [], callback);
+                return;
+            }
+            return this._scope;
+        },
+        /**
+         * Sets the current scope.
+         *
+         * @method setScope
+         * @param scope {ContentScope}
+         * @param callback {Function()} called when the scope has been updated
+         */
+        setScope: function(scope, callback) {
+            this._proxy.call('setScope', [scope, callback]);
         },
 
         // extras
@@ -394,7 +583,9 @@ function createContentHubApi(backendBridge) {
              Documents
              
              Music
-          
+
+             Contacts
+
          @static
          @property ContentType {String}
          
@@ -406,9 +597,52 @@ function createContentHubApi(backendBridge) {
           var pictureContentType = hub.ContentType.Pictures;
          */
         ContentType: {
+            All: "All",
+            Unknown: "Unknown",
             Pictures: "Pictures",
             Documents: "Documents",
-            Music: "Music"
+            Music: "Music",
+            Contacts: "Contacts",
+        },
+
+        /**
+          ContentHandler is an enumeration of well known content handlers.
+
+           Values:
+
+             Source
+
+             Destination
+
+             Share
+
+           @static
+           @property ContentHandler {String}
+         */
+        ContentHandler: {
+            Source: "Source",
+            Destination: "Destination",
+            Share: "Share",
+        },
+
+        /**
+          ContentScope is an enumeration of well known scope types.
+
+           Values:
+
+             System
+
+             User
+
+             App
+
+           @static
+           @property ContentScope {String}
+         */
+        ContentScope: {
+            System: "System",
+            User: "User",
+            App: "App",
         },
 
         ContentTransfer: {
@@ -527,67 +761,46 @@ function createContentHubApi(backendBridge) {
         /**
          * Creates a ContentPeer object for the given source type.
          *
-         * @method defaultSourceForType
-         * @param type {ContentType} Content type.
-         * @param callback {Function (ContentPeer)} Function called with the created ContentPeer.
+         * @method getPeers
+         * @param filters {Object} A dictionary of parameters to filter the result. The filtering keys are:
+         * - contentType: desired ContentType
+         * - handler: desired ContentHandler
+         *
+         * @param callback {Function(List of ContentPeer objects)} Callback that receives the result or null
          */
-        defaultSourceForType: function(type, callback) {
-            backendBridge.call('ContentHub.defaultSourceForType',
-                               [type],
+        getPeers: function(filter, callback) {
+            backendBridge.call('ContentHub.getPeers',
+                               [filter],
                                callback);
         },
 
         /**
-         * Creates a ContentStore object for the given content type.
+         * Creates a ContentStore object for the given scope type.
          *
-         * @method defaultStoreForType
-         * @param type {ContentType} Content type.
-         * @param callback {Function (ContentStore)} Function called with the created ContentStore.
+         * @method getStore
+         * @param scope {ContentScope} The content scope for the store
+         * @param callback {Function(ContentStore)} Callback that receives the result or null
          */
-        defaultStoreForType: function(type, callback) {
-            backendBridge.call('ContentHub.defaultStoreForType',
-                               [type],
+        getStore: function(scope, callback) {
+            backendBridge.call('ContentHub.getStore',
+                               [scope],
                                callback);
         },
 
         /**
-         * Returns all possible peers for the given ContentType.
+         * Launches the content peer picker ui that allows the user to select a peer.
          *
-         * @method knownSourcesForType
-         * @param type {ContentType} Content type.
-         * @param callback {Function (Array of ContentPeer)} Function called with the possible ContentPeers.
+         * @method launchContentPeerPicker
+         * @param filters {Object} A dictionary of parameters to filter the result. The filtering keys are:
+         * - contentType: desired ContentType
+         * - handler: desired ContentHandler
+         * - showTitle: boolean value indicating if the title should be visible
+         * @param onPeerSelected {Function(ContentPeer)} Called when the user has selected a peer
+         * @param onCancelPressed {Function()} Called when the user has pressed cancel
          */
-        knownSourcesForType: function(type, callback) {
-            backendBridge.call('ContentHub.knownSourcesForType',
-                               [type],
-                               callback);
-        },
-
-        /**
-         * Creates a ContentTransfer object for the given content type.
-         *
-         * @method importContent
-         * @param type {ContentType} Content type.
-         * @param callback {Function(ContentTransfer)} Function called with the created ContentTransfer.
-         */
-        importContent: function(type, callback) {
-            backendBridge.call('ContentHub.importContent',
-                               [type],
-                               callback);
-        },
-
-        /**
-         * Creates a ContentTransfer object for the given ContentPeer.
-         *
-         * @method importContentForPeer
-         * @param type {ContentType} Content type.
-         * @param peer {ContentPeer} Content peer.
-         * @param callback {Function(ContentTransfer)} Function called with the created ContentTransfer.
-         */
-        importContentForPeer: function(type, peer, callback) {
-            backendBridge.call('ContentHub.importContentForPeer',
-                               [type, peer.serialize()],
-                               callback);
+        launchContentPeerPicker: function(filters, onPeerSelected, onCancelPressed) {
+            backendBridge.call('ContentHub.launchContentPeerPicker',
+                               [filters, onPeerSelected, onCancelPressed]);
         },
 
         /**
@@ -631,7 +844,9 @@ function createContentHubApi(backendBridge) {
              * @method api.importContent
              * @param type {ContentType} type of the content to import
              * @param peer {ContentPeer} peer whos content should be imported
-             * @param transferOptions {Object {multipleFiles: {Bool}, importToLocalStore: {Bool}} } the set of options for the transfer
+             * @param transferOptions {Object} a dictionary of transfer options. The options are the following:
+             * - multipleFiles {Bool}: specified if a transfer should involve multiple files or not
+             * - scope {ContentScope}: specifies the location where the transferred files should be copied to
              * @param onError {Function(reason:)} called when the transfer has failed
              * @param onSuccess {Function(Array of {ContentItem})} called when the transfer has been a success and items are available
              */

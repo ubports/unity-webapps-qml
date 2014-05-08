@@ -670,4 +670,3 @@ function createOnlineAccountsApi(backendDelegate) {
         }
     };
 }
-

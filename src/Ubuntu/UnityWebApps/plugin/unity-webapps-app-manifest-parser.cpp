@@ -111,6 +111,13 @@ bool UnityWebappsAppManifestParser::parseContent(const QString& content, Manifes
     }
     infos->chromeOptions = parseChromeOptions(chromeOption);
 
+    QString userAgentOverride;
+    if (object.contains("user-agent-override")
+            && object.value("user-agent-override").isString())
+    {
+        infos->userAgentOverride = object.value("user-agent-override").toString();
+    }
+
     return true;
 }
 

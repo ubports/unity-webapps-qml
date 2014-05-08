@@ -17,6 +17,10 @@
  */
 
 #include "qml-plugin.h"
+
+#include <QtQml/QQmlEngine>
+#include <QtQml/QQmlContext>
+
 #include "unity-webapps-api.h"
 #include "unity-webapps-api-notifications.h"
 #include "unity-webapps-api-messaging-menu.h"
@@ -26,11 +30,19 @@
 #include "unity-webapps-app-model.h"
 #include "unity-webapps-app-infos.h"
 
+#include "application-api.h"
 #include "abstract-item-model-adaptor.h"
 #include "callback.h"
 
 #include <qqml.h>
 
+static QObject *createApplicationApi(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine);
+    Q_UNUSED(scriptEngine);
+
+    return new ApplicationApi();
+}
 
 void WebappsQmlPlugin::registerTypes(const char *uri)
 {
@@ -49,5 +61,8 @@ void WebappsQmlPlugin::registerTypes(const char *uri)
 
     // TODO bump version
     qmlRegisterType<AbstractItemModelAdaptor> (uri, 0, 1, "AbstractItemModelAdaptor");
+
+    //
+    qmlRegisterSingletonType<ApplicationApi>(uri, 0, 1, "ApplicationApi", createApplicationApi);
 }
 

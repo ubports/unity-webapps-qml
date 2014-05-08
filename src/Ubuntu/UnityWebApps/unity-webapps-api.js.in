@@ -18,7 +18,7 @@
 
 (function () {
 
-    if (top !== self) {
+    if (window.self !== window.top) {
         return;
     }
 
@@ -33,6 +33,8 @@
     //@include ./bindings/alarm-api/client/alarm-api.js
     //@include ./bindings/content-hub/client/content-hub.js
     //@include ./bindings/online-accounts/client/online-accounts.js
+    //@include ./bindings/runtime-api/client/runtime-api.js
+    //@include ./common/js/unity-backend-messaging-proxy.js
     //@include ./common/js/unity-binding-proxy.js
     //@include ./common/js/unity-binding-bridge.js
 
@@ -279,12 +281,15 @@
             OnlineAccounts: createOnlineAccountsApi(backend),
             AlarmApi: createAlarmApi(backend),
             ContentHub: createContentHubApi(backend),
+            RuntimeApi: createRuntimeApi(backend),
         };
 
         return api;
     };
 
-    var apiBridge = new UnityBindingBridge(makeCallbackManager());
+    var apiBridge = new UnityBindingBridge(makeCallbackManager(),
+        createMessagingProxyForCurrentWebRuntime());
+
     var api = apiBuilder (apiBridge);
 
     apiBridge.setBindingApi(api);

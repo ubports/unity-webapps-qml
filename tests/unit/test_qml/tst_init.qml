@@ -6,7 +6,7 @@ TestCase {
     name: "WebAppsComponentInitTests"
 
     function setup() {
-        webapps.__reset();
+        webapps.__unbind();
         mockedWebView.disconnectAll();
     }
 
@@ -18,7 +18,6 @@ TestCase {
         spy.signalName = "injected";
 
         webapps.name = "test_nullInit";
-        webapps.__bind(webapps.bindee, []);
 
         compare(spy.count, 0, "Invalid (null) init call");
     }
@@ -32,7 +31,6 @@ TestCase {
 
         webapps.name = "test_initAndInjected";
         webapps.bindee = mockedWebView;
-        webapps.__bind(webapps.bindee, []);
 
         mockedWebView.loadingStarted();
 
@@ -48,7 +46,6 @@ TestCase {
 
         webapps.name = "test_initAndMessageHandlerAdded";
         webapps.bindee = mockedWebView;
-        webapps.__bind(webapps.bindee, []);
 
         compare(spy.count, 1, "WebApp message connected on load started");
     }
@@ -62,7 +59,6 @@ TestCase {
 
         webapps.name = "test_initWithNoName";
         webapps.bindee = mockedWebView;
-        webapps.__bind(webapps.bindee, []);
 
         compare(spy.count, 1, "WebApp message received connected");
     }

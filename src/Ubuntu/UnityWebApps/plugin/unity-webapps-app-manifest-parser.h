@@ -46,6 +46,8 @@ struct ManifestFileInfo
     QStringList requires;
     // The currently selected chrome option for this WebApp
     QStringList chromeOptions;
+    // (optional) A User Agent override string to be used for the current webapp
+    QString userAgentOverride;
 };
 
 /*!

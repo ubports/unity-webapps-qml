@@ -1,8 +1,9 @@
-function UnityBindingBridge(callbackManager) {
+function UnityBindingBridge(callbackManager, backendMessagingProxy) {
     this._proxies = {};
     this._last_proxy = 0;
     this._callbackManager = callbackManager;
     this._bindingApi = null;
+    this._backendMessagingProxy = backendMessagingProxy;
     this._startMessagePump();
 };
 UnityBindingBridge.prototype = {
@@ -116,9 +117,7 @@ UnityBindingBridge.prototype = {
      */
     _startMessagePump: function() {
         var self = this;
-        navigator.qt.onmessage = function (event) {
-            var message = JSON.parse(event.data);
-
+        this._backendMessagingProxy.addMessageHandler(function (message) {
             if (isUbuntuBindingCallbackCall (message)) {
                 try {
                     self._dispatchCallbackCall (message.id, message.args);
@@ -134,7 +133,7 @@ UnityBindingBridge.prototype = {
                 }
                 catch(e) {}
             }
-        }
+        });
     },
 
     /**
@@ -197,7 +196,7 @@ UnityBindingBridge.prototype = {
      * @internal
      */
     _sendToBackend: function(data) {
-        navigator.qt.postMessage(data);
+        this._backendMessagingProxy.postMessage(data);
     },
 
     /**

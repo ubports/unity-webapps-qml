@@ -21,7 +21,8 @@ PRE_TARGETDEPS += \
 #
 # deployment directives
 #
-PLUGIN_JS_FILES = $$system(ls *.js) \
+PLUGIN_JS_FILES = \
+    $$system(ls *.js) \
     $${UNITY_API_JS_FILE}
 
 CLIENT_JS_FILES = \
@@ -36,6 +37,7 @@ QMAKE_SUBSTITUTES += qmldir.in
 OTHER_FILES += $$QML_FILES \
     $$PLUGIN_JS_FILES \
     $$CLIENT_JS_FILES \
+    $$system(ls ./bindings/*/backend/*.js) \
     qmldir.in \
     unity-webapps-api.js.in \
     $${UNITY_API_JS_FILE}
@@ -63,10 +65,14 @@ alarm_binding_backend_js_files.files = ./bindings/alarm-api/backend/alarm-api.js
 online_accounts_binding_backend_js_files.path = $$installPath/bindings/online-accounts/backend/
 online_accounts_binding_backend_js_files.files = ./bindings/online-accounts/backend/online-accounts.js
 
+runtime_api_binding_backend_js_files.path = $$installPath/bindings/runtime-api/backend/
+runtime_api_binding_backend_js_files.files = ./bindings/runtime-api/backend/runtime-api.js
+
 INSTALLS += qmldir_file \
     qml_files \
     js_files \
     content_hub_binding_backend_js_files \
     alarm_binding_backend_js_files \
-    online_accounts_binding_backend_js_files
+    online_accounts_binding_backend_js_files \
+    runtime_api_binding_backend_js_files
 

@@ -21,6 +21,7 @@ import Ubuntu.UnityWebApps 0.1 as UbuntuUnityWebApps
 import "UnityWebApps.js" as UnityWebAppsJs
 import "UnityWebAppsUtils.js" as UnityWebAppsJsUtils
 import "UnityWebAppsBackendComponents.js" as UnityBackends
+import "./bindings/runtime-api/backend/runtime-api.js" as RuntimeApiBackend
 
 import "./bindings/alarm-api/backend/alarm-api.js" as AlarmApiBackend
 import "./bindings/content-hub/backend/content-hub.js" as ContentHubApiBackend
@@ -204,15 +205,13 @@ Item {
             return;
         }
 
-        var backends = __createBackendsIfNeeded();
-
         var instance = new UnityWebAppsJs.UnityWebApps(webapps,
-                                                     bindeeProxies,
-                                                     backends,
-                                                     webappUserscripts);
-
-        internal.backends = backends;
+                                                       bindeeProxies,
+                                                       webappUserscripts);
         internal.instance = instance;
+
+        if (internal.backends)
+            internal.instance.setBackends(internal.backends)
     }
 
     /*!
@@ -227,6 +226,18 @@ Item {
             backends = __makeBackendProxies();
         }
         return backends;
+    }
+
+    /*!
+      \internal
+
+     */
+    function __initBackends() {
+        if (__isValidWebAppName(webapps.name)) {
+            internal.backends = __createBackendsIfNeeded();
+            if (internal.backends && internal.instance)
+                internal.instance.setBackends(internal.backends);
+        }
     }
 
     /*!
@@ -261,26 +272,12 @@ Item {
     /*!
       \internal
 
-      PRIVATE FUNCTION: __reset
-     */
-    function __reset() {
-        __unbind();
-
-        if (typeof(name) === 'string' && name !== "")
-            UnityBackends.clearAll();
-    }
-
-    /*!
-      \internal
-
       PRIVATE FUNCTION: __unbind
      */
     function __unbind() {
-        //TODO: make sure that now leaks here
         if (internal.instance)
             internal.instance.cleanup();
         internal.instance = null;
-        internal.backends = null;
     }
 
     /*!
@@ -337,31 +334,23 @@ Item {
     /*!
       \internal
 
+      If running as a known webapp, setup the scripts are that to be injected
+      (and provided by the model), and navigate to the proper homepage.
      */
-    function __initWebappForName(name) {
-        webapps.__unbind();
-
-        if (bindee != null)
-            webapps.__bind(bindee, __isValidWebAppForModel(name) ? __gatherWebAppUserscriptsIfAny(name) : null);
-
-        if (__isValidWebAppName(name)) {
+    function __setupNamedWebappEnvironment() {
+        if (__isValidWebAppForModel(name)) {
+            if (internal.instance) {
+                var userScripts = __gatherWebAppUserscriptsIfAny(name);
+                internal.instance.setUserScriptsToInject(userScripts);
+            }
             __navigateToWebappHomepageInBindee(name);
         }
-
     }
 
     Component.onCompleted: {
-        function oncompleted() {
-            __initWebappForName(name);
-        }
-        if ( ! internal.instance)
-            oncompleted();
-
         if (model) {
-            model.modelChanged.connect(oncompleted);
+            model.modelChanged.connect(function() { __setupNamedWebappEnvironment() });
         }
-
-        internal.componentComplete = true;
     }
 
     /*!
@@ -369,7 +358,15 @@ Item {
 
      */
     onBindeeChanged: {
-        //FIXME: we shouldn't allow bindee to change
+        // cleanup old refs & go
+        webapps.__unbind();
+
+        if (bindee != null) {
+            webapps.__bind(bindee);
+
+            // if we are running as a named webapp
+            __setupNamedWebappEnvironment();
+        }
     }
 
     /*!
@@ -377,9 +374,10 @@ Item {
 
      */
     onNameChanged: {
-        //FIXME: we shouldn't allow webapp names to change
-        if (internal.componentComplete)
-            __initWebappForName(name);
+        __initBackends(webapps.name);
+
+        // if we are running as a proper named webapp
+        __setupNamedWebappEnvironment();
     }
 
     /*!
@@ -390,7 +388,6 @@ Item {
         id: internal
         property var instance: null
         property var backends: null
-        property bool componentComplete: false
     }
 
 
@@ -452,6 +449,7 @@ Item {
             return params.__unity_webapps_hidden.hostname.indexOf(params.domain) !== -1;
         };
 
+        UnityBackends.clearAll();
         UnityBackends.createBackendDelegate(webapps);
 
         return {
@@ -646,6 +644,8 @@ Item {
             Alarm: AlarmApiBackend.createAlarmApi(UnityBackends.backendDelegate),
 
             ContentHub: ContentHubApiBackend.createContentHubApi(UnityBackends.backendDelegate),
+
+            RuntimeApi: RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate),
 
             Launcher: {
                 setCount: function (count) {

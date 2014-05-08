@@ -153,6 +153,9 @@ int main(int argc, char *argv[])
     if ( ! appid.isEmpty())
     {
         qputenv("APP_ID", appid.toLatin1());
+        QCoreApplication::setApplicationName(appid.toLatin1());
+
+        qDebug() << "Using:" << appid.toLatin1();
     }
 
     if ( ! inspector.isEmpty())
