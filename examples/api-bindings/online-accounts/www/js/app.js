@@ -4,7 +4,7 @@ window.onload = function() {
     var api = external.getUnityObject('1.0');
     var oa = api.OnlineAccounts;
 
-    oa.api.getProviders(function(providers) {
+    oa.api.getProviders({"applicationId": "webbrowser-app"}, function(providers) {
         var ul = document.querySelector('#providers ul');
 
         for (var i = 0; i < providers.length; ++i) {

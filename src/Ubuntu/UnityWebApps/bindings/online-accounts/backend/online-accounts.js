@@ -320,9 +320,9 @@ function createOnlineAccountsApi(backendDelegate) {
     };
 
 
-    function ProviderModel() {
+    function ProviderModel(filterParams) {
         var result = backendDelegate.createQmlObject(
-                    PLUGIN_URI, VERSION, 'ProviderModel');
+                    PLUGIN_URI, VERSION, 'ProviderModel', filterParams);
         this._id = result.id;
         this._object = result.object;
 
@@ -626,8 +626,8 @@ function createOnlineAccountsApi(backendDelegate) {
             callback(accounts);
         },
 
-        getProviders: function(callback) {
-            var providerModel = new ProviderModel();
+        getProviders: function(filters, callback) {
+            var providerModel = new ProviderModel(filters);
             var count = providerModel.internal.count(providerModel);
             var providers = []
             for (var i = 0; i < count; ++i) {

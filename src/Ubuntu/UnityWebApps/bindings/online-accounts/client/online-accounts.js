@@ -191,7 +191,8 @@ function createOnlineAccountsApi(backendBridge) {
              * Gets list of available providers.
              *
              * @method api.getProviders
-             * @param filters {Object} A dictionary of parameters to filter the result.
+             * @param filters {Object} A dictionary of parameters to filter the result. The filtering keys are:
+             * - applicationId: the ID of a application (see /usr/share/accounts/applications/ or ~/.local/share/accounts/applications/ for a list of the available applications)
              * @param callback {Function(List of AccountService objects)} Callback that receives the result or null.
              *                                                            The result is a dictionary with the following keys:
              *          - displayName: the display name for the corresponding provider
@@ -201,7 +202,7 @@ function createOnlineAccountsApi(backendBridge) {
                var api = external.getUnityObject(1.0);
                var oa = api.OnlineAccounts;
 
-               oa.api.getProviders(function(result) {
+               oa.api.getProviders({}, function(result) {
                  for (var i = 0; i < result.length; ++i) {
                    console.log("displayName: " + result[i].displayName
                                + ', providerId: ' + result[i].providerId);
@@ -209,9 +210,9 @@ function createOnlineAccountsApi(backendBridge) {
                });
 
              */
-            getProviders: function(callback) {
+            getProviders: function(filters, callback) {
                 backendBridge.call('OnlineAccounts.getProviders'
-                                   , []
+                                   , [filters]
                                    , callback);
             },
         },
