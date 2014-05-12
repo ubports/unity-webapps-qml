@@ -151,20 +151,27 @@ void WebappsAppModelTest::testWebappsModelUrlMatch()
 
 void WebappsAppModelTest::testSimplifiedManifestInstall()
 {
-    UnityWebappsAppModel
-            model;
-    model.setSearchPath("./data/simple-install");
+    QStringList paths =
+            QStringList() << QString("./data/simple-install")
+                          << QString("./data/simple-install-embedded");
 
-    const int FOUND_COUNT = model.rowCount();
-    QCOMPARE(FOUND_COUNT, 1);
+    Q_FOREACH(QString path, paths)
+    {
+        UnityWebappsAppModel
+                model;
+        model.setSearchPath(path);
 
-    QString name = model.data(model.index(0), UnityWebappsAppModel::Name).toString();
-    QVERIFY(name == "MyWebApp");
+        const int FOUND_COUNT = model.rowCount();
+        QCOMPARE(FOUND_COUNT, 1);
 
-    QVERIFY(model.data(model.index(0), UnityWebappsAppModel::Homepage).toString() == "http://www.bbc.co.uk/news/");
-    QCOMPARE(model.data(model.index(0), UnityWebappsAppModel::Urls).toStringList().count(), 0);
-    QVERIFY(model.data(model.index(0), UnityWebappsAppModel::UserAgentOverride).toString() == "");
-    QVERIFY(model.data(model.index(0), UnityWebappsAppModel::Domain).toString() == "bbc.co.uk");
-    QCOMPARE(model.data(model.index(0), UnityWebappsAppModel::Scripts).toStringList().count(), 0);
-    QVERIFY(model.data(model.index(0), UnityWebappsAppModel::ScriptsContent).toString() == "");
+        QString name = model.data(model.index(0), UnityWebappsAppModel::Name).toString();
+        QVERIFY(name == "MyWebApp");
+
+        QVERIFY(model.data(model.index(0), UnityWebappsAppModel::Homepage).toString() == "http://www.bbc.co.uk/news/");
+        QCOMPARE(model.data(model.index(0), UnityWebappsAppModel::Urls).toStringList().count(), 0);
+        QVERIFY(model.data(model.index(0), UnityWebappsAppModel::UserAgentOverride).toString() == "");
+        QVERIFY(model.data(model.index(0), UnityWebappsAppModel::Domain).toString() == "bbc.co.uk");
+        QCOMPARE(model.data(model.index(0), UnityWebappsAppModel::Scripts).toStringList().count(), 0);
+        QVERIFY(model.data(model.index(0), UnityWebappsAppModel::ScriptsContent).toString() == "");
+    }
 }
