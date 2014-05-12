@@ -38,6 +38,7 @@ private Q_SLOTS:
     void testParseManifest();
     void testParseChromeOptions();
     void testParseUserOverride();
+    void testParseManifestEmbeddedInClickManifest();
 
 private:
 

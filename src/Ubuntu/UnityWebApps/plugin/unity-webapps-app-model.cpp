@@ -115,6 +115,7 @@ void UnityWebappsAppModel::setDoSearchHomeFolder (bool searchLocalHome)
 
 void UnityWebappsAppModel::setSearchPath(const QString& path)
 {
+    qDebug() << "setSearchPath" << path;
     if (_searchPath.compare(path, Qt::CaseInsensitive) == 0)
         return;
 
@@ -208,6 +209,8 @@ UnityWebappsAppModel::getCandidateInstalledWebappsFolders (const QString& instal
     QFileInfoList
         candidateWebappsFolders = webappsDir.entryInfoList (QStringList(_webappDirPrefix + "*")
                                                             , QDir::Dirs);
+    qDebug() << "installationSearchPath:" << installationSearchPath;
+    qDebug() << "getDefaultWebappsInstallationSearchPath:" << getDefaultWebappsInstallationSearchPath();
     if (installationSearchPath != getDefaultWebappsInstallationSearchPath())
     {
         QFileInfo localSearchPath(installationSearchPath);
