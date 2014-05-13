@@ -22,6 +22,7 @@ import "UnityWebApps.js" as UnityWebAppsJs
 import "UnityWebAppsUtils.js" as UnityWebAppsJsUtils
 import "UnityWebAppsBackendComponents.js" as UnityBackends
 import "./bindings/runtime-api/backend/runtime-api.js" as RuntimeApiBackend
+import "./bindings/download-manager/backend/download-api.js" as DownloadApiBackend
 
 
 /*!
@@ -647,7 +648,13 @@ Item {
                 return UnityBackends.createContentHubApi(UnityBackends.backendDelegate)
             }),
 
-            RuntimeApi: RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate),
+            RuntimeApi:  __injectResourceIfExtraApisAreEnabled(function() {
+                return RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate)
+            }),
+
+            DownloadApi:  __injectResourceIfExtraApisAreEnabled(function() {
+                return DownloadApiBackend.createDownloadApi(UnityBackends.backendDelegate)
+            }),
 
             Launcher: {
                 setCount: function (count) {

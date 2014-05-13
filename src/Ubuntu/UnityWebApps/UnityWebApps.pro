@@ -59,9 +59,13 @@ js_files.files = $$PLUGIN_JS_FILES
 runtime_api_binding_backend_js_files.path = $$installPath/bindings/runtime-api/backend/
 runtime_api_binding_backend_js_files.files = ./bindings/runtime-api/backend/runtime-api.js
 
+download_api_binding_backend_js_files.path = $$installPath/bindings/download-manager/backend/
+download_api_binding_backend_js_files.files = ./bindings/download-manager/backend/download-api.js
+
 INSTALLS += qmldir_file \
     qml_files \
     js_files \
     runtime_api_binding_backend_js_files \
+    download_api_binding_backend_js_files
 
 
