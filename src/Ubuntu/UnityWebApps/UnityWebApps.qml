@@ -230,7 +230,7 @@ Item {
 
      */
     function __initBackends() {
-        if (__isValidWebAppName(webapps.name)) {
+        if (__isValidWebAppName(webapps.name) || injectExtraUbuntuApis) {
             internal.backends = __createBackendsIfNeeded();
             if (internal.backends && internal.instance)
                 internal.instance.setBackends(internal.backends);
@@ -360,6 +360,7 @@ Item {
 
         if (bindee != null) {
             webapps.__bind(bindee);
+            __initBackends();
 
             // if we are running as a named webapp
             __setupNamedWebappEnvironment();
