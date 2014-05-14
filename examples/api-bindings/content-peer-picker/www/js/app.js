@@ -7,22 +7,23 @@ window.onload = function() {
 
     document.getElementById('pick').addEventListener('click', doContentPeerPicking);
     function doContentPeerPicking() {
-	hub.launchContentPeerPicker(
-	    {
-		contentType: hub.ContentType.Pictures,
-		handler: hub.ContentHandler.Source,
-	    },
-	    function(peer) {
-		if ( ! peer) {
-		    nopeers();
-		    return;
-		}
-		addPeerElement(peer.appId(), peer.name());
-		doSimpleApiImport(peer);
-	    },
-	    function() {
-		aborted();
-	    });
+        hub.launchContentPeerPicker(
+            {
+                contentType: hub.ContentType.Pictures,
+                handler: hub.ContentHandler.Source,
+            },
+            function(peer) {
+                if ( ! peer) {
+                    nopeers();
+                    return;
+                }
+                addPeerElement(peer.appId(), peer.name());
+                doSimpleApiImport(peer);
+            },
+            function() {
+                aborted();
+            }
+        );
     };
 
     function addPeerElement(appId, name) {

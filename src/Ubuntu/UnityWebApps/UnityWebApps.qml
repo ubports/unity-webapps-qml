@@ -21,7 +21,11 @@ import Ubuntu.UnityWebApps 0.1 as UbuntuUnityWebApps
 import "UnityWebApps.js" as UnityWebAppsJs
 import "UnityWebAppsUtils.js" as UnityWebAppsJsUtils
 import "UnityWebAppsBackendComponents.js" as UnityBackends
+
 import "./bindings/runtime-api/backend/runtime-api.js" as RuntimeApiBackend
+import "./bindings/alarm-api/backend/alarm-api.js" as AlarmApiBackend
+import "./bindings/content-hub/backend/content-hub.js" as ContentHubApiBackend
+import "./bindings/online-accounts/backend/online-accounts.js" as OnlineAccountsApiBackend
 
 
 /*!
@@ -229,7 +233,7 @@ Item {
 
      */
     function __initBackends() {
-        if (__isValidWebAppName(webapps.name)) {
+        if (__isValidWebAppName(webapps.name) || injectExtraUbuntuApis) {
             internal.backends = __createBackendsIfNeeded();
             if (internal.backends && internal.instance)
                 internal.instance.setBackends(internal.backends);
@@ -359,6 +363,7 @@ Item {
 
         if (bindee != null) {
             webapps.__bind(bindee);
+            webapps.__initBackends();
 
             // if we are running as a named webapp
             __setupNamedWebappEnvironment();
@@ -370,7 +375,7 @@ Item {
 
      */
     onNameChanged: {
-        __initBackends(webapps.name);
+        __initBackends();
 
         // if we are running as a proper named webapp
         __setupNamedWebappEnvironment();
@@ -636,18 +641,20 @@ Item {
             },
 
             OnlineAccounts: __injectResourceIfExtraApisAreEnabled(function() {
-                return UnityBackends.createOnlineAccountsApi(UnityBackends.backendDelegate)
+                return OnlineAccountsApiBackend.createOnlineAccountsApi(UnityBackends.backendDelegate)
             }),
 
             Alarm: __injectResourceIfExtraApisAreEnabled(function() {
-                return UnityBackends.createAlarmApi(UnityBackends.backendDelegate)
+                return AlarmApiBackend.createAlarmApi(UnityBackends.backendDelegate)
             }),
 
             ContentHub:  __injectResourceIfExtraApisAreEnabled(function() {
-                return UnityBackends.createContentHubApi(UnityBackends.backendDelegate)
+                return ContentHubApiBackend.createContentHubApi(UnityBackends.backendDelegate)
             }),
 
-            RuntimeApi: RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate),
+            RuntimeApi:  __injectResourceIfExtraApisAreEnabled(function() {
+                return RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate)
+            }),
 
             Launcher: {
                 setCount: function (count) {

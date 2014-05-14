@@ -15,7 +15,7 @@ MainView {
   WebView {
     id: webview
     anchors.fill: parent
-    url: \"file://$$OUT_PWD/content-hub/www/index.html\"
+    url: \"file://$$OUT_PWD/content-peer-picker/www/index.html\"
 
     experimental.preferences.navigatorQtObjectEnabled: true
     experimental.preferences.developerExtrasEnabled: true
@@ -27,6 +27,7 @@ MainView {
     UnityWebApps {
         id: webapps
         bindee: webview
+        injectExtraUbuntuApis: true
     }
   }
 }

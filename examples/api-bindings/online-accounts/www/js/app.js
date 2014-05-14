@@ -4,6 +4,17 @@ window.onload = function() {
     var api = external.getUnityObject('1.0');
     var oa = api.OnlineAccounts;
 
+    oa.api.getProviders({"applicationId": "webbrowser-app"}, function(providers) {
+        var ul = document.querySelector('#providers ul');
+
+        for (var i = 0; i < providers.length; ++i) {
+            var li = document.createElement('li');
+            li.innerHTML = 'displayName: ' + providers[i].displayName
+                    + ', providerId: ' + providers[i].providerId;
+            ul.appendChild(li);
+        }
+    });
+
     function listAccounts() {
         var filters = {};
         var service = document.getElementById('service').value;

@@ -56,12 +56,23 @@ qml_files.files = $$QML_FILES
 js_files.path = $$installPath
 js_files.files = $$PLUGIN_JS_FILES
 
+content_hub_binding_backend_js_files.path = $$installPath/bindings/content-hub/backend/
+content_hub_binding_backend_js_files.files = ./bindings/content-hub/backend/content-hub.js
+
+alarm_binding_backend_js_files.path = $$installPath/bindings/alarm-api/backend/
+alarm_binding_backend_js_files.files = ./bindings/alarm-api/backend/alarm-api.js
+
+online_accounts_binding_backend_js_files.path = $$installPath/bindings/online-accounts/backend/
+online_accounts_binding_backend_js_files.files = ./bindings/online-accounts/backend/online-accounts.js
+
 runtime_api_binding_backend_js_files.path = $$installPath/bindings/runtime-api/backend/
 runtime_api_binding_backend_js_files.files = ./bindings/runtime-api/backend/runtime-api.js
 
 INSTALLS += qmldir_file \
     qml_files \
     js_files \
-    runtime_api_binding_backend_js_files \
-
+    content_hub_binding_backend_js_files \
+    alarm_binding_backend_js_files \
+    online_accounts_binding_backend_js_files \
+    runtime_api_binding_backend_js_files
 
