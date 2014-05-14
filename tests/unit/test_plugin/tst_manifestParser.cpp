@@ -126,3 +126,4 @@ void ManifestParserTest::testParseUserOverride()
             parser.parse(manifestsDataPath + "/valid-with-ua-override.json");
     QVERIFY(result.value().userAgentOverride == "My Override");
 }
+

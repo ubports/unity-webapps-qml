@@ -161,7 +161,7 @@ UnityWebappsAppModel::roleNames() const
 }
 
 UnityWebappsAppModel::WebappFileInfoOption
-UnityWebappsAppModel::getWebappFiles(QFileInfo webAppInstallLocation)
+UnityWebappsAppModel::getWebappFiles(const QFileInfo& webAppInstallLocation)
 {
     if (!webAppInstallLocation.isDir()) {
         qDebug() << "Invalid webapps path found (not a proper folder): "
@@ -171,32 +171,69 @@ UnityWebappsAppModel::getWebappFiles(QFileInfo webAppInstallLocation)
 
     QDir installationDir = QDir(webAppInstallLocation.absoluteFilePath());
 
-    //TODO search only for manifest.json
-    // Search for manifest & userscript
-    QFileInfoList manifest =
-            installationDir.entryInfoList(QStringList("*.json"), QDir::Files);
-    if (manifest.count() != 1) {
-        qDebug() << "Folder not being considered for webapp (no manifest file found): "
-                 << installationDir.absolutePath();
-        return WebappFileInfoOption();
+    // Search for manifest files & userscript
+
+    // The order here is important, the preferred filename is manifest.json
+    // which is still used in the desktop for regulat webapps, but in order
+    // to avoid name clashes w/ the click package manifest.json, the
+    // webapp-properties.json filename is searches first as a valid name
+    // and the regular manifest.json file used as a standard fallback.
+    QStringList manifestFileNames =
+            QStringList() << QString("webapp-properties.json")
+                          << QString("manifest.json");
+
+    WebappFileInfoOption
+            webappCandidateInfo;
+    Q_FOREACH(QString manifestFileName, manifestFileNames)
+    {
+        QFileInfo manifestFileInfo =
+                installationDir.absolutePath() + QDir::separator() + manifestFileName;
+        if ( ! manifestFileInfo.isFile()) {
+            qDebug() << "Skipping" << manifestFileName << "as a webapp definition search: "
+                     << manifestFileInfo.absoluteFilePath();
+            continue;
+        }
+
+        QString userScriptFilename;
+        QFileInfoList script =
+                installationDir.entryInfoList(QStringList("*.user.js"), QDir::Files);
+        if (script.count() >= 1) {
+            // Arbitrarily considering the "first" one
+            userScriptFilename = script[0].absoluteFilePath();
+        }
+
+        webappCandidateInfo = WebappFileInfoOption (WebappFileInfo (manifestFileInfo.absoluteFilePath(),
+                                                                    userScriptFilename));
+
+        break;
     }
 
-    QFileInfoList script =
-            installationDir.entryInfoList(QStringList("*.user.js"), QDir::Files);
-    if (script.count() != 1) {
-        qDebug() << "Folder not being considered for webapp (no userscript found): "
-                 << installationDir.absolutePath();
-        return WebappFileInfoOption();
-    }
-
-    return WebappFileInfoOption (WebappFileInfo (manifest[0].absoluteFilePath(), script[0].absoluteFilePath()));
+    return webappCandidateInfo;
 }
 
 QFileInfoList
 UnityWebappsAppModel::getCandidateInstalledWebappsFolders (const QString& installationSearchPath)
 {
+    // If the search path was overriden (not the default system one), we add the local
+    // path to the list of searched paths. The idea is to remove some of the potentially
+    // overloaded cruft (notably on UbuntuTouch or for simple installs/tests) the needed
+    // webapp file setup.
+    // We still do some possibly unecessary work of looking up in any unity-webapp-* subdir
+    // but in the general case that shouldn't be too much of a hassle.
+
     QDir webappsDir(installationSearchPath);
-    return webappsDir.entryInfoList (QStringList(_webappDirPrefix + "*"), QDir::Dirs);
+    QFileInfoList
+        candidateWebappsFolders = webappsDir.entryInfoList (QStringList(_webappDirPrefix + "*")
+                                                            , QDir::Dirs);
+    if (installationSearchPath != getDefaultWebappsInstallationSearchPath())
+    {
+        QFileInfo localSearchPath(installationSearchPath);
+        if (localSearchPath.isDir())
+        {
+            candidateWebappsFolders.append(localSearchPath);
+        }
+    }
+    return candidateWebappsFolders;
 }
 
 void UnityWebappsAppModel::cleanup()
@@ -223,8 +260,6 @@ void UnityWebappsAppModel::load()
     {
         if (!candidateWebappFolder.isDir())
         {
-            qDebug() << "Candidate webapp folder not a webapp: "
-                     << candidateWebappFolder.absoluteFilePath();
             continue;
         }
 
@@ -232,8 +267,6 @@ void UnityWebappsAppModel::load()
                 getWebappFiles (candidateWebappFolder);
         if (!webappInfos.isvalid())
         {
-            qDebug() << "Invalid webapps path found: "
-                     << candidateWebappFolder.absoluteFilePath();
             continue;
         }
 
@@ -244,7 +277,7 @@ void UnityWebappsAppModel::load()
                 parser.parse (QFileInfo (webappInfos.value().manifestFilename));
         if (!manifest.isvalid())
         {
-            qDebug() << "Invalid webapps installation found: "
+            qDebug() << "Invalid webapps manifest found in: "
                      << candidateWebappFolder.absoluteFilePath();
             continue;
         }
@@ -430,9 +463,7 @@ void UnityWebappsAppModel::addWebApp(const QString& userscriptLocation,
 bool UnityWebappsAppModel::isValidInstall(const QString& searchPath)
 {
     return QFileInfo(searchPath).isDir()
-           && QDir(searchPath).exists()
-           && QFileInfo(searchPath + QDir::separator() + _commonScriptsDirName).isDir()
-           && QDir(searchPath + QDir::separator() + _commonScriptsDirName).exists();
+           && QDir(searchPath).exists();
 }
 
 int UnityWebappsAppModel::rowCount(const QModelIndex& parent) const

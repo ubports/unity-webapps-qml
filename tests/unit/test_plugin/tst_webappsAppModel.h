@@ -39,7 +39,7 @@ private Q_SLOTS:
     void testWebappsModel();
     void testWebappsContentWithRequiresModel();
     void testWebappsModelUrlMatch();
-
+    void testSimplifiedManifestInstall();
 
 private:
 
