@@ -70,7 +70,7 @@ bool UnityWebappsAppManifestParser::parseWebappDeclaration(const QJsonObject& js
         if (  !json.contains(QLatin1String(property)) \
            || !json.value(QLatin1String(property)).predicate()) \
         { \
-            qDebug() << "Invalid webapp manifest.json file:" << property << "not found or fails predicate" << #predicate; \
+            qDebug() << "Invalid webapp webapp definition:" << property << "not found or fails predicate" << #predicate; \
             return false; \
         } \
     } while(0)
@@ -136,20 +136,6 @@ bool UnityWebappsAppManifestParser::parseManifestContent(const QString& content,
         return false;
 
     QJsonObject object = doc.object();
-
-    // In some instances we offer the option to
-    // isolate the webapps definition in a specific
-    // "namespace" (subobject) of a given manifest.json file.
-    // It is handy in the context of click packages for which
-    // some webapp definition elements are needed (UA string override)
-    // and ideally defined in the same manifest.json file as the
-    // click's manifest.json.
-
-    if (object.contains("webapp-properties") &&
-            object.value("webapp-properties").isObject())
-    {
-        object = object.value("webapp-properties").toObject();
-    }
 
     return parseWebappDeclaration(object, infos);
 }

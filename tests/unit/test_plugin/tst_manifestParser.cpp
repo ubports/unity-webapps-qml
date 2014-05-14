@@ -127,14 +127,3 @@ void ManifestParserTest::testParseUserOverride()
     QVERIFY(result.value().userAgentOverride == "My Override");
 }
 
-void ManifestParserTest::testParseManifestEmbeddedInClickManifest()
-{
-    UnityWebappsAppManifestParser parser;
-    ManifestFileInfoOption result =
-            parser.parse(manifestsDataPath + "/valid-embedded-in-click-manifest.json");
-    QVERIFY(result.value().name == "MyWebApp");
-    QVERIFY(result.value().domain == "bbc.co.uk");
-    QVERIFY(result.value().homepage == "http://www.bbc.co.uk/news/");
-    QVERIFY(result.value().includes.empty());
-}
-

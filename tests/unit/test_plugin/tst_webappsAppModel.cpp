@@ -153,7 +153,7 @@ void WebappsAppModelTest::testSimplifiedManifestInstall()
 {
     QStringList paths =
             QStringList() << QString("./data/simple-install")
-                          << QString("./data/simple-install-embedded");
+                          << QString("./data/simple-install-webapp-properties-file");
 
     Q_FOREACH(QString path, paths)
     {

@@ -11,12 +11,5 @@
     "maintainer": "Webapps Team <webapps@lists.launchpad.net>",
     "name": "com.ubuntu.developer.webapps.webapp-gmail",
     "title": "webapp-gmail",
-    "version": "1.0.10",
-
-    "webapp-properties": {
-        "name": "MyWebApp",
-        "homepage": "http://www.bbc.co.uk/news/",
-        "domain": "bbc.co.uk",
-        "includes": []
-    }
+    "version": "1.0.10"
 }

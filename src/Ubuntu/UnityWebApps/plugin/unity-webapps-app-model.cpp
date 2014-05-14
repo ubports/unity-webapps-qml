@@ -171,27 +171,44 @@ UnityWebappsAppModel::getWebappFiles(const QFileInfo& webAppInstallLocation)
 
     QDir installationDir = QDir(webAppInstallLocation.absoluteFilePath());
 
-    // Search for manifest & userscript
+    // Search for manifest files & userscript
 
-    QFileInfo manifestFileInfo =
-            installationDir.absolutePath() + QDir::separator() + QString("manifest.json");
-    if ( ! manifestFileInfo.isFile()) {
-        qDebug() << "Folder not being considered for webapp (no manifest file found): "
-                 << manifestFileInfo.absoluteFilePath();
-        return WebappFileInfoOption();
+    // The order here is important, the preferred filename is manifest.json
+    // which is still used in the desktop for regulat webapps, but in order
+    // to avoid name clashes w/ the click package manifest.json, the
+    // webapp-properties.json filename is searches first as a valid name
+    // and the regular manifest.json file used as a standard fallback.
+    QStringList manifestFileNames =
+            QStringList() << QString("webapp-properties.json")
+                          << QString("manifest.json");
+
+    WebappFileInfoOption
+            webappCandidateInfo;
+    Q_FOREACH(QString manifestFileName, manifestFileNames)
+    {
+        QFileInfo manifestFileInfo =
+                installationDir.absolutePath() + QDir::separator() + manifestFileName;
+        if ( ! manifestFileInfo.isFile()) {
+            qDebug() << "Skipping" << manifestFileName << "as a webapp definition search: "
+                     << manifestFileInfo.absoluteFilePath();
+            continue;
+        }
+
+        QString userScriptFilename;
+        QFileInfoList script =
+                installationDir.entryInfoList(QStringList("*.user.js"), QDir::Files);
+        if (script.count() >= 1) {
+            // Arbitrarily considering the "first" one
+            userScriptFilename = script[0].absoluteFilePath();
+        }
+
+        webappCandidateInfo = WebappFileInfoOption (WebappFileInfo (manifestFileInfo.absoluteFilePath(),
+                                                                    userScriptFilename));
+
+        break;
     }
 
-    QString userScriptFilename;
-    QFileInfoList script =
-            installationDir.entryInfoList(QStringList("*.user.js"), QDir::Files);
-    if (script.count() >= 1) {
-        // Arbitrarily considering the "first" one
-        userScriptFilename = script[0].absoluteFilePath();
-    }
-
-    return WebappFileInfoOption (
-                WebappFileInfo (manifestFileInfo.absoluteFilePath(),
-                                userScriptFilename));
+    return webappCandidateInfo;
 }
 
 QFileInfoList
