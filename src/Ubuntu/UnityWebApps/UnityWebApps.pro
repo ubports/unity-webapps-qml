@@ -68,11 +68,15 @@ online_accounts_binding_backend_js_files.files = ./bindings/online-accounts/back
 runtime_api_binding_backend_js_files.path = $$installPath/bindings/runtime-api/backend/
 runtime_api_binding_backend_js_files.files = ./bindings/runtime-api/backend/runtime-api.js
 
+download_api_binding_backend_js_files.path = $$installPath/bindings/download-manager/backend/
+download_api_binding_backend_js_files.files = ./bindings/download-manager/backend/download-api.js
+
 INSTALLS += qmldir_file \
     qml_files \
     js_files \
     content_hub_binding_backend_js_files \
     alarm_binding_backend_js_files \
     online_accounts_binding_backend_js_files \
-    runtime_api_binding_backend_js_files
+    runtime_api_binding_backend_js_files \
+    download_api_binding_backend_js_files
 
