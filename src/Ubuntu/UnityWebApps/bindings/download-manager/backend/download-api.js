@@ -4,7 +4,7 @@
  *
  */
 function createDownloadApi(backendDelegate) {
-    var PLUGIN_URI = 'UbuntuDownloadManager';
+    var PLUGIN_URI = 'Ubuntu.DownloadManager';
     var VERSION = 0.1;
 
     function SingleDownload(singledownload, objectid) {
