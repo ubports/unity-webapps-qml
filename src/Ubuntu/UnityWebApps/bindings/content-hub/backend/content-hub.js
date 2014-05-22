@@ -24,7 +24,7 @@
  *
  */
 
-function createContentHubApi(backendDelegate) {
+function createContentHubApi(backendDelegate, accessPolicy) {
     var PLUGIN_URI = 'Ubuntu.Content';
     var VERSION = 0.1;
 

@@ -58,7 +58,8 @@ public:
         Scripts,
         ScriptsContent,
         Chrome,
-        UserAgentOverride
+        UserAgentOverride,
+        Path
     };
 
     // QAbstractListModel implementation
@@ -107,6 +108,11 @@ public:
      * \brief
      */
     Q_INVOKABLE QString userAgentOverrideFor(const QString & webappName) const;
+
+    /*!
+     * \brief
+     */
+    Q_INVOKABLE QString path(const QString & webappName) const;
 
 
     /*!

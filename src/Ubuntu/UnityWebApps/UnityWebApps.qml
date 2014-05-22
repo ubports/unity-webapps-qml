@@ -412,6 +412,27 @@ Item {
         return null;
     }
 
+    /*!
+      \internal
+
+     */
+    function __getPolicyForContent(settings) {
+        // TODO: review this
+        function PassthroughPolicy() {};
+        PassthroughPolicy.prototype.allowed = function(signature) {
+            return true;
+        };
+        function RestrictedPolicy(restrictions) {
+            this.restrictions = restrictions || [];
+        };
+        RestrictedPolicy.prototype.allowed = function(signature) {
+            return this.restrictions.some(function(e) { return e == signature; });
+        };
+
+        if (injectExtraUbuntuApis)
+            return new PassthroughPolicy();
+        return new RestrictedPolicy(["ContentHub.onShareRequested"])
+    }
 
     /*!
       \internal
@@ -521,6 +542,51 @@ Item {
                     return;
                 // hud remove all action
                 UnityBackends.get("hud").clearActions();
+            },
+
+            launchEmbeddedUI: function(name, callback, params) {
+                if ( ! model)
+                    return;
+
+                // TODO validate
+                var path = model.path(name);
+                if (! path || path.length == 0)
+                    return;
+
+                var backendDelegate = UnityBackends.backendDelegate;
+
+                var parentItem = backendDelegate.parentView();
+                if ( ! parentItem || ! parentItem.visible || ! parentItem.height || ! parentItem.width) {
+                    console.debug("Cannot launch the content peer picker UI, invalid parent item: " + parentItem);
+                    callback({result: "cancelled"});
+                    return;
+                }
+
+                var statement = "import QtQuick 2.0; import '" + path + "'; " + name + " { ";
+                if (params.fileToShare) {
+                    statement += "fileToShare: " + params.fileToShare;
+                }
+                statement += "; visible: true; }";
+                var ui = Qt.createQmlObject(
+                            statement,
+                            parentItem.parent ? parentItem.parent : parentItem);
+
+                if ( ! ui.onCompleted) {
+                    ui.destroy();
+                    return;
+                }
+
+                if (parentItem.parent)
+                    parentItem.visible = false;
+
+                function _onCompleted(data) {
+                    ui.visible = false;
+                    parentItem.visible = true;
+                    ui.onCompleted.disconnect(_onCompleted);
+                    ui.destroy();
+                    callback(data);
+                }
+                ui.onCompleted.connect(_onCompleted);
             },
 
             Notification: {
@@ -640,17 +706,13 @@ Item {
                 }
             },
 
-            OnlineAccounts: __injectResourceIfExtraApisAreEnabled(function() {
-                return OnlineAccountsApiBackend.createOnlineAccountsApi(UnityBackends.backendDelegate)
-            }),
+            OnlineAccounts: OnlineAccountsApiBackend.createOnlineAccountsApi(UnityBackends.backendDelegate),
 
             Alarm: __injectResourceIfExtraApisAreEnabled(function() {
                 return AlarmApiBackend.createAlarmApi(UnityBackends.backendDelegate)
             }),
 
-            ContentHub:  __injectResourceIfExtraApisAreEnabled(function() {
-                return ContentHubApiBackend.createContentHubApi(UnityBackends.backendDelegate)
-            }),
+            ContentHub: ContentHubApiBackend.createContentHubApi(UnityBackends.backendDelegate),
 
             RuntimeApi:  __injectResourceIfExtraApisAreEnabled(function() {
                 return RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate)
