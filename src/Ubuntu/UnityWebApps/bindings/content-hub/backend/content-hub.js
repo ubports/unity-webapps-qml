@@ -769,6 +769,20 @@ function createContentHubApi(backendDelegate, accessPolicy) {
             });
         },
 
+        onImportRequested: function(callback) {
+            _contenthub.onImportRequested.connect(function(importTransfer) {
+                var wrapped = new ContentTransfer(importTransfer);
+                callback(wrapped.serialize());
+            });
+        },
+
+        onShareRequested: function(callback) {
+            _contenthub.shareRequested.connect(function(shareTransfer) {
+                var wrapped = new ContentTransfer(shareTransfer);
+                callback(wrapped.serialize());
+            });
+        },
+
         // Internal
 
         dispatchToObject: function(infos) {

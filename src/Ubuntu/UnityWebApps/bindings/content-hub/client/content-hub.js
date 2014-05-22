@@ -836,6 +836,58 @@ function createContentHubApi(backendBridge) {
                                [callback]);
         },
 
+        /**
+         * Sets a handler that is to be called when the current application is the
+         * target of an share request.
+         *
+         * @method onExportRequested
+         * @param callback {Function(ContentTransfer)} Function when one requests a resource to be shared.
+         *                                                          The corresponding ContentTransfer is provided as a parameter.
+         *
+         * @example
+
+            var api = external.getUnityObject(1.0);
+            var hub = api.ContentHub;
+
+            var transferState = hub.ContentTransfer.State;
+
+            function _shareRequested(transfer) {
+            };
+
+            hub.onShareRequested(_shareRequested);
+
+         */
+        onShareRequested: function(callback) {
+            backendBridge.call('ContentHub.onShareRequested',
+                               [callback]);
+        },
+
+        /**
+         * Sets a handler that is to be called when the current application is the
+         * target of an import request.
+         *
+         * @method onImportRequested
+         * @param callback {Function(ContentTransfer)} Function when one requests a resource to be imported.
+         *                                                          The corresponding ContentTransfer is provided as a parameter.
+         *
+         * @example
+
+            var api = external.getUnityObject(1.0);
+            var hub = api.ContentHub;
+
+            var transferState = hub.ContentTransfer.State;
+
+            function _importRequested(transfer) {
+            };
+
+            hub.onImportRequested(_importRequested);
+
+         */
+        onImportRequested: function(callback) {
+            backendBridge.call('ContentHub.onImportRequested',
+                               [callback]);
+        },
+
         api: {
 
             /**
