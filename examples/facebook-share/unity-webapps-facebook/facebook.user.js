@@ -10,62 +10,42 @@ function _shareRequested(transfer) {
 hub.onShareRequested(_shareRequested);
 
 function upload(res) {
+    //console.log(res);
     var results = JSON.parse(res);
     //console.log (results);
     console.log (results.accessToken);
     var xhr = new XMLHttpRequest();
     xhr.open( 'POST', 'https://graph.facebook.com/me/photos?access_token=' + results.accessToken, true );
     xhr.onload = xhr.onerror = function() {
-        console.log( xhr.responseText );
+        console.log("status: " + xhr.status + " : " + xhr.responseText );
+        if ( xhr.status == 200 )
+            window.location.reload();
     };
 
-    //var xhrr = new XMLHttpRequest();
-    //var re = /file:\/\//gi;
-    //var file = results.fileToShare.replace(re, '');
-    //console.log ("FILE: " + results.fileToShare);
-    console.log('file to share lenght: ' + [].slice.call(results.fileToShare).length)
+    var b64data = results.fileToShare.split(',')[1];
 
-    console.log(results.fileToShare)
-
-    console.log("After atob: " + atob(results.fileToShare))
-
-    var bin = atob(results.fileToShare);
-    var a = new Uint8Array(results.contentlength);
-
-    console.log('results.length: ' + results.size)
-
-    for (var i = 0; i < results.size; ++i) {
-	a[i] = bin.charCodeAt(i);
+    var byteCharacters = atob(b64data);
+    var byteNumbers = new Array(byteCharacters.length);
+    for (var i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
-
-    console.log("array buffer content: " + btoa(a.buffer))
+    var byteArray = new Uint8Array(byteNumbers);
 
     var div = document.createElement('div');
     div.innerHTML = '<form enctype="multipart/form-data" method="post" id="uploadForm"><textarea id="message" name="message"></textarea></form>';
     document.getElementsByTagName('body')[0].appendChild(div);
 
-    var blob = new Blob([a], {type: "image/png"});
+    var blob = new Blob([byteArray], {type: "image/png"});
 
-    console.log('blob size: ' + blob.size)
-    console.log(blob.type)
+    console.log('blob size: ' + blob.size);
+    console.log(blob.type);
 
     var uploadForm = document.forms.namedItem("uploadForm");
     var formData = new FormData(uploadForm);
     formData.append('source', blob);
+    formData.append('message', results.message);
     xhr.send(formData);
 
-    /*
-    xhrr.open("GET", results.fileToShare, true);
-    xhrr.responseType = "blob";
-    xhrr.onload = function (e) {
-        var blob = new Blob([xhrr.response], {type: "image/png"});
-        var formData = new FormData();
-        formData.append('source', blob);
-        formData.append('message', results.message);
-        xhr.send(formData);
-    }
-    xhrr.send();
-    */
 }
 
 

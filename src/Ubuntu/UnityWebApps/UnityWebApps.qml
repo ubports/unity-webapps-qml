@@ -583,7 +583,7 @@ Item {
                   }
 
                   function _onCompleted(data) {
-                    ui.visible = false;
+                    //ui.visible = false;
                     p.visible = true;
                     ui.onCompleted.disconnect(_onCompleted);
                     ui.destroy();

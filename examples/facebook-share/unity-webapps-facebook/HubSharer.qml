@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Ubuntu.Components 0.1
 import Ubuntu.Components.ListItems 0.1 as ListItem
 import Ubuntu.Components.Popups 0.1
+import Ubuntu.Content 0.1
 
 /*!
     \brief MainView with a Label and Button elements.
@@ -27,7 +28,7 @@ Item {
 
     signal completed(string result)
 
-    property string fileToShare: "/home/ken/Pictures/Ubuntu_TV.png"
+    property string fileToShare
 
 
     function _callback(accessToken, fileToShare, message, cb) {
@@ -35,41 +36,20 @@ Item {
         print ("_callback: " + fileToShare);
         print ("_callback: " + message);
 
+        itemComp.url = fileToShare;
+        var dataUri = itemComp.toDataURI();
+	var result = {accessToken: accessToken,
+            fileToShare: dataUri.toString(),
+            message: message};
 
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", fileToShare, true);
-        xhr.setRequestHeader("Content-type", "image/png");
-
-        //xhr.responseType = "blob";
-        xhr.onreadystatechange = function (e) {
-            print ("HERE");
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-
-            //var blob = new Blob([xhr.response], {type: "image/png"});
-//            for (var i in XMLHttpRequest.prototype)
-//                print (i);
-
-                console.log("HEADERS: " + xhr.getAllResponseHeaders());
-                console.log("SIZE: "+ xhr.responseText.length);
-                var a1 = Qt.btoa(xhr.responseText);
-                console.log("SIZE: "+ a1.length);
-                console.log('response body:' + xhr.responseText)
-		console.log('a1: ' + a1);
-	        var result = {accessToken: accessToken,
-                fileToShare: a1,
-             	    message: message, size: xhr.responseText.length, contentlength: xhr.getResponseHeader('content-length')};
-
-                completed(JSON.stringify(result));
-
-                /*
-
-                */
-            }
-        }
-        xhr.send();
+        completed(JSON.stringify(result));
 
     }
 
+    ContentItem {
+        id: itemComp
+        //ContentItem {}
+    }
 
     //PageStack {
     //    id: pageStack
