@@ -2,5 +2,6 @@
     "name": "facebook",
     "includes": ["https://*.facebook.com/*"],
     "homepage": "https://m.facebook.com/",
-    "domain": "facebook.com"
+    "domain": "facebook.com",
+    "scripts": ["facebook.user.js"]
 }

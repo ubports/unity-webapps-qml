@@ -545,11 +545,16 @@ Item {
             },
 
             launchEmbeddedUI: function(name, callback, params) {
-                if ( ! model)
+                console.debug ("launchEmbeddedUI: HERE");
+                if ( ! model) {
+                    print ("No model");
                     return;
+                }
+		console.log(JSON.stringify(params));
 
                 // TODO validate
-                var path = model.path(name);
+                var path = model.path(webapps.name);
+                console.debug ("PATH: " + path);
                 if (! path || path.length == 0)
                     return;
 
@@ -562,31 +567,37 @@ Item {
                     return;
                 }
 
-                var statement = "import QtQuick 2.0; import '" + path + "'; " + name + " { ";
-                if (params.fileToShare) {
-                    statement += "fileToShare: " + params.fileToShare;
-                }
-                statement += "; visible: true; }";
-                var ui = Qt.createQmlObject(
-                            statement,
-                            parentItem.parent ? parentItem.parent : parentItem);
+		var p = parentItem.parent ? parentItem.parent : parentItem
 
-                if ( ! ui.onCompleted) {
+		var c;
+		function oncreated() {
+                  //if (p) {
+                  //  p.visible = false;
+                  //}
+
+		  var ui = c.createObject(p, {"fileToShare": params.fileToShare.url, "visible": true});
+
+                  if ( ! ui.onCompleted) {
                     ui.destroy();
                     return;
-                }
+                  }
 
-                if (parentItem.parent)
-                    parentItem.visible = false;
-
-                function _onCompleted(data) {
+                  function _onCompleted(data) {
                     ui.visible = false;
-                    parentItem.visible = true;
+                    p.visible = true;
                     ui.onCompleted.disconnect(_onCompleted);
                     ui.destroy();
                     callback(data);
-                }
-                ui.onCompleted.connect(_onCompleted);
+                  }
+                  ui.onCompleted.connect(_onCompleted);
+		};
+
+		console.debug("parent: " + p.status + ", " + p.item)
+		c = Qt.createComponent(path + "/" + name + ".qml");
+		if (c.status == Component.Ready)
+		  oncreated()
+	  	else
+		  c.statusChanged.connect(oncreated)
             },
 
             Notification: {

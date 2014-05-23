@@ -1,6 +1,6 @@
 {
     "description": "Facebook (webapp version)",
-    "framework": "ubuntu-sdk-14.04",
+    "framework": "ubuntu-sdk-14.04-dev1",
     "architecture": "all",
     "hooks": {
         "webapp-facebook": {

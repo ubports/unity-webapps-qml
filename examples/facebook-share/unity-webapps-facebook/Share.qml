@@ -20,8 +20,10 @@ import Ubuntu.Components 0.1
 import Ubuntu.Components.ListItems 0.1 as ListItem
 import Ubuntu.OnlineAccounts 0.1
 
-Item {
+Rectangle {
     id: root
+    anchors.fill: parent
+    color: Theme.palette.normal.background
     property string fileToShare
     property var callback
     property string serviceType: "sharing"
@@ -41,6 +43,8 @@ Item {
             print ("Failed to post");
     }
 
+    Component.onCompleted: print ("Root completed " + height + " : " + width)
+
     AccountServiceModel {
         id: accounts
         serviceType: root.serviceType
@@ -53,6 +57,8 @@ Item {
         anchors.fill: parent
         color: Theme.palette.normal.background
         visible: false
+
+        Component.onCompleted: print ("shareComponent completed " + height + " : " + width)
 
         Column {
             anchors.fill: parent
@@ -229,9 +235,14 @@ Item {
     Item {
         id: sharemenu
         anchors.fill: parent
+        visible: true
 
         signal selected(string accountId, string token)
 
+        Component.onCompleted: {
+            visible = true;
+            print ("sharemenu completed " + height + " : " + width);
+        }
         onSelected: {
             root.userAccountId = accountId;
             root.accessToken = token;
@@ -261,7 +272,6 @@ Item {
                         left: parent.left
                         right: parent.right
                     }
-
                     text: service.provider.displayName
                     subText: displayName
                     iconName: service.provider.iconName
@@ -272,6 +282,7 @@ Item {
                         root.account = service;
                         root.account.authenticate(null);
                     }
+                    Component.onCompleted: print ("KEN: " + service.provider.displayName + " height: " + height + " y: " + y + " visible: " + visible)
                 }
             }
         }
@@ -286,6 +297,7 @@ Item {
             interactive: false
             model: accounts
             delegate: acctDelegate
+            Component.onCompleted: print ("listview completed " + height + " : " + width)
         }
     }
 }
