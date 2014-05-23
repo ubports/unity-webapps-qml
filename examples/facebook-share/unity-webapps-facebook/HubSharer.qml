@@ -48,7 +48,6 @@ Item {
 
     ContentItem {
         id: itemComp
-        //ContentItem {}
     }
 
     //PageStack {

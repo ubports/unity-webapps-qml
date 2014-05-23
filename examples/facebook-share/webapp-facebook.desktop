@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Terminal=false
-Exec=webapp-container --enable-back-forward --webappModelSearchPath=. --webappUrlPatterns=https?://*.facebook.com/*
+Exec=webapp-container --enable-back-forward --webkit --webapp='ZmFjZWJvb2s=' --webappModelSearchPath=. --webappUrlPatterns=https?://*.facebook.com/*
 Name=Facebook
 Icon=./facebook.png
 X-Ubuntu-Touch=true

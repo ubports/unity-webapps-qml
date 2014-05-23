@@ -1,12 +1,12 @@
 {
     "description": "Facebook (webapp version)",
-    "framework": "ubuntu-sdk-14.04-dev1",
+    "framework": "ubuntu-sdk-14.10-dev1",
     "architecture": "all",
     "hooks": {
         "webapp-facebook": {
             "account-application": "webapp-facebook.application",
             "content-hub": "content-hub/content-hub-exporter.json",
-            "account-service": "facebook-webapp.service",
+            "account-service": "webapp-facebook.service",
             "apparmor": "webapp-facebook.json",
             "desktop": "webapp-facebook.desktop"
         }
@@ -14,6 +14,6 @@
     "maintainer": "Webapps Team <webapps@lists.launchpad.net>",
     "name": "com.ubuntu.developer.webapps.webapp-facebook",
     "title": "webapp-facebook",
-    "version": "1.0.13"
+    "version": "1.0.17.3"
 }
 

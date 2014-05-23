@@ -2,12 +2,12 @@
   "template": "ubuntu-webapp",
   "policy_groups": [    
     "networking",
+    "accounts",
     "audio",
     "video",
     "webview",
     "location",
-    "content_exchange",
-    "content_exchange_source"
+    "content_exchange"
   ],
-  "policy_version": 1.1
+  "policy_version": 1.2
 }

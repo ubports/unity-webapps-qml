@@ -26,7 +26,7 @@ Rectangle {
     color: Theme.palette.normal.background
     property string fileToShare
     property var callback
-    property string serviceType: "sharing"
+    property string serviceType: "webapps"
     property string provider: "facebook"
     property string userAccountId
     property string accessToken
@@ -43,13 +43,31 @@ Rectangle {
             print ("Failed to post");
     }
 
-    Component.onCompleted: print ("Root completed " + height + " : " + width)
-
     AccountServiceModel {
         id: accounts
         serviceType: root.serviceType
         provider: root.provider
+        Component.onCompleted: {
+            if (count == 1) {
+                srv.objectHandle = get(0, "accountServiceHandle");
+            }
+        }
     }
+
+    AccountService {
+        id: srv
+        onObjectHandleChanged: {
+            root.account = srv;
+            root.account.authenticate(null);
+        }
+        onAuthenticated: {
+            root.userAccountId = accountId;
+            root.accessToken = reply.AccessToken;
+            shareComponent.visible = true;
+            sharemenu.visible = false;
+        }
+    }
+
 
     Rectangle {
         id: shareComponent
@@ -57,8 +75,6 @@ Rectangle {
         anchors.fill: parent
         color: Theme.palette.normal.background
         visible: false
-
-        Component.onCompleted: print ("shareComponent completed " + height + " : " + width)
 
         Column {
             anchors.fill: parent
@@ -241,7 +257,6 @@ Rectangle {
 
         Component.onCompleted: {
             visible = true;
-            print ("sharemenu completed " + height + " : " + width);
         }
         onSelected: {
             root.userAccountId = accountId;
@@ -282,7 +297,6 @@ Rectangle {
                         root.account = service;
                         root.account.authenticate(null);
                     }
-                    Component.onCompleted: print ("KEN: " + service.provider.displayName + " height: " + height + " y: " + y + " visible: " + visible)
                 }
             }
         }
@@ -297,7 +311,6 @@ Rectangle {
             interactive: false
             model: accounts
             delegate: acctDelegate
-            Component.onCompleted: print ("listview completed " + height + " : " + width)
         }
     }
 }

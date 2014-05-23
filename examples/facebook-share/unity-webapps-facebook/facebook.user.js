@@ -22,8 +22,10 @@ function upload(res) {
             window.location.reload();
     };
 
+    var contentType = results.fileToShare.split(',')[0].split(':')[1];
     var b64data = results.fileToShare.split(',')[1];
 
+    console.log ("Content Type: " + contentType);
     var byteCharacters = atob(b64data);
     var byteNumbers = new Array(byteCharacters.length);
     for (var i = 0; i < byteCharacters.length; i++) {
@@ -35,7 +37,7 @@ function upload(res) {
     div.innerHTML = '<form enctype="multipart/form-data" method="post" id="uploadForm"><textarea id="message" name="message"></textarea></form>';
     document.getElementsByTagName('body')[0].appendChild(div);
 
-    var blob = new Blob([byteArray], {type: "image/png"});
+    var blob = new Blob([byteArray], {type: contentType});
 
     console.log('blob size: ' + blob.size);
     console.log(blob.type);
