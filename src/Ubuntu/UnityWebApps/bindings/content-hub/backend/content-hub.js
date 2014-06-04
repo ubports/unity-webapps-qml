@@ -39,6 +39,8 @@ function createContentHubApi(backendDelegate, accessPolicy) {
             "Documents": ContentHubBridge.ContentType.Documents,
             "Music": ContentHubBridge.ContentType.Music,
             "Contacts": ContentHubBridge.ContentType.Contacts,
+            "Videos": ContentHubBridge.ContentType.Videos,
+            "Link": ContentHubBridge.ContentType.Link,
         };
         return name in contentTypePerName ?
                     contentTypePerName[name]
@@ -57,6 +59,10 @@ function createContentHubApi(backendDelegate, accessPolicy) {
             return "Music";
         else if (state === ContentHubBridge.ContentType.Contacts)
             return "Contacts";
+        else if (state === ContentHubBridge.ContentType.Videos)
+            return "Videos";
+        else if (state === ContentHubBridge.ContentType.Links)
+            return "Links";
         return "Unknown";
     };
 
@@ -146,6 +152,8 @@ function createContentHubApi(backendDelegate, accessPolicy) {
             "Collected": ContentHubBridge.ContentTransfer.Collected,
             "Aborted": ContentHubBridge.ContentTransfer.Aborted,
             "Finalized": ContentHubBridge.ContentTransfer.Finalized,
+            "Downloading": ContentHubBridge.ContentTransfer.Downloading,
+            "Downloaded": ContentHubBridge.ContentTransfer.Downloaded,
         };
         return name in contentTransferStatePerName ?
                     contentTransferStatePerName[name]
@@ -166,6 +174,10 @@ function createContentHubApi(backendDelegate, accessPolicy) {
             return "Aborted";
         else if (state === ContentHubBridge.ContentTransfer.Finalized)
             return "Finalized";
+        else if (state === ContentHubBridge.ContentTransfer.Downloading)
+            return "Downloading";
+        else if (state === ContentHubBridge.ContentTransfer.Downloaded)
+            return "Downloaded";
         return "<Unknown State>";
     };
 

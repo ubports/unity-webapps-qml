@@ -26,6 +26,7 @@ import "./bindings/runtime-api/backend/runtime-api.js" as RuntimeApiBackend
 import "./bindings/alarm-api/backend/alarm-api.js" as AlarmApiBackend
 import "./bindings/content-hub/backend/content-hub.js" as ContentHubApiBackend
 import "./bindings/online-accounts/backend/online-accounts.js" as OnlineAccountsApiBackend
+import "./bindings/download-manager/backend/download-api.js" as DownloadApiBackend
 
 
 /*!
@@ -727,6 +728,10 @@ Item {
 
             RuntimeApi:  __injectResourceIfExtraApisAreEnabled(function() {
                 return RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate)
+            }),
+
+            DownloadApi:  __injectResourceIfExtraApisAreEnabled(function() {
+                return DownloadApiBackend.createDownloadApi(UnityBackends.backendDelegate)
             }),
 
             Launcher: {

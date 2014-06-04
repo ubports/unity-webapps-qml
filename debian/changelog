@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+14.10.20140520-0ubuntu1) utopic; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Bindings for the download manager (LP: #1295842)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 20 May 2014 13:42:03 +0000
+
 unity-webapps-qml (0.1+14.10.20140514.2-0ubuntu1) utopic; urgency=low
 
   [ Ubuntu daily release ]
