@@ -1,3 +1,44 @@
+unity-webapps-qml (0.1+14.10.20140520-0ubuntu1) utopic; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Bindings for the download manager (LP: #1295842)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 20 May 2014 13:42:03 +0000
+
+unity-webapps-qml (0.1+14.10.20140514.2-0ubuntu1) utopic; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Cleanup the structure of the QML bindings to make it clearer. No
+    Changes in functionality all features are still working & same, This
+    is an updated version of: https://code.launchpad.net/~abreu-
+    alexandre/unity-webapps-qml/restructure-cleanup-bindings-qml-
+    structure/+merge/208148 with the latest changes that got in in
+    between (LP: #1288801)
+  * Simplifies the manifest.json handling in some instances. More
+    precisely when one is using a custom model search path for the
+    webapp lookup, some restrictions are being put on what is expected
+    to be found in the folder among which: a common/ subfolder (even if
+    the webapp doesnt require one),. one or more unity-webapps-* folders
+    with manifest.json & *.user.js files in it,. More over the manifest
+    files do require user scripts to be defined. This imposes a set of
+    constraints over a given webapp that simply wants to use the
+    container (w/o js injection). This simplifies it an allows one to
+    define a manifest.json file (still with some required elements, but
+    a smaller set), directly in the model search path. E.g. something
+    like: {     "name": "MyWebApp",     "homepage":
+    "http://www.bbc.co.uk/news/",     "domain": "bbc.co.uk",
+        "includes": [] } will do, or to avoid any confusion w/ the click
+    manifest.json file, one also searches for a webapp-properties.json
+    w/ the same content as above.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 14 May 2014 22:31:22 +0000
+
 unity-webapps-qml (0.1+14.10.20140506.1-0ubuntu1) utopic; urgency=low
 
   [ Ubuntu daily release ]

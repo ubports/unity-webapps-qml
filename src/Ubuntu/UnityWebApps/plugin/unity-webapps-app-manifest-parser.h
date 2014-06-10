@@ -93,13 +93,22 @@ private:
     parseChromeOptions(const QString& options);
 
     /*!
-     * \brief parseContent
+     * \brief parseManifestContent
      * \param content
      * \param infos
      * \return
      */
-    bool parseContent(const QString& content,
-                      ManifestFileInfo * infos);
+    bool parseManifestContent(const QString& content,
+                              ManifestFileInfo * infos);
+
+    /*!
+     * \brief parseManifestContent
+     * \param content
+     * \param infos
+     * \return
+     */
+    bool parseWebappDeclaration(const QJsonObject& json,
+                                ManifestFileInfo * infos);
 };
 
 #endif // __UNITY_WEBAPPS_APP_MANIFEST_H__

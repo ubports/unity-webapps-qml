@@ -53,7 +53,7 @@ ManifestFileInfoOption UnityWebappsAppManifestParser::parse (QFileInfo manifest)
     QString content = istream.readAll();
 
     ManifestFileInfo infos;
-    if (!parseContent(content, &infos))
+    if (!parseManifestContent(content, &infos))
     {
         qDebug() << "Could not open manifest file: " << manifest.absoluteFilePath();
         return ManifestFileInfoOption();
@@ -62,7 +62,63 @@ ManifestFileInfoOption UnityWebappsAppManifestParser::parse (QFileInfo manifest)
     return ManifestFileInfoOption(infos);
 }
 
-bool UnityWebappsAppManifestParser::parseContent(const QString& content, ManifestFileInfo * infos)
+bool UnityWebappsAppManifestParser::parseWebappDeclaration(const QJsonObject& json,
+                                                           ManifestFileInfo * infos)
+{
+#define VALIDATE_PROPERTY_TYPE(property,predicate) \
+    do { \
+        if (  !json.contains(QLatin1String(property)) \
+           || !json.value(QLatin1String(property)).predicate()) \
+        { \
+            qDebug() << "Invalid webapp webapp definition:" << property << "not found or fails predicate" << #predicate; \
+            return false; \
+        } \
+    } while(0)
+
+    VALIDATE_PROPERTY_TYPE("name",isString);
+    VALIDATE_PROPERTY_TYPE("domain",isString);
+    VALIDATE_PROPERTY_TYPE("homepage",isString);
+    VALIDATE_PROPERTY_TYPE("includes",isArray);
+#undef VALIDATE_PROPERTY_TYPE
+
+    infos->name = json.value(QLatin1String("name")).toString();
+    infos->domain = json.value(QLatin1String("domain")).toString();
+    infos->homepage = json.value(QLatin1String("homepage")).toString();
+    infos->includes = parseArray(json, QLatin1String("includes"));
+
+    // Script & requires (script source dependancies found in common/)
+    // are not really mandatory, one could have a very simple webapp
+    // that acts just as a launcher & w/ e.g. a ua override or speciic chrome
+    if (json.contains("scripts")
+            && json.value("scripts").isArray())
+    {
+        infos->scripts = parseArray(json, QLatin1String("scripts"));
+    }
+
+    if (json.contains("requires")
+            && json.value("requires").isArray())
+    {
+        infos->requires = parseArray(json, QLatin1String("requires"));
+    }
+
+    QString chromeOption;
+    if (json.contains("chrome") && json.value("chrome").isString())
+    {
+        chromeOption = json.value("chrome").toString();
+    }
+    infos->chromeOptions = parseChromeOptions(chromeOption);
+
+    if (json.contains("user-agent-override")
+            && json.value("user-agent-override").isString())
+    {
+        infos->userAgentOverride = json.value("user-agent-override").toString();
+    }
+
+    return true;
+}
+
+bool UnityWebappsAppManifestParser::parseManifestContent(const QString& content,
+                                                        ManifestFileInfo * infos)
 {
     if (! infos)
         return false;
@@ -79,46 +135,9 @@ bool UnityWebappsAppManifestParser::parseContent(const QString& content, Manifes
     if (!doc.isObject())
         return false;
 
-#define VALIDATE_PROPERTY_TYPE(property,predicate) \
-    !object.contains(QLatin1String(property)) \
-    || !object.value(QLatin1String(property)).predicate()
-
     QJsonObject object = doc.object();
-    if (VALIDATE_PROPERTY_TYPE("name",isString)
-          || VALIDATE_PROPERTY_TYPE("domain",isString)
-          || VALIDATE_PROPERTY_TYPE("homepage",isString)
-          || VALIDATE_PROPERTY_TYPE("includes",isArray)
-          || VALIDATE_PROPERTY_TYPE("requires",isArray)
-          || VALIDATE_PROPERTY_TYPE("scripts",isArray)
-        )
-    {
-        return false;
-    }
-#undef VALIDATE_PROPERTY_TYPE
 
-    infos->domain = object.value(QLatin1String("domain")).toString();
-    infos->name = object.value(QLatin1String("name")).toString();
-    infos->homepage = object.value(QLatin1String("homepage")).toString();
-
-    infos->scripts = parseArray(object, QLatin1String("scripts"));
-    infos->requires = parseArray(object, QLatin1String("requires"));
-    infos->includes = parseArray(object, QLatin1String("includes"));
-
-    QString chromeOption;
-    if (object.contains("chrome") && object.value("chrome").isString())
-    {
-        chromeOption = object.value("chrome").toString();
-    }
-    infos->chromeOptions = parseChromeOptions(chromeOption);
-
-    QString userAgentOverride;
-    if (object.contains("user-agent-override")
-            && object.value("user-agent-override").isString())
-    {
-        infos->userAgentOverride = object.value("user-agent-override").toString();
-    }
-
-    return true;
+    return parseWebappDeclaration(object, infos);
 }
 
 QStringList

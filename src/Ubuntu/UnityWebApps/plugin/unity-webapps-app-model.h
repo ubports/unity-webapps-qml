@@ -169,13 +169,13 @@ private:
      * \return
      */
     WebappFileInfoOption
-    getWebappFiles (QFileInfo webappDir);
+    getWebappFiles (const QFileInfo& webAppInstallLocatio);
 
     /*!
      * \brief UnityWebappsAppModel::getCandidateInstalledWebappsFolders
      * \return
      */
-    static QFileInfoList
+    QFileInfoList
     getCandidateInstalledWebappsFolders (const QString& installationSearchPath);
 
     static QString

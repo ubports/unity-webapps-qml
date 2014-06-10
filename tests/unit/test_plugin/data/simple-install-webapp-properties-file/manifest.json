@@ -1,0 +1,15 @@
+{
+    "description": "Gmail (webapp version)",
+    "framework": "ubuntu-sdk-14.04-dev1",
+    "architecture": "all",
+    "hooks": {
+        "webapp-gmail": {
+            "apparmor": "webapp-gmail.json",
+            "desktop": "webapp-gmail.desktop"
+        }
+    },
+    "maintainer": "Webapps Team <webapps@lists.launchpad.net>",
+    "name": "com.ubuntu.developer.webapps.webapp-gmail",
+    "title": "webapp-gmail",
+    "version": "1.0.10"
+}
