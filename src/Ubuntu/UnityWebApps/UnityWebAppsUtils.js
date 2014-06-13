@@ -103,7 +103,6 @@ OxideWebviewAdapter.prototype = {
                 '}';
         var messageHandler = Qt.createQmlObject(script, this.webview);
         messageHandler.callback = handler;
-        this.webview.messageHandlers = [ messageHandler ];
     }
 }
 
