@@ -63,7 +63,9 @@ alarm_binding_backend_js_files.path = $$installPath/bindings/alarm-api/backend/
 alarm_binding_backend_js_files.files = ./bindings/alarm-api/backend/alarm-api.js
 
 online_accounts_binding_backend_js_files.path = $$installPath/bindings/online-accounts/backend/
-online_accounts_binding_backend_js_files.files = ./bindings/online-accounts/backend/online-accounts.js
+online_accounts_binding_backend_js_files.files = \
+    ./bindings/online-accounts/backend/online-accounts.js \
+    ./bindings/online-accounts/backend/online-accounts-client.js
 
 runtime_api_binding_backend_js_files.path = $$installPath/bindings/runtime-api/backend/
 runtime_api_binding_backend_js_files.files = ./bindings/runtime-api/backend/runtime-api.js
