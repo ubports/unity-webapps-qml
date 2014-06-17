@@ -1,23 +1,24 @@
 var api = external.getUnityObject('1.0');
-var oa = api.OnlineAccounts;
 var hub = api.ContentHub;
+var activeTransfer;
 
 function _shareRequested(transfer) {
+    activeTransfer = transfer;
     transfer.items(function(items) {
 	api.launchEmbeddedUI("HubSharer", upload, {"fileToShare": items[0]});
     });
 };
+
 hub.onShareRequested(_shareRequested);
 
 function upload(res) {
-    //console.log(res);
     var results = JSON.parse(res);
-    //console.log (results);
-    console.log (results.accessToken);
+    if (results.status == "cancelled")
+        activeTransfer.setState(hub.ContentTransfer.State.Aborted);
+
     var xhr = new XMLHttpRequest();
     xhr.open( 'POST', 'https://graph.facebook.com/me/photos?access_token=' + results.accessToken, true );
     xhr.onload = xhr.onerror = function() {
-        console.log("status: " + xhr.status + " : " + xhr.responseText );
         if ( xhr.status == 200 )
             window.location.reload();
     };
@@ -25,7 +26,6 @@ function upload(res) {
     var contentType = results.fileToShare.split(',')[0].split(':')[1];
     var b64data = results.fileToShare.split(',')[1];
 
-    console.log ("Content Type: " + contentType);
     var byteCharacters = atob(b64data);
     var byteNumbers = new Array(byteCharacters.length);
     for (var i = 0; i < byteCharacters.length; i++) {
@@ -39,15 +39,9 @@ function upload(res) {
 
     var blob = new Blob([byteArray], {type: contentType});
 
-    console.log('blob size: ' + blob.size);
-    console.log(blob.type);
-
     var uploadForm = document.forms.namedItem("uploadForm");
     var formData = new FormData(uploadForm);
     formData.append('source', blob);
     formData.append('message', results.message);
     xhr.send(formData);
-
 }
-
-

@@ -5,7 +5,7 @@
     "hooks": {
         "webapp-facebook": {
             "account-application": "webapp-facebook.application",
-            "content-hub": "content-hub/content-hub-exporter.json",
+            "content-hub": "content-hub/webapp-facebook.json",
             "account-service": "webapp-facebook.service",
             "apparmor": "webapp-facebook.json",
             "desktop": "webapp-facebook.desktop"
@@ -14,6 +14,5 @@
     "maintainer": "Webapps Team <webapps@lists.launchpad.net>",
     "name": "com.ubuntu.developer.webapps.webapp-facebook",
     "title": "webapp-facebook",
-    "version": "1.0.17.3"
+    "version": "1.0.17.4"
 }
-
