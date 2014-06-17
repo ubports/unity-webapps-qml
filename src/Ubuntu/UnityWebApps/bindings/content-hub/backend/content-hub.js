@@ -40,7 +40,7 @@ function createContentHubApi(backendDelegate, accessPolicy) {
             "Music": ContentHubBridge.ContentType.Music,
             "Contacts": ContentHubBridge.ContentType.Contacts,
             "Videos": ContentHubBridge.ContentType.Videos,
-            "Link": ContentHubBridge.ContentType.Link,
+            "Links": ContentHubBridge.ContentType.Links,
         };
         return name in contentTypePerName ?
                     contentTypePerName[name]
