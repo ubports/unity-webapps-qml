@@ -310,6 +310,13 @@ Rectangle {
             height: childrenRect.height
             interactive: false
             model: accounts
+            header: ListItem.Header {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+                text: i18n.tr("Select account")
+            }
             delegate: acctDelegate
         }
     }
