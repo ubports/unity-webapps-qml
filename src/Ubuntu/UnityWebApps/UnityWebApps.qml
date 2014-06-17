@@ -546,12 +546,10 @@ Item {
             },
 
             launchEmbeddedUI: function(name, callback, params) {
-                console.debug ("launchEmbeddedUI: HERE");
                 if ( ! model) {
                     print ("No model");
                     return;
                 }
-		console.log(JSON.stringify(params));
 
                 // TODO validate
                 var path = model.path(webapps.name);
@@ -568,15 +566,15 @@ Item {
                     return;
                 }
 
-		var p = parentItem.parent ? parentItem.parent : parentItem
+                var p = parentItem.parent ? parentItem.parent : parentItem
 
-		var c;
-		function oncreated() {
-                  //if (p) {
-                  //  p.visible = false;
-                  //}
+                var c;
+                function oncreated() {
+                          //if (p) {
+                          //  p.visible = false;
+                          //}
 
-		  var ui = c.createObject(p, {"fileToShare": params.fileToShare.url, "visible": true});
+                  var ui = c.createObject(p, {"fileToShare": params.fileToShare.url, "visible": true});
 
                   if ( ! ui.onCompleted) {
                     ui.destroy();
@@ -591,14 +589,13 @@ Item {
                     callback(data);
                   }
                   ui.onCompleted.connect(_onCompleted);
-		};
+                };
 
-		console.debug("parent: " + p.status + ", " + p.item)
-		c = Qt.createComponent(path + "/" + name + ".qml");
-		if (c.status == Component.Ready)
-		  oncreated()
-	  	else
-		  c.statusChanged.connect(oncreated)
+                c = Qt.createComponent(path + "/" + name + ".qml");
+                if (c.status == Component.Ready)
+                  oncreated()
+                else
+                  c.statusChanged.connect(oncreated)
             },
 
             Notification: {
