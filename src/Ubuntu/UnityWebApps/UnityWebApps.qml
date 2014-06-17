@@ -570,19 +570,13 @@ Item {
 
                 var c;
                 function oncreated() {
-                          //if (p) {
-                          //  p.visible = false;
-                          //}
-
                   var ui = c.createObject(p, {"fileToShare": params.fileToShare.url, "visible": true});
-
                   if ( ! ui.onCompleted) {
                     ui.destroy();
                     return;
                   }
 
                   function _onCompleted(data) {
-                    //ui.visible = false;
                     p.visible = true;
                     ui.onCompleted.disconnect(_onCompleted);
                     ui.destroy();
