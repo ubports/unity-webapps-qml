@@ -4,8 +4,6 @@ import Ubuntu.Content 0.1
 
 Item {
     id: main
-    width: parent.width
-    height: parent.height
     anchors.fill: parent
 
     signal completed(string result)
