@@ -593,11 +593,11 @@ Item {
                     uiobject.onCompleted.connect(_onCompleted);
                 };
 
-                var component = Qt.createComponent(path + "/" + name + ".qml");
-                if (component.status === Component.Ready)
+                var uicomponent = Qt.createComponent(path + "/" + name + ".qml");
+                if (uicomponent.status === Component.Ready)
                     onCreated()
                 else
-                    component.statusChanged.connect(onCreated)
+                    uicomponent.statusChanged.connect(onCreated)
             },
 
             Notification: {
