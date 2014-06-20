@@ -115,20 +115,22 @@ Item {
 
 
     /*!
-      \qmlproperty UnityWebappsAppModel UnityWebApps::extraApisSource
-
-      An optional model used in conjunction with the 'name' property
-        as a location for looking up the desired webapps.
+      \qmlproperty bool UnityWebApps::injectExtraUbuntuApis
 
      */
     property alias injectExtraUbuntuApis: settings.injectExtraUbuntuApis
 
     /*!
-      \qmlproperty UnityWebappsAppModel UnityWebApps::extraApisSource
+      \qmlproperty bool UnityWebApps::injectExtraUILaunchCapabilities
+
+     */
+    property alias injectExtraUILaunchCapabilities: settings.injectExtraUILaunchCapabilities
+
+    /*!
+      \qmlproperty bool UnityWebApps::requiresInit
 
      */
     property alias requiresInit: settings.requiresInit
-
 
     /*!
       \qmlproperty UnityActions.Context UnityWebApps::actionsContext
@@ -138,7 +140,6 @@ Item {
 
      */
     property var actionsContext: null
-
 
     /*!
       \qmlproperty string UnityWebApps::_opt_backendProxies
@@ -152,6 +153,7 @@ Item {
 
     Settings {
         id: settings
+        injectExtraUILaunchCapabilities: name && name.length && name.length !== 0
     }
 
 /*
@@ -208,7 +210,7 @@ Item {
 
         var instance = new UnityWebAppsJs.UnityWebApps(webapps,
                                                        bindeeProxies,
-                                                       webappUserscripts);
+                                                       __getPolicyForContent(settings));
         internal.instance = instance;
 
         if (internal.backends)
@@ -418,21 +420,27 @@ Item {
 
      */
     function __getPolicyForContent(settings) {
-        // TODO: review this
         function PassthroughPolicy() {};
         PassthroughPolicy.prototype.allowed = function(signature) {
             return true;
         };
+
+        var BASIC_WEBAPPS_ALLOWED_APIS = ["init"];
         function RestrictedPolicy(restrictions) {
-            this.restrictions = restrictions || [];
+            this.restrictions = restrictions || BASIC_WEBAPPS_ALLOWED_APIS;
         };
         RestrictedPolicy.prototype.allowed = function(signature) {
-            return this.restrictions.some(function(e) { return e == signature; });
+            return this.restrictions.some(function(e) { return e === signature; });
         };
 
-        if (injectExtraUbuntuApis)
+        if (settings.injectExtraUbuntuApis)
             return new PassthroughPolicy();
-        return new RestrictedPolicy(["ContentHub.onShareRequested"])
+
+        if (settings.injectExtraUILaunchCapabilities)
+            return new RestrictedPolicy(["launchEmbeddedUI", "ContentHub.onShareRequested"]);
+
+        // Inject only the basic init + api
+        return new PassthroughPolicy()
     }
 
     /*!
@@ -546,50 +554,50 @@ Item {
             },
 
             launchEmbeddedUI: function(name, callback, params) {
-                if ( ! model) {
-                    print ("No model");
+                if (!model || !webapps || !webapps.name) {
+                    console.error("launchEmbeddedUI: could not find a valid webapp model or webapp name");
                     return;
                 }
 
-                // TODO validate
                 var path = model.path(webapps.name);
-                console.debug ("PATH: " + path);
-                if (! path || path.length == 0)
+                if (!path || path.length === 0) {
+                    console.error("launchEmbeddedUI: Invalid or empty webapp path name");
                     return;
+                }
 
                 var backendDelegate = UnityBackends.backendDelegate;
 
                 var parentItem = backendDelegate.parentView();
-                if ( ! parentItem || ! parentItem.visible || ! parentItem.height || ! parentItem.width) {
-                    console.debug("Cannot launch the content peer picker UI, invalid parent item: " + parentItem);
+                if (!parentItem || !parentItem.visible || !parentItem.height || !parentItem.width) {
+                    console.error("launchEmbeddedUI: Cannot launch the embedded UI, invalid or malformed parent item: " + parentItem);
                     callback({result: "cancelled"});
                     return;
                 }
 
                 var p = parentItem.parent ? parentItem.parent : parentItem
 
-                var c;
-                function oncreated() {
-                  var ui = c.createObject(p, {"fileToShare": params.fileToShare.url, "visible": true});
-                  if ( ! ui.onCompleted) {
-                    ui.destroy();
-                    return;
-                  }
-
-                  function _onCompleted(data) {
-                    p.visible = true;
-                    ui.onCompleted.disconnect(_onCompleted);
-                    ui.destroy();
-                    callback(data);
-                  }
-                  ui.onCompleted.connect(_onCompleted);
+                var uicomponent;
+                function onCreated() {
+                    var uiobject = uicomponent.createObject(p, {"fileToShare": params.fileToShare.url, "visible": true});
+                    if ( ! uiobject.onCompleted) {
+                        console.error("launchEmbeddedUI: The local UI component to be launched does not expose a mandatory 'completed' signal");
+                        uiobject.destroy();
+                        return;
+                    }
+                    function _onCompleted(data) {
+                        p.visible = true;
+                        uiobject.onCompleted.disconnect(_onCompleted);
+                        uiobject.destroy();
+                        callback(data);
+                    }
+                    uiobject.onCompleted.connect(_onCompleted);
                 };
 
-                c = Qt.createComponent(path + "/" + name + ".qml");
-                if (c.status == Component.Ready)
-                  oncreated()
+                var component = Qt.createComponent(path + "/" + name + ".qml");
+                if (component.status === Component.Ready)
+                    onCreated()
                 else
-                  c.statusChanged.connect(oncreated)
+                    component.statusChanged.connect(onCreated)
             },
 
             Notification: {
