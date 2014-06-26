@@ -24,7 +24,7 @@
  *
  */
 
-function createContentHubApi(backendDelegate) {
+function createContentHubApi(backendDelegate, accessPolicy) {
     var PLUGIN_URI = 'Ubuntu.Content';
     var VERSION = 0.1;
 
@@ -39,6 +39,8 @@ function createContentHubApi(backendDelegate) {
             "Documents": ContentHubBridge.ContentType.Documents,
             "Music": ContentHubBridge.ContentType.Music,
             "Contacts": ContentHubBridge.ContentType.Contacts,
+            "Videos": ContentHubBridge.ContentType.Videos,
+            "Links": ContentHubBridge.ContentType.Links,
         };
         return name in contentTypePerName ?
                     contentTypePerName[name]
@@ -57,6 +59,10 @@ function createContentHubApi(backendDelegate) {
             return "Music";
         else if (state === ContentHubBridge.ContentType.Contacts)
             return "Contacts";
+        else if (state === ContentHubBridge.ContentType.Videos)
+            return "Videos";
+        else if (state === ContentHubBridge.ContentType.Links)
+            return "Links";
         return "Unknown";
     };
 
@@ -146,6 +152,8 @@ function createContentHubApi(backendDelegate) {
             "Collected": ContentHubBridge.ContentTransfer.Collected,
             "Aborted": ContentHubBridge.ContentTransfer.Aborted,
             "Finalized": ContentHubBridge.ContentTransfer.Finalized,
+            "Downloading": ContentHubBridge.ContentTransfer.Downloading,
+            "Downloaded": ContentHubBridge.ContentTransfer.Downloaded,
         };
         return name in contentTransferStatePerName ?
                     contentTransferStatePerName[name]
@@ -166,6 +174,10 @@ function createContentHubApi(backendDelegate) {
             return "Aborted";
         else if (state === ContentHubBridge.ContentTransfer.Finalized)
             return "Finalized";
+        else if (state === ContentHubBridge.ContentTransfer.Downloading)
+            return "Downloading";
+        else if (state === ContentHubBridge.ContentTransfer.Downloaded)
+            return "Downloaded";
         return "<Unknown State>";
     };
 
@@ -765,6 +777,20 @@ function createContentHubApi(backendDelegate) {
         onExportRequested: function(callback) {
             _contenthub.exportRequested.connect(function(exportTransfer) {
                 var wrapped = new ContentTransfer(exportTransfer);
+                callback(wrapped.serialize());
+            });
+        },
+
+        onImportRequested: function(callback) {
+            _contenthub.onImportRequested.connect(function(importTransfer) {
+                var wrapped = new ContentTransfer(importTransfer);
+                callback(wrapped.serialize());
+            });
+        },
+
+        onShareRequested: function(callback) {
+            _contenthub.shareRequested.connect(function(shareTransfer) {
+                var wrapped = new ContentTransfer(shareTransfer);
                 callback(wrapped.serialize());
             });
         },

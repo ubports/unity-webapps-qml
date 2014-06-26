@@ -230,7 +230,7 @@ function createContentHubApi(backendBridge) {
 /**
  * ContentPeer is an object returned by the ContentHub.
    It represents a remote peer that can be used in a request
-   to export or import date.
+   to import, export or share content.
 
  * @class ContentPeer
  * @module ContentHub
@@ -421,7 +421,7 @@ function createContentHubApi(backendBridge) {
         // methods
 
         /**
-         * Request to import data from this ContentPeer.
+         * Request to exchange content with this ContentPeer.
          *
          * @method request
          * @param callback {Function(ContentTransfer)} Called with the resulting content transfer
@@ -431,7 +431,7 @@ function createContentHubApi(backendBridge) {
         },
 
         /**
-         * Request to import data from this ContentPeer and use a ContentStore for permanent storage.
+         * Request to import content from this ContentPeer and use a ContentStore for permanent storage.
          *
          * @method requestForStore
          * @param store {ContentStore} Store used as a permanent storage
@@ -586,6 +586,10 @@ function createContentHubApi(backendBridge) {
 
              Contacts
 
+             Videos
+
+             Links
+
          @static
          @property ContentType {String}
          
@@ -603,6 +607,8 @@ function createContentHubApi(backendBridge) {
             Documents: "Documents",
             Music: "Music",
             Contacts: "Contacts",
+            Videos: "Videos",
+            Links: "Links",
         },
 
         /**
@@ -665,6 +671,10 @@ function createContentHubApi(backendBridge) {
             Aborted: Transfer has been aborted.
 
             Finalized: Transfer has been finished and cleaned up.
+
+            Downloaded: Download specified by downloadId has completed.
+
+            Downloading: Transfer is downloading item specified by downloadId.
           
          @static
          @property ContentTransfer.State {String}
@@ -715,6 +725,12 @@ function createContentHubApi(backendBridge) {
 
                 // Transfer has been finished and cleaned up.
                 Finalized: "Finalized",
+
+                // Transfer has finished downloading.
+                Downloaded: "Downloaded",
+
+                // Transfer is downloading.
+                Downloading: "Downloading",
             },
 
         /**
@@ -726,6 +742,8 @@ function createContentHubApi(backendBridge) {
 
             Export
 
+            Share
+
          @static
          @property ContentTransfer.Direction {String}
          */
@@ -735,6 +753,9 @@ function createContentHubApi(backendBridge) {
 
                 // Transfer is a request to export content
                 Export: "Export",
+
+                // Transfer is a request to share content
+                Share: "Share",
             },
 
         /**
@@ -836,6 +857,58 @@ function createContentHubApi(backendBridge) {
                                [callback]);
         },
 
+        /**
+         * Sets a handler that is to be called when the current application is the
+         * target of an share request.
+         *
+         * @method onShareRequested
+         * @param callback {Function(ContentTransfer)} Function when one requests a resource to be shared.
+         *                                                          The corresponding ContentTransfer is provided as a parameter.
+         *
+         * @example
+
+            var api = external.getUnityObject(1.0);
+            var hub = api.ContentHub;
+
+            var transferState = hub.ContentTransfer.State;
+
+            function _shareRequested(transfer) {
+            };
+
+            hub.onShareRequested(_shareRequested);
+
+         */
+        onShareRequested: function(callback) {
+            backendBridge.call('ContentHub.onShareRequested',
+                               [callback]);
+        },
+
+        /**
+         * Sets a handler that is to be called when the current application is the
+         * target of an import request.
+         *
+         * @method onImportRequested
+         * @param callback {Function(ContentTransfer)} Function when one requests a resource to be imported.
+         *                                                          The corresponding ContentTransfer is provided as a parameter.
+         *
+         * @example
+
+            var api = external.getUnityObject(1.0);
+            var hub = api.ContentHub;
+
+            var transferState = hub.ContentTransfer.State;
+
+            function _importRequested(transfer) {
+            };
+
+            hub.onImportRequested(_importRequested);
+
+         */
+        onImportRequested: function(callback) {
+            backendBridge.call('ContentHub.onImportRequested',
+                               [callback]);
+        },
+
         api: {
 
             /**
@@ -843,7 +916,7 @@ function createContentHubApi(backendBridge) {
              *
              * @method api.importContent
              * @param type {ContentType} type of the content to import
-             * @param peer {ContentPeer} peer whos content should be imported
+             * @param peer {ContentPeer} peer who's content should be imported
              * @param transferOptions {Object} a dictionary of transfer options. The options are the following:
              * - multipleFiles {Bool}: specified if a transfer should involve multiple files or not
              * - scope {ContentScope}: specifies the location where the transferred files should be copied to

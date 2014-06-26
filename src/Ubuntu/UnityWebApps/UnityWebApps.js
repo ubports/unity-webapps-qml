@@ -36,11 +36,12 @@ var UnityWebApps = (function () {
      * \param backends
      * \param userscriptContent
      */
-    function _UnityWebApps(parentItem, bindeeProxies) {
+    function _UnityWebApps(parentItem, bindeeProxies, accessPolicy) {
         this._injected_unity_api_path = Qt.resolvedUrl('unity-webapps-api.js');
         this._bindeeProxies = bindeeProxies;
         this._backends = null;
         this._userscripts = [];
+        this._accessPolicy = accessPolicy;
 
         this._bind();
     };
@@ -70,7 +71,6 @@ var UnityWebApps = (function () {
          */
         _bind: function () {
             var self = this;
-
             var cb = this._onMessageReceivedCallback.bind(self);
             self._bindeeProxies.messageReceivedConnect(cb);
 
@@ -147,6 +147,13 @@ var UnityWebApps = (function () {
                     var cb = this._wrapCallbackIds (message.callback);
                     params.push(cb);
                 }
+
+                var apiCallName = message.name;
+                if (this._accessPolicy && this._accessPolicy.allowed && !this._accessPolicy.allowed(apiCallName)) {
+                    console.error("Unauthorize API call blocked: " + apiCallName);
+                    return;
+                }
+
                 this._dispatchApiCall (message.name, params);
 
             } else if (target === UnityWebAppsUtils.UBUNTU_WEBAPPS_BINDING_OBJECT_METHOD_CALL_MESSAGE) {

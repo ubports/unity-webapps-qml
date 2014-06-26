@@ -98,6 +98,12 @@
             clearActions: createArgumentsSanitizer (backend, [], 'clearActions'),
 
             /**
+             */
+            launchEmbeddedUI: function(name, callback, params) {
+                backend.call('launchEmbeddedUI', [name, callback, params]);
+            },
+
+            /**
              *
              * MediaPlayer API
              *

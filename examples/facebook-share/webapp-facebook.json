@@ -1,0 +1,13 @@
+{
+  "template": "ubuntu-webapp",
+  "policy_groups": [    
+    "networking",
+    "accounts",
+    "audio",
+    "video",
+    "webview",
+    "location",
+    "content_exchange"
+  ],
+  "policy_version": 1.2
+}

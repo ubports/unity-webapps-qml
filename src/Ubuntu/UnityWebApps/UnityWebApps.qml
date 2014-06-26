@@ -115,20 +115,22 @@ Item {
 
 
     /*!
-      \qmlproperty UnityWebappsAppModel UnityWebApps::extraApisSource
-
-      An optional model used in conjunction with the 'name' property
-        as a location for looking up the desired webapps.
+      \qmlproperty bool UnityWebApps::injectExtraUbuntuApis
 
      */
     property alias injectExtraUbuntuApis: settings.injectExtraUbuntuApis
 
     /*!
-      \qmlproperty UnityWebappsAppModel UnityWebApps::extraApisSource
+      \qmlproperty bool UnityWebApps::injectExtraUILaunchCapabilities
+
+     */
+    property alias injectExtraUILaunchCapabilities: settings.injectExtraUILaunchCapabilities
+
+    /*!
+      \qmlproperty bool UnityWebApps::requiresInit
 
      */
     property alias requiresInit: settings.requiresInit
-
 
     /*!
       \qmlproperty UnityActions.Context UnityWebApps::actionsContext
@@ -138,7 +140,6 @@ Item {
 
      */
     property var actionsContext: null
-
 
     /*!
       \qmlproperty string UnityWebApps::_opt_backendProxies
@@ -152,6 +153,7 @@ Item {
 
     Settings {
         id: settings
+        injectExtraUILaunchCapabilities: name && name.length && name.length !== 0
     }
 
 /*
@@ -208,7 +210,7 @@ Item {
 
         var instance = new UnityWebAppsJs.UnityWebApps(webapps,
                                                        bindeeProxies,
-                                                       webappUserscripts);
+                                                       __getPolicyForContent(settings));
         internal.instance = instance;
 
         if (internal.backends)
@@ -413,6 +415,33 @@ Item {
         return null;
     }
 
+    /*!
+      \internal
+
+     */
+    function __getPolicyForContent(settings) {
+        function PassthroughPolicy() {};
+        PassthroughPolicy.prototype.allowed = function(signature) {
+            return true;
+        };
+
+        var BASIC_WEBAPPS_ALLOWED_APIS = ["init"];
+        function RestrictedPolicy(restrictions) {
+            this.restrictions = restrictions || BASIC_WEBAPPS_ALLOWED_APIS;
+        };
+        RestrictedPolicy.prototype.allowed = function(signature) {
+            return this.restrictions.some(function(e) { return e === signature; });
+        };
+
+        if (settings.injectExtraUbuntuApis)
+            return new PassthroughPolicy();
+
+//        if (settings.injectExtraUILaunchCapabilities)
+//            return new RestrictedPolicy(["launchEmbeddedUI", "ContentHub.onShareRequested"]);
+
+        // Inject only the basic init + api
+        return new PassthroughPolicy()
+    }
 
     /*!
       \internal
@@ -522,6 +551,53 @@ Item {
                     return;
                 // hud remove all action
                 UnityBackends.get("hud").clearActions();
+            },
+
+            launchEmbeddedUI: function(name, callback, params) {
+                if (!model || !webapps || !webapps.name) {
+                    console.error("launchEmbeddedUI: could not find a valid webapp model or webapp name");
+                    return;
+                }
+
+                var path = model.path(webapps.name);
+                if (!path || path.length === 0) {
+                    console.error("launchEmbeddedUI: Invalid or empty webapp path name");
+                    return;
+                }
+
+                var backendDelegate = UnityBackends.backendDelegate;
+
+                var parentItem = backendDelegate.parentView();
+                if (!parentItem || !parentItem.visible || !parentItem.height || !parentItem.width) {
+                    console.error("launchEmbeddedUI: Cannot launch the embedded UI, invalid or malformed parent item: " + parentItem);
+                    callback({result: "cancelled"});
+                    return;
+                }
+
+                var p = parentItem.parent ? parentItem.parent : parentItem
+
+                var uicomponent;
+                function onCreated() {
+                    var uiobject = uicomponent.createObject(p, {"fileToShare": params.fileToShare.url, "visible": true});
+                    if ( ! uiobject.onCompleted) {
+                        console.error("launchEmbeddedUI: The local UI component to be launched does not expose a mandatory 'completed' signal");
+                        uiobject.destroy();
+                        return;
+                    }
+                    function _onCompleted(data) {
+                        p.visible = true;
+                        uiobject.onCompleted.disconnect(_onCompleted);
+                        uiobject.destroy();
+                        callback(data);
+                    }
+                    uiobject.onCompleted.connect(_onCompleted);
+                };
+
+                var uicomponent = Qt.createComponent(path + "/" + name + ".qml");
+                if (uicomponent.status === Component.Ready)
+                    onCreated()
+                else
+                    uicomponent.statusChanged.connect(onCreated)
             },
 
             Notification: {
@@ -641,17 +717,13 @@ Item {
                 }
             },
 
-            OnlineAccounts: __injectResourceIfExtraApisAreEnabled(function() {
-                return OnlineAccountsApiBackend.createOnlineAccountsApi(UnityBackends.backendDelegate)
-            }),
+            OnlineAccounts: OnlineAccountsApiBackend.createOnlineAccountsApi(UnityBackends.backendDelegate),
 
             Alarm: __injectResourceIfExtraApisAreEnabled(function() {
                 return AlarmApiBackend.createAlarmApi(UnityBackends.backendDelegate)
             }),
 
-            ContentHub:  __injectResourceIfExtraApisAreEnabled(function() {
-                return ContentHubApiBackend.createContentHubApi(UnityBackends.backendDelegate)
-            }),
+            ContentHub: ContentHubApiBackend.createContentHubApi(UnityBackends.backendDelegate),
 
             RuntimeApi:  __injectResourceIfExtraApisAreEnabled(function() {
                 return RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate)

@@ -23,5 +23,6 @@ Item {
      *
      */
     property bool injectExtraUbuntuApis: false
+    property bool injectExtraUILaunchCapabilities: false
     property bool requiresInit: true
 }
