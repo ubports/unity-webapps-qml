@@ -436,8 +436,8 @@ Item {
         if (settings.injectExtraUbuntuApis)
             return new PassthroughPolicy();
 
-        if (settings.injectExtraUILaunchCapabilities)
-            return new RestrictedPolicy(["launchEmbeddedUI", "ContentHub.onShareRequested"]);
+        // if (settings.injectExtraUILaunchCapabilities)
+        //    return new RestrictedPolicy(["launchEmbeddedUI", "ContentHub.onShareRequested"]);
 
         // Inject only the basic init + api
         return new PassthroughPolicy()
