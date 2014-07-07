@@ -76,8 +76,9 @@ Window {
             actionsContext: webappsActionsContext
             name: root.webappName
             bindee: webView
-            //searchPath: '/home/alex/dev/work/webapps/branches/webapps-qml/latest/examples/data/userscripts'
-            model: UnityWebappsAppModel { }
+            model: UnityWebappsAppModel {
+//                searchPath: ''
+            }
         }
     }
 }
