@@ -35,7 +35,6 @@ SOURCES += \
     unity-webapps-api-mediaplayer.cpp \
     unity-webapps-app-model.cpp \
     unity-webapps-app-manifest-parser.cpp \
-    unity-webapps-app-model-filter-proxy.cpp \
     unity-webapps-app-infos.cpp \
     unity-webapps-desktop-infos.cpp \
     unity-webapps-icon-utils.cpp \
@@ -54,7 +53,6 @@ HEADERS += \
     unity-webapps-app-model.h \
     unity-webapps-app-manifest-parser.h \
     unity-webapps-common-priv.h \
-    unity-webapps-app-model-filter-proxy.h \
     unity-webapps-app-infos.h \
     unity-webapps-desktop-infos.h \
     unity-webapps-icon-utils.h \
