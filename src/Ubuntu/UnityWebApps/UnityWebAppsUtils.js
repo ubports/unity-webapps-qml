@@ -71,6 +71,10 @@ OxideWebviewAdapter.prototype = {
             return;
 
         var context = this.webview.context;
+        if (!context) {
+            console.error('No context found for the current Oxide webview. Cannot inject user scripts.');
+            return;
+        }
 
         for (var i = 0; i < userScriptUrls.length; ++i) {
             var scriptStart = "import com.canonical.Oxide 1.0 as Oxide; Oxide.UserScript { context:";

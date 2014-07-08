@@ -137,7 +137,7 @@ public:
 Q_SIGNALS:
 
     void searchPathChanged(const QString & path);
-    void modelChanged();
+    void modelContentChanged();
 
 
 private Q_SLOTS:

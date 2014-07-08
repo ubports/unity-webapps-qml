@@ -150,6 +150,15 @@ Item {
      */
     property var _opt_backendProxies: null
 
+    /*!
+      \qmlproperty string UnityWebApps::_opt_homepage
+
+      Used only for testing.
+      Allows an optional a homepage to be specified when running a local http server.
+
+     */
+    property string _opt_homepage: ""
+
 
     Settings {
         id: settings
@@ -325,6 +334,9 @@ Item {
             var idx = model.getWebappIndex(webappName);
             var homepage = model.data(idx, UbuntuUnityWebApps.UnityWebappsAppModel.Homepage);
 
+            if (!homepage || homepage.length === 0) {
+                homepage = _opt_homepage;
+            }
             console.debug('Requesting the bindee to navigate to homepage: ' + homepage);
 
             // We recreate a bindee object, but we call any function that requires
@@ -352,9 +364,15 @@ Item {
 
     Component.onCompleted: {
         if (model) {
-            model.modelChanged.connect(function() { __setupNamedWebappEnvironment() });
+            __setupNamedWebappEnvironment();
         }
     }
+
+    /*!
+      \internal
+
+     */
+    onModelChanged: model.modelContentChanged.connect(__setupNamedWebappEnvironment)
 
     /*!
       \internal
