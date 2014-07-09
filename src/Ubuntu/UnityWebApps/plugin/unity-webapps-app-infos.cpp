@@ -28,7 +28,8 @@
 
 
 UnityWebappsAppInfos::UnityWebappsAppInfos(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+    _model(NULL)
 {}
 
 UnityWebappsAppInfos::~UnityWebappsAppInfos()

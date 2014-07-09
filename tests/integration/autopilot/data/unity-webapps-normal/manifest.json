@@ -1,0 +1,7 @@
+{
+    "includes": ["http://localhost:*/*"],
+    "name": "Normal",
+    "scripts": ["script.user.js"],
+    "domain":"",
+    "homepage":""
+}

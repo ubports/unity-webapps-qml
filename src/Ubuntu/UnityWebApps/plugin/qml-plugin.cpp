@@ -26,7 +26,6 @@
 #include "unity-webapps-api-messaging-menu.h"
 #include "unity-webapps-api-launcher.h"
 #include "unity-webapps-api-mediaplayer.h"
-#include "unity-webapps-app-model-filter-proxy.h"
 #include "unity-webapps-app-model.h"
 #include "unity-webapps-app-infos.h"
 
@@ -55,7 +54,6 @@ void WebappsQmlPlugin::registerTypes(const char *uri)
 
     // misc
     qmlRegisterType<UnityWebappsAppModel> (uri, 0, 1, "UnityWebappsAppModel");
-    qmlRegisterType<UnityWebappsAppModelFilterProxy> (uri, 0, 1, "UnityWebappsAppModelFilterProxy");
     qmlRegisterType<UnityWebappsCallback> (uri, 0, 1, "UnityWebappsCallback");
     qmlRegisterType<UnityWebappsAppInfos> (uri, 0, 1, "UnityWebappsAppInfos");
 

@@ -301,7 +301,7 @@ void UnityWebappsAppModel::load()
                    content);
     }
 
-    Q_EMIT modelChanged();
+    Q_EMIT modelContentChanged();
 }
 
 QString

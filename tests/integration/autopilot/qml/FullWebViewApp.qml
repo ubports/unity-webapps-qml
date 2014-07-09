@@ -18,10 +18,9 @@
 
 import QtQuick 2.0
 import QtQuick.Window 2.0
-import QtWebKit 3.0
-import QtWebKit.experimental 1.0
 import Ubuntu.Unity.Action 1.0 as UnityActions
 import Ubuntu.UnityWebApps 0.1
+import "."
 
 import "dom-introspection-utils.js" as DomIntrospectionUtils
 
@@ -36,15 +35,25 @@ Window {
     signal resultUpdated(string message)
 
     function evalInPageUnsafe(expr) {
-        var tid = DomIntrospectionUtils.gentid();
-        console.log(DomIntrospectionUtils.wrapJsCommands(expr))
-        webView.experimental.evaluateJavaScript(DomIntrospectionUtils.wrapJsCommands(expr),
-            function(result) { console.log('Result: ' + result); root.resultUpdated(DomIntrospectionUtils.createResult(result)); });
+        if (webView && webView.experimental) {
+            webView.experimental.evaluateJavaScript(DomIntrospectionUtils.wrapJsCommands(expr),
+                function(result) {
+                    console.log('Result: ' + result);
+                    root.resultUpdated(DomIntrospectionUtils.createResult(result));
+                });
+        }
+        else {
+            root.resultUpdated(DomIntrospectionUtils.createResult(webView.evaluateCode("return navigator.userAgent", true)))
+        }
     }
 
-    property alias url: webView.url
+    property var webView: null
+
+    property bool useOxide: false
+    property string url: ""
     property string webappName: ""
     property string webappSearchPath: ""
+    property string webappHomepage: ""
 
     UnityActions.ActionManager {
         localContexts: [webappsActionsContext]
@@ -54,21 +63,37 @@ Window {
         active: true
     }
 
-    WebView {
-        id: webView
-        objectName: "webview"
-
-        anchors.fill: parent
-        width: parent.width
-        height: parent.height
-
-        experimental.userScripts: []
-        experimental.preferences.navigatorQtObjectEnabled: true
-        experimental.preferences.developerExtrasEnabled: true
-
-        function getUnityWebappsProxies() {
-            return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
+    Loader {
+        id: webviewLoader
+        onLoaded: {
+            webView = webviewLoader.item
         }
+    }
+
+    Component.onCompleted: {
+        var webviewSource = useOxide ?
+                    Qt.resolvedUrl("WebviewBackendOxide.qml")
+                  : Qt.resolvedUrl("WebviewBackendWebkit.qml");
+        var override =  webappName && webappModel.exists(webappName) ?
+                    webappModel.userAgentOverrideFor(webappName) : ""
+        webviewLoader.setSource(webviewSource,
+            { url: root.url,
+            localUserAgentOverride: override})
+    }
+
+    Loader {
+        id: unityWebappsComponentLoader
+        anchors.fill: parent
+        sourceComponent: webView !== null && webappName.length !== 0 ? unityWebappsComponent : null
+    }
+
+    UnityWebappsAppModel {
+        id: webappModel
+        searchPath: root.webappSearchPath
+    }
+
+    Component {
+        id: unityWebappsComponent
 
         UnityWebApps {
             id: webapps
@@ -76,8 +101,8 @@ Window {
             actionsContext: webappsActionsContext
             name: root.webappName
             bindee: webView
-            //searchPath: '/home/alex/dev/work/webapps/branches/webapps-qml/latest/examples/data/userscripts'
-            model: UnityWebappsAppModel { }
+            _opt_homepage: root.webappHomepage
+            model: webappModel
         }
     }
 }
