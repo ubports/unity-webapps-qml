@@ -42,6 +42,8 @@ Window {
             function(result) { console.log('Result: ' + result); root.resultUpdated(DomIntrospectionUtils.createResult(result)); });
     }
 
+    property string apiBackendQmlFileUrl: ""
+    property string clientApiFileUrl: ""
     property alias url: webView.url
     property string webappName: ""
     property string webappSearchPath: ""
@@ -69,15 +71,35 @@ Window {
         function getUnityWebappsProxies() {
             return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
         }
+    }
+
+    Loader {
+        id: apiBackendQmlFileLoader
+        source: apiBackendQmlFileUrl.length !== 0 ? apiBackendQmlFileUrl : ""
+    }
+
+    Loader {
+        id: unityWebappsComponentLoader
+        sourceComponent: apiBackendQmlFileUrl.length !== 0 ?
+                    (apiBackendQmlFileLoader.item ? unityWebappsComponent : undefined)
+                  : unityWebappsComponent
+    }
+
+    Component {
+        id: unityWebappsComponent
 
         UnityWebApps {
             id: webapps
             objectName: "webappsContainer"
             actionsContext: webappsActionsContext
             name: root.webappName
+            customBackendProxies: apiBackendQmlFileLoader.item
+                                 ? apiBackendQmlFileLoader.item.buildapi()
+                                 : undefined
+            customClientApiFileUrl: root.clientApiFileUrl
             bindee: webView
-            //searchPath: '/home/alex/dev/work/webapps/branches/webapps-qml/latest/examples/data/userscripts'
             model: UnityWebappsAppModel { }
         }
     }
 }
+

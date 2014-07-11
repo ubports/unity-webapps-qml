@@ -112,17 +112,17 @@ int main(int argc, char *argv[])
 
             QString value = argument.right(argument.count() - argument.indexOf(VALUE_HEADER) - 1);
 
-            qDebug() << "Adding property: "
+            qDebug() << "Adding property:"
                      << property
-                     << ", "
-                     << "value: "
+                     << ","
+                     << "value:"
                      << value;
 
             properties.insert(property, value);
         }
         else
         {
-            qDebug() << "Ignoring argument: " << argument;
+            qDebug() << "Ignoring argument:" << argument;
         }
     }
 
@@ -140,13 +140,13 @@ int main(int argc, char *argv[])
     QFileInfo f(qmlfile);
     if (!f.exists() || !f.isFile())
     {
-        qDebug() << "QML file not found or not a file: " << qmlfile;
+        qDebug() << "QML file not found or not a file:" << qmlfile;
         return EXIT_FAILURE;
     }
 
     if ( ! importPath.isEmpty())
     {
-        qDebug() << "Setting import path to: " << importPath;
+        qDebug() << "Setting import path to:" << importPath;
         qputenv("QML2_IMPORT_PATH", importPath.toLatin1());
     }
 
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 
     if ( ! inspector.isEmpty())
     {
-        qDebug() << "Inspector server being set to: " << inspector;
+        qDebug() << "Inspector server being set to:" << inspector;
 
         qputenv("QTWEBKIT_INSPECTOR_SERVER", inspector.toLatin1());
     }
@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
     QQmlContext *context = new QQmlContext(engine.rootContext());
 
     QQmlComponent component(&engine, qmlfile);
-    QObject *object = component.create(context);
+    QObject *object = component.beginCreate(context);
 
     if (!component.isReady()) {
         qWarning() << component.errorString();
@@ -191,6 +191,8 @@ int main(int argc, char *argv[])
     {
         object->setProperty(it.key().toStdString().c_str(), QUrl(it.value()));
     }
+
+    component.completeCreate();
 
     if (window)
     {

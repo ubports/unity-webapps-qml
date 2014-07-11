@@ -21,7 +21,7 @@ from unity.emulators.unity import Unity
 from unity.tests import UnityTestCase
 
 class UnityWebappsTestCaseBase(UnityTestCase):
-    LOCAL_QML_LAUNCHER_APP_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../../../../tools/qml-launcher/unity-webapps-qml-launcher')
+    LOCAL_QML_LAUNCHER_APP_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../../../tools/qml-launcher/unity-webapps-qml-launcher')
     INSTALLED_QML_LAUNCHER_APP_PATH = 'unity-webapps-qml-launcher'
 
     # TODO create __init__.py.in
@@ -43,18 +43,27 @@ class UnityWebappsTestCaseBase(UnityTestCase):
             return self.LOCAL_QML_LAUNCHER_APP_PATH
         return self.INSTALLED_QML_LAUNCHER_APP_PATH
 
-    def get_launch_params(self, url):
-        base_params = ['--qml=' + self.get_qml_browser_container_path(), '--url=' + url, '--app-id=unitywebappsqmllauncher', '--webappName=unitywebappsqmllauncher']
+    def get_launch_params(self, url, extra_params=[]):
+        base_params = ['--qml=' + self.get_qml_browser_container_path(),
+            '--url=' + url,
+            '--app-id=unitywebappsqmllauncher',
+            '--webappName=unitywebappsqmllauncher']
+
         if os.path.exists(self.LOCAL_QML_LAUNCHER_APP_PATH):
             # we are local
-            base_params.append('--import=' + os.path.join (os.path.dirname(os.path.realpath(__file__)), '../../../../../src'))
+            base_params.append(
+                '--import=' + os.path.join (os.path.dirname(os.path.realpath(__file__)), '../../../../src'))
+
+        base_params += extra_params
+
         return base_params
 
-    def launch_with_html_filepath(self, html_filepath):
+    def launch_with_html_filepath(self, html_filepath, extra_params=[]):
         self.assertThat(os.path.exists(html_filepath), Equals(True))
 
         url = self.create_file_url(html_filepath)
-        params = self.get_launch_params(url)
+
+        params = self.get_launch_params(url, extra_params)
 
         print 'Launching test with params:', params
         self.app = self.launch_test_application(self.get_qml_launcher_path(),
