@@ -28,7 +28,6 @@ import "./bindings/content-hub/backend/content-hub.js" as ContentHubApiBackend
 import "./bindings/online-accounts/backend/online-accounts.js" as OnlineAccountsApiBackend
 import "./bindings/download-manager/backend/download-api.js" as DownloadApiBackend
 
-
 /*!
     \qmltype UnityWebApps
     \inqmlmodule Ubuntu.UnityWebApps 0.1
