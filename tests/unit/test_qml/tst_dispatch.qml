@@ -19,7 +19,7 @@ TestCase {
 
         var simple_backend = {This: { Is: { A: {Backend: function (args) { mockedWebView.called(args) } } } } };
 
-        webapps._opt_backendProxies = simple_backend;
+        webapps.customBackendProxies = simple_backend;
         webapps.name = "test_properBackendDispatched";
         webapps.bindee = mockedWebView;
 
@@ -47,7 +47,7 @@ TestCase {
 
         var simple_backend = {This: { Is: { A: {Backend: action } } } };
 
-        webapps._opt_backendProxies = simple_backend;
+        webapps.customBackendProxies = simple_backend;
         webapps.name = "test_backendDispatchedWithProperArguments";
         webapps.bindee = mockedWebView;
 
@@ -65,7 +65,7 @@ TestCase {
 
         var invalid_backend = {This: { Is: { Not: { A: {Backend: function (args) { mockedWebView.called(args) } } } } } };
 
-        webapps._opt_backendProxies = invalid_backend;
+        webapps.customBackendProxies = invalid_backend;
         webapps.name = "test_invalidBackendNotDispatched";
         webapps.bindee = mockedWebView;
 
@@ -94,7 +94,7 @@ TestCase {
 
         var backend = {This: { Is: { A: {Backend: action } } } };
 
-        webapps._opt_backendProxies = backend;
+        webapps.customBackendProxies = backend;
         webapps.name = "test_callbacksAreWrapped";
         webapps.bindee = mockedWebView;
 
