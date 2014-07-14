@@ -51,6 +51,10 @@ Window {
 
     property bool useOxide: false
     property string url: ""
+
+    property string apiBackendQmlFileUrl: ""
+    property string clientApiFileUrl: ""
+
     property string webappName: ""
     property string webappSearchPath: ""
     property string webappHomepage: ""
@@ -82,9 +86,18 @@ Window {
     }
 
     Loader {
+        id: apiBackendQmlFileLoader
+        source: apiBackendQmlFileUrl.length !== 0 ? apiBackendQmlFileUrl : ""
+    }
+
+    Loader {
         id: unityWebappsComponentLoader
         anchors.fill: parent
-        sourceComponent: webView !== null && webappName.length !== 0 ? unityWebappsComponent : null
+        sourceComponent: (webView !== null && webappName.length !== 0) ?
+                    (apiBackendQmlFileUrl.length !== 0 ?
+                      (apiBackendQmlFileLoader.item ? unityWebappsComponent : undefined)
+                      : unityWebappsComponent)
+                    : null
     }
 
     UnityWebappsAppModel {
@@ -100,9 +113,14 @@ Window {
             objectName: "webappsContainer"
             actionsContext: webappsActionsContext
             name: root.webappName
+            customBackendProxies: apiBackendQmlFileLoader.item
+                                 ? apiBackendQmlFileLoader.item.buildapi()
+                                 : undefined
+            customClientApiFileUrl: root.clientApiFileUrl
             bindee: webView
             _opt_homepage: root.webappHomepage
             model: webappModel
         }
     }
 }
+

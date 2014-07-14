@@ -28,7 +28,6 @@ import "./bindings/content-hub/backend/content-hub.js" as ContentHubApiBackend
 import "./bindings/online-accounts/backend/online-accounts.js" as OnlineAccountsApiBackend
 import "./bindings/download-manager/backend/download-api.js" as DownloadApiBackend
 
-
 /*!
     \qmltype UnityWebApps
     \inqmlmodule Ubuntu.UnityWebApps 0.1
@@ -121,10 +120,10 @@ Item {
     property alias injectExtraUbuntuApis: settings.injectExtraUbuntuApis
 
     /*!
-      \qmlproperty bool UnityWebApps::injectExtraUILaunchCapabilities
+      \qmlproperty bool UnityWebApps::injectExtraContentShareCapabilities
 
      */
-    property alias injectExtraUILaunchCapabilities: settings.injectExtraUILaunchCapabilities
+    property alias injectExtraContentShareCapabilities: settings.injectExtraContentShareCapabilities
 
     /*!
       \qmlproperty bool UnityWebApps::requiresInit
@@ -142,13 +141,22 @@ Item {
     property var actionsContext: null
 
     /*!
-      \qmlproperty string UnityWebApps::_opt_backendProxies
+      \qmlproperty string UnityWebApps::customBackendProxies
 
       Used only for testing.
       Allows optional (not the default ones) mocked backends to be used.
 
      */
-    property var _opt_backendProxies: null
+    property var customBackendProxies: null
+
+    /*!
+      \qmlproperty string UnityWebApps::_opt_clientApiFileUrl
+
+      Used only for testing.
+      Allows optional (not the default ones) client api to be used instead of the default one.
+
+     */
+    property string customClientApiFileUrl: ""
 
     /*!
       \qmlproperty string UnityWebApps::_opt_homepage
@@ -162,7 +170,7 @@ Item {
 
     Settings {
         id: settings
-        injectExtraUILaunchCapabilities: name && name.length && name.length !== 0
+        injectExtraContentShareCapabilities: name && name.length && name.length !== 0
     }
 
 /*
@@ -216,10 +224,15 @@ Item {
             console.debug('__bind: ERROR bindee proxies not valid')
             return;
         }
+        var instance =
+            new UnityWebAppsJs.UnityWebApps(
+                    webapps,
+                    bindeeProxies,
+                    __getPolicyForContent(settings),
+                    customClientApiFileUrl && customClientApiFileUrl.length !== 0
+                      ? customClientApiFileUrl
+                      : Qt.resolvedUrl('unity-webapps-api.js'));
 
-        var instance = new UnityWebAppsJs.UnityWebApps(webapps,
-                                                       bindeeProxies,
-                                                       __getPolicyForContent(settings));
         internal.instance = instance;
 
         if (internal.backends)
@@ -232,8 +245,8 @@ Item {
      */
     function __createBackendsIfNeeded() {
         var backends;
-        if (_opt_backendProxies != null)
-            backends = _opt_backendProxies;
+        if (customBackendProxies != null)
+            backends = customBackendProxies;
         else {
             backends = __makeBackendProxies();
         }
@@ -245,7 +258,7 @@ Item {
 
      */
     function __initBackends() {
-        if (__isValidWebAppName(webapps.name) || injectExtraUbuntuApis) {
+        if (customBackendProxies || __isValidWebAppName(webapps.name) || injectExtraUbuntuApis) {
             internal.backends = __createBackendsIfNeeded();
             if (internal.backends && internal.instance)
                 internal.instance.setBackends(internal.backends);
@@ -368,6 +381,8 @@ Item {
         }
     }
 
+    onCustomBackendProxiesChanged: __initBackends()
+
     /*!
       \internal
 
@@ -448,17 +463,32 @@ Item {
             this.restrictions = restrictions || BASIC_WEBAPPS_ALLOWED_APIS;
         };
         RestrictedPolicy.prototype.allowed = function(signature) {
-            return this.restrictions.some(function(e) { return e === signature; });
+            return this.restrictions.some(function(e) { return signature.match(e); });
+        };
+        RestrictedPolicy.prototype.add = function(signature) {
+            if (! this.restrictions.some(function(e) { return e === signature; })) {
+                this.restrictions.push(signature);
+            }
         };
 
         if (settings.injectExtraUbuntuApis)
             return new PassthroughPolicy();
 
-//        if (settings.injectExtraUILaunchCapabilities)
-//            return new RestrictedPolicy(["launchEmbeddedUI", "ContentHub.onShareRequested"]);
-
-        // Inject only the basic init + api
-        return new PassthroughPolicy()
+        var policy = new RestrictedPolicy(['init',
+                                           'addAction',
+                                           'clearAction',
+                                           'clearActions',
+                                           'acceptData',
+                                           'Launcher.*',
+                                           'Notification.*',
+                                           'Launcher.*',
+                                           'MediaPlayer.*',
+                                           'MessagingIndicator.*']);
+        if (settings.injectExtraContentShareCapabilities) {
+            policy.add("launchEmbeddedUI");
+            policy.add("ContentHub.onShareRequested");
+        }
+        return policy;
     }
 
     /*!

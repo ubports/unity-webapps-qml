@@ -137,6 +137,64 @@ UnityBindingBridge.prototype = {
     },
 
     /**
+     * \internal
+     *
+     */
+    _makeWebpageCallback: function (callbackid) {
+        var self = this;
+        return function () {
+            var callback_args = Array.prototype.slice.call(arguments);
+
+            callback_args = callback_args.map (function (arg) {
+                return self._transformCallbacksToIds(arg);
+            });
+
+            var message = formatUnityWebappsCallbackCall(callbackid, callback_args);
+
+            self._bindeeProxies.sendToPage(JSON.stringify(message));
+        };
+    },
+
+    /**
+     * \internal
+     *
+     * Wraps callback ids in proper callback that dispatch to the
+     * webpage thru a proper event
+     *
+     */
+    _wrapCallbackIds: function (obj) {
+        if ( ! obj)
+            return obj;
+        if ( ! isIterableObject(obj)) {
+            return obj;
+        }
+
+        if (obj
+            && obj.hasOwnProperty('callbackid')
+            && obj.callbackid !== null) {
+          return this._makeWebpageCallback (obj.callbackid);
+        }
+
+        var ret = (obj instanceof Array) ? [] : {};
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                if (UnityWebAppsUtils.isIterableObject (obj[key])) {
+                    if (obj[key].callbackid != null) {
+                        ret[key] = this._makeWebpageCallback (obj[key].callbackid);
+                    }
+                    else {
+                        ret[key] = this._wrapCallbackIds (obj[key]);
+                    }
+                }
+                else {
+                    ret[key] = obj[key];
+                }
+            }
+        }
+        return ret;
+    },
+
+    /**
      * @internal
      */
     _dispatchCallbackCall: function(id, args) {

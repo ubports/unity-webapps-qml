@@ -331,4 +331,71 @@ var toISODate = function(d) {
         + pad(d.getUTCSeconds()) + 'Z';
 };
 
+function transformFunctionToCallbackIdIfNecessary(obj, callbackManager) {
+    var ret = obj;
+    if (obj instanceof Function && callbackManager && callbackManager.store) {
+        var id = callbackManager.store(obj);
+        ret = {callbackid: id};
+    }
+    return ret;
+}
+
+function transformCallbacksToIds(obj, callbackManager) {
+    if ( ! isIterableObject(obj)) {
+        return transformFunctionToCallbackIdIfNecessary(obj, callbackManager);
+    }
+    var ret = (obj instanceof Array) ? [] : {};
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            if (obj[key] instanceof Function) {
+                ret[key] = transformFunctionToCallbackIdIfNecessary(obj[key], callbackManager);
+            }
+            else if (isIterableObject (obj[key])) {
+                ret[key] = transformCallbacksToIds(obj[key]);
+            }
+            else {
+                ret[key] = obj[key];
+            }
+        }
+    }
+    return ret;
+}
+
+/**
+ * Wraps callback ids in proper callback that dispatch to the
+ * webpage thru a proper event
+ *
+ */
+function wrapCallbackIds(obj) {
+    if ( ! obj)
+        return obj;
+
+    if (!UnityWebAppsUtils.isIterableObject(obj)) {
+        return obj;
+    }
+
+    if (obj
+        && obj.hasOwnProperty('callbackid')
+        && obj.callbackid !== null) {
+      return this._makeWebpageCallback (obj.callbackid);
+    }
+
+    var ret = (obj instanceof Array) ? [] : {};
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            if (UnityWebAppsUtils.isIterableObject (obj[key])) {
+                if (obj[key].callbackid !== null) {
+                    ret[key] = this._makeWebpageCallback (obj[key].callbackid);
+                }
+                else {
+                    ret[key] = this._wrapCallbackIds (obj[key]);
+                }
+            }
+            else {
+                ret[key] = obj[key];
+            }
+        }
+    }
+    return ret;
+}
 
