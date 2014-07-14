@@ -25,10 +25,10 @@
         document.dispatchEvent (e);
     };
 
-    //@include ../../../src/Ubuntu/UnityWebApps/UnityWebAppsUtils.js
-    //@include ../../../src/Ubuntu/UnityWebApps/common/js/unity-backend-messaging-proxy.js
-    //@include ../../../src/Ubuntu/UnityWebApps/common/js/unity-binding-proxy.js
-    //@include ../../../src/Ubuntu/UnityWebApps/common/js/unity-binding-bridge.js
+    //@include ../../src/Ubuntu/UnityWebApps/UnityWebAppsUtils.js
+    //@include ../../src/Ubuntu/UnityWebApps/common/js/unity-backend-messaging-proxy.js
+    //@include ../../src/Ubuntu/UnityWebApps/common/js/unity-binding-proxy.js
+    //@include ../../src/Ubuntu/UnityWebApps/common/js/unity-binding-bridge.js
 
     var apiBuilder = function(backend) {
         return {

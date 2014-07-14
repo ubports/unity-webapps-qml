@@ -4,7 +4,7 @@ UNITY_API_JS_FILE = $$system($$PWD/../../tools/inject-js-utils.py ./html/test_we
 
 inject_dependancies.target = ./html/test_webapps_callback_dispatch_api.js
 inject_dependancies.depends = ./html/test_webapps_callback_dispatch_api.js.in
-inject_dependancies.commands = $$PWD/../../../tools/inject-js-utils.py $< $@
+inject_dependancies.commands = $$PWD/../../tools/inject-js-utils.py $< $@
 
 QMAKE_EXTRA_TARGETS += inject_dependancies
 
