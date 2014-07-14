@@ -113,6 +113,7 @@ Window {
             objectName: "webappsContainer"
             actionsContext: webappsActionsContext
             name: root.webappName
+            injectExtraUbuntuApis: true
             customBackendProxies: apiBackendQmlFileLoader.item
                                  ? apiBackendQmlFileLoader.item.buildapi()
                                  : undefined
