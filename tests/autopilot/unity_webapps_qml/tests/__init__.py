@@ -21,7 +21,7 @@ from unity.emulators.unity import Unity
 
 from unity.tests import UnityTestCase
 
-LOCAL_QML_LAUNCHER_APP_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../../../../tools/qml-launcher/unity-webapps-qml-launcher')
+LOCAL_QML_LAUNCHER_APP_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../../../tools/qml-launcher/unity-webapps-qml-launcher')
 INSTALLED_QML_LAUNCHER_APP_PATH = 'unity-webapps-qml-launcher'
 
 # TODO create __init__.py.in
@@ -31,6 +31,7 @@ INSTALLED_BROWSER_CONTAINER_PATH = '/usr/share/unity-webapps-qml/autopilot-tests
 BASE_URL = ''
 
 class UnityWebappsTestCaseBase(UnityTestCase):
+
     def setUp(self):
         super(UnityWebappsTestCaseBase, self).setUp()
         self.use_oxide = False
@@ -56,7 +57,8 @@ class UnityWebappsTestCaseBase(UnityTestCase):
                           webapp_name='unitywebappsqmllauncher',
                           webapp_search_path="",
                           webapp_homepage="",
-                          use_oxide=False):
+                          use_oxide=False,
+                          extra_params=[]):
         base_params = ['--qml=' + self.get_qml_browser_container_path(),
             '--app-id=' + webapp_name,
             '--webappName=' + webapp_name,
@@ -74,15 +76,17 @@ class UnityWebappsTestCaseBase(UnityTestCase):
         if os.path.exists(LOCAL_QML_LAUNCHER_APP_PATH):
             # we are local
             base_params.append('--import=' + os.path.join (os.path.dirname(os.path.realpath(__file__)),
-                               '../../../../../src'))
+                               '../../../../src'))
+
+        base_params += extra_params
 
         return base_params
 
-    def launch_with_html_filepath(self, html_filepath):
+    def launch_with_html_filepath(self, html_filepath, extra_params=[]):
         self.assertThat(os.path.exists(html_filepath), Equals(True))
         url = self.create_file_url(html_filepath)
 
-        self.launch_application(self.get_launch_params(url))
+        self.launch_application(self.get_launch_params(url, 'unitywebappsqmllauncher', '', '', False, extra_params))
         self.assert_url_eventually_loaded(url)
 
     def launch_application(self, args):
