@@ -77,6 +77,19 @@ public:
 
     // Exposed to QML
     /*!
+     * \brief providesSingleWebappName
+     * \return
+     */
+    Q_INVOKABLE bool providesSingleInlineWebapp() const;
+
+    /*!
+     * \brief providesSingleWebappName
+     * \return
+     */
+    Q_INVOKABLE QString getSingleInlineWebappName() const;
+
+
+    /*!
      * \brief exists
      * \param webappName
      * \return
@@ -156,12 +169,14 @@ private:
     struct WebappFileInfo
     {
         WebappFileInfo ()
+            : isLocalInlineWebapp(false)
         {}
-        WebappFileInfo(const QString& m, const QString& s)
-            : manifestFilename(m), userscript(s)
+        WebappFileInfo(const QString& m, const QString& s, bool isLocal)
+            : manifestFilename(m), userscript(s), isLocalInlineWebapp(isLocal)
         {}
         QString manifestFilename;
         QString userscript;
+        bool isLocalInlineWebapp;
     };
     /*!
      * \brief Option type for WebappFileInfo
@@ -205,7 +220,8 @@ private:
     void addWebApp(const QString& userscriptLocation,
                    const QString& requiresLocation,
                    const ManifestFileInfo& manifest,
-                   const QString& content);
+                   const QString& content,
+                   bool isLocalInlineWebapp);
 
     /*!
      * \brief isValidInstall
@@ -229,6 +245,7 @@ private:
     {
         QString userscriptLocation;
         QString requiresLocation;
+        bool isLocalInlineWebapp;
 
         struct
         {

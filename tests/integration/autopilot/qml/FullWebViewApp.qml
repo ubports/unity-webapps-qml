@@ -84,7 +84,7 @@ Window {
     Loader {
         id: unityWebappsComponentLoader
         anchors.fill: parent
-        sourceComponent: webView !== null && webappName.length !== 0 ? unityWebappsComponent : null
+        sourceComponent: webView !== null ? unityWebappsComponent : null
     }
 
     UnityWebappsAppModel {
