@@ -155,9 +155,7 @@ void WebappsAppModelTest::testSimplifiedManifestInstall()
         UnityWebappsAppModel
                 model;
         model.setSearchPath(QString("./data/simple-install"));
-
-        const int FOUND_COUNT = model.rowCount();
-        QCOMPARE(FOUND_COUNT, 1);
+        QCOMPARE(model.rowCount(), 1);
 
         QString name = model.data(model.index(0), UnityWebappsAppModel::Name).toString();
         QVERIFY(name == "MyWebApp");
@@ -175,8 +173,7 @@ void WebappsAppModelTest::testSimplifiedManifestInstall()
                 model;
         model.setSearchPath(QString("./data/simple-install-webapp-properties-file"));
 
-        const int FOUND_COUNT = model.rowCount();
-        QCOMPARE(FOUND_COUNT, 1);
+        QCOMPARE(model.rowCount(), 1);
 
         QString name = model.data(model.index(0), UnityWebappsAppModel::Name).toString();
         QVERIFY(name == "MyWebApp");

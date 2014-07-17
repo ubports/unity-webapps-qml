@@ -205,9 +205,12 @@ UnityWebappsAppModel::getWebappFiles(const QFileInfo& webAppInstallLocation)
         }
 
         webappCandidateInfo =
-                WebappFileInfoOption (WebappFileInfo (manifestFileInfo.absoluteFilePath(),
-                                                      userScriptFilename,
-                                                      manifestFileName == INLINE_WEBAPP_MANIFEST_FILENAME));
+            WebappFileInfoOption (
+                WebappFileInfo (manifestFileInfo.absoluteFilePath(),
+                                userScriptFilename,
+                                manifestFileName == INLINE_WEBAPP_MANIFEST_FILENAME
+                                    ? WebappFileInfo::IS_LOCAL_INLINE_WEBAPP
+                                    : WebappFileInfo::IS_NON_LOCAL_INLINE_WEBAPP));
 
         break;
     }

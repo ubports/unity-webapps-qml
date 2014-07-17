@@ -168,11 +168,19 @@ private:
      */
     struct WebappFileInfo
     {
+        enum WebappType
+        {
+            IS_LOCAL_INLINE_WEBAPP,
+            IS_NON_LOCAL_INLINE_WEBAPP
+        };
+
         WebappFileInfo ()
             : isLocalInlineWebapp(false)
         {}
-        WebappFileInfo(const QString& m, const QString& s, bool isLocal)
-            : manifestFilename(m), userscript(s), isLocalInlineWebapp(isLocal)
+        WebappFileInfo(const QString& m, const QString& s, WebappType type)
+            : manifestFilename(m),
+              userscript(s),
+              isLocalInlineWebapp(type == IS_LOCAL_INLINE_WEBAPP)
         {}
         QString manifestFilename;
         QString userscript;
