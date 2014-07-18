@@ -179,8 +179,9 @@ UnityWebappsAppModel::getWebappFiles(const QFileInfo& webAppInstallLocation)
     // to avoid name clashes w/ the click package manifest.json, the
     // webapp-properties.json filename is searches first as a valid name
     // and the regular manifest.json file used as a standard fallback.
+    const QString INLINE_WEBAPP_MANIFEST_FILENAME = "webapp-properties.json";
     QStringList manifestFileNames =
-            QStringList() << QString("webapp-properties.json")
+            QStringList() << INLINE_WEBAPP_MANIFEST_FILENAME
                           << QString("manifest.json");
 
     WebappFileInfoOption
@@ -203,8 +204,13 @@ UnityWebappsAppModel::getWebappFiles(const QFileInfo& webAppInstallLocation)
             userScriptFilename = script[0].absoluteFilePath();
         }
 
-        webappCandidateInfo = WebappFileInfoOption (WebappFileInfo (manifestFileInfo.absoluteFilePath(),
-                                                                    userScriptFilename));
+        webappCandidateInfo =
+            WebappFileInfoOption (
+                WebappFileInfo (manifestFileInfo.absoluteFilePath(),
+                                userScriptFilename,
+                                manifestFileName == INLINE_WEBAPP_MANIFEST_FILENAME
+                                    ? WebappFileInfo::IS_LOCAL_INLINE_WEBAPP
+                                    : WebappFileInfo::IS_NON_LOCAL_INLINE_WEBAPP));
 
         break;
     }
@@ -298,7 +304,8 @@ void UnityWebappsAppModel::load()
         addWebApp (candidateWebappFolder.absoluteFilePath(),
                    COMMON_BASE_PATH,
                    manifest.value(),
-                   content);
+                   content,
+                   webappInfos.value().isLocalInlineWebapp);
     }
 
     Q_EMIT modelContentChanged();
@@ -451,7 +458,8 @@ QString UnityWebappsAppModel::getDisplayNameFor(const QString & webappName) cons
 void UnityWebappsAppModel::addWebApp(const QString& userscriptLocation,
                                      const QString& requiresLocation,
                                      const ManifestFileInfo& manifest,
-                                     const QString& content)
+                                     const QString& content,
+                                     bool isLocalInlineWebapp)
 {
     if (manifest.name.isEmpty())
     {
@@ -470,6 +478,7 @@ void UnityWebappsAppModel::addWebApp(const QString& userscriptLocation,
 
     webapp.userscriptLocation = userscriptLocation;
     webapp.requiresLocation = requiresLocation;
+    webapp.isLocalInlineWebapp = isLocalInlineWebapp;
     webapp.data.manifest = manifest;
     webapp.data.content = content;
 
@@ -578,3 +587,14 @@ QVariant UnityWebappsAppModel::data(const QModelIndex& index, int role) const
 }
 
 
+bool UnityWebappsAppModel::providesSingleInlineWebapp() const
+{
+    return !_webapps.empty() && _webapps.count() == 1 && _webapps.at(0).isLocalInlineWebapp;
+}
+
+QString UnityWebappsAppModel::getSingleInlineWebappName() const
+{
+    if (!providesSingleInlineWebapp())
+        return QString();
+    return _webapps.at(0).data.manifest.name;
+}

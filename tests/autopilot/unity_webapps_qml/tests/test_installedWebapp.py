@@ -57,3 +57,7 @@ class InstalledWebappsTestCaseBase(WebappsTestCaseBaseWithLocalHttpContentBase):
         self.launch_with_webapp('ExtendedWebappProperties', self.get_webapp_install_folder() + '/all-in-same-folder', True)
         self.assertThat(lambda: self.eval_expression_in_page_unsafe('return navigator.userAgent;'), Eventually(Equals("My Override")))
 
+    def test_webappPropertiesNameUpdated(self):
+        self.launch_with_webapp('', self.get_webapp_install_folder() + '/all-in-same-folder')
+        self.assertThat(lambda: self.eval_expression_in_page_unsafe('return window.external.getUnityObject("1.0") != null;'), Eventually(Equals(True)))
+
