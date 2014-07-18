@@ -1,3 +1,10 @@
+unity-webapps-qml (0.1+14.10.20140718.1-0ubuntu1) utopic; urgency=low
+
+  [ Alexandre Abreu ]
+  * Add bidirectional callback support between js <-> qml,
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 18 Jul 2014 17:40:27 +0000
+
 unity-webapps-qml (0.1+14.10.20140709-0ubuntu1) utopic; urgency=low
 
   [ Alexandre Abreu ]
