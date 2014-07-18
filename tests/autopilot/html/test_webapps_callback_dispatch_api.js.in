@@ -1,0 +1,58 @@
+/*
+ * Copyright 2014 Canonical Ltd.
+ *
+ * This file is part of unity-webapps-qml.
+ *
+ * unity-webapps-qml is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 3.
+ *
+ * unity-webapps-qml is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+(function () {
+
+    // Acknowledge that the API has been fully injected
+    var sendApiCreatedAcknowledgeEvent = function () {
+        var e = document.createEvent ("Events");
+        e.initEvent ("ubuntu-webapps-api-ready", false, false);
+        document.dispatchEvent (e);
+    };
+
+    //@include ../../src/Ubuntu/UnityWebApps/UnityWebAppsUtils.js
+    //@include ../../src/Ubuntu/UnityWebApps/common/js/unity-backend-messaging-proxy.js
+    //@include ../../src/Ubuntu/UnityWebApps/common/js/unity-binding-proxy.js
+    //@include ../../src/Ubuntu/UnityWebApps/common/js/unity-binding-bridge.js
+
+    var apiBuilder = function(backend) {
+        return {
+            withCallback: function(callback) {
+                backend.call('withCallback', [callback]);
+            }
+        };
+    };
+
+    var apiBridge = new UnityBindingBridge(
+        makeCallbackManager(),
+        createMessagingProxyForCurrentWebRuntime());
+
+    var api = apiBuilder (apiBridge);
+
+    apiBridge.setBindingApi(api);
+
+    if (!window.external)
+        window.external = {};
+
+    window.external.getUnityObject = function (version) {
+        return api;
+    };
+
+    sendApiCreatedAcknowledgeEvent();
+}) ();
+

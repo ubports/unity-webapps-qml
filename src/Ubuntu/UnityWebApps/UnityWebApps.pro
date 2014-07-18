@@ -4,9 +4,6 @@ include(../../../common-vars.pri)
 TEMPLATE = subdirs
 SUBDIRS += plugin
 
-#
-#
-#
 UNITY_API_JS_FILE = $$system($$PWD/../../../tools/inject-js-utils.py unity-webapps-api.js.in unity-webapps-api.js)
 
 inject_dependancies.target = unity-webapps-api.js

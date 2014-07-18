@@ -1,4 +1,4 @@
 TEMPLATE=subdirs
 
-SUBDIRS = unit integration
+SUBDIRS = unit autopilot
 
