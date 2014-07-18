@@ -632,11 +632,11 @@ Item {
                         uiobject.destroy();
                         return;
                     }
-                    function _onCompleted(data) {
+                    function _onCompleted(data, onResourceUploadedCallback) {
                         p.visible = true;
                         uiobject.onCompleted.disconnect(_onCompleted);
                         uiobject.destroy();
-                        callback(data);
+                        callback(data, onResourceUploadedCallback);
                     }
                     uiobject.onCompleted.connect(_onCompleted);
                 };

@@ -111,7 +111,7 @@ var UnityWebApps = (function () {
          *
          */
         _onMessage: function(msg) {
-            if ( ! this._isValidWebAppsMessage(msg)) {
+            if ( ! this._isValidWebAppsMessage(msg) && ! this._isValidCallbackMessage(msg)) {
                 this._log ('Invalid message received: ' + json.stringify(msg));
 
                 return;
@@ -177,6 +177,23 @@ var UnityWebApps = (function () {
                                           objectid: objectid,
                                           class_name: class_name,
                                           method_name: method_name}]);
+
+            } else if (target === UnityWebAppsUtils.UBUNTU_WEBAPPS_BINDING_API_CALLBACK_MESSAGE) {
+
+                var id = message.id;
+
+                if (! id || ! params)
+                    return;
+
+                var cbfunc = this._callbackManager.get(id);
+                if (!cbfunc || !(cbfunc instanceof Function)) {
+                    try {
+                        console.log('Invalid callback id: ' + id);
+                    }
+                    catch (e) {}
+                    return;
+                }
+                cbfunc.apply(null, params);
             }
         },
 
@@ -286,6 +303,17 @@ var UnityWebApps = (function () {
                     message.target &&
                     message.target.indexOf('ubuntu-webapps-binding-call') === 0 &&
                     message.name &&
+                    message.args;
+        },
+
+        /**
+         * \internal
+         *
+         */
+        _isValidCallbackMessage: function(message) {
+            return message != null &&
+                    message.target &&
+                    message.target.indexOf('ubuntu-webapps-binding-callback-call') === 0 &&
                     message.args;
         }
     };
