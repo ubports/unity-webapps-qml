@@ -19,6 +19,7 @@
 .pragma library
 
 var UBUNTU_WEBAPPS_BINDING_API_CALL_MESSAGE = "ubuntu-webapps-binding-call";
+var UBUNTU_WEBAPPS_BINDING_API_CALLBACK_MESSAGE = "ubuntu-webapps-binding-callback-call";
 var UBUNTU_WEBAPPS_BINDING_OBJECT_METHOD_CALL_MESSAGE = "ubuntu-webapps-binding-call-object-method";
 
 

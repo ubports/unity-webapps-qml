@@ -149,9 +149,9 @@ UnityBindingBridge.prototype = {
                 return self._transformCallbacksToIds(arg);
             });
 
-            var message = formatUnityWebappsCallbackCall(callbackid, callback_args);
+            var message = formatUnityWebappsCallbackCall(callbackid, JSON.stringify(callback_args));
 
-            self._bindeeProxies.sendToPage(JSON.stringify(message));
+            self._sendToBackend(JSON.stringify(message));
         };
     },
 
@@ -231,6 +231,11 @@ UnityBindingBridge.prototype = {
             }
             else if (arg instanceof Array) {
                 return self._translateArgs(arg);
+            }
+            else if (arg
+                && arg.hasOwnProperty('callbackid')
+                && arg.callbackid !== null) {
+              return self._makeWebpageCallback (arg.callbackid);
             }
 
             return arg;
