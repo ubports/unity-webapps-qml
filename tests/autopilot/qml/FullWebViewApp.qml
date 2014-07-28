@@ -93,11 +93,10 @@ Window {
     Loader {
         id: unityWebappsComponentLoader
         anchors.fill: parent
-        sourceComponent: (webView !== null && webappName.length !== 0) ?
+        sourceComponent: webView !== null ?
                     (apiBackendQmlFileUrl.length !== 0 ?
                       (apiBackendQmlFileLoader.item ? unityWebappsComponent : undefined)
-                      : unityWebappsComponent)
-                    : null
+                      : unityWebappsComponent) : null
     }
 
     UnityWebappsAppModel {
