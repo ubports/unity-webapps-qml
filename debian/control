@@ -8,7 +8,7 @@ Build-Depends: debhelper (>= 9),
                libnotify-dev,
 # depend on oxide so that we don't build for archs that we can't install on
                liboxideqtcore0,
-               libqt5webkit5-dev,
+               liboxideqt-qmlplugin (>= 1.2.0),
                libunity-action-qt1-dev,
                libunity-dev,
                pkg-config,
@@ -28,8 +28,7 @@ Vcs-Bzr: lp:unity-webapps-qml
 
 Package: unity-webapps-qml
 Architecture: any
-Depends: libqt5webkit5-qmlwebkitplugin,
-         liboxideqt-qmlplugin (>= 1.0),
+Depends: liboxideqt-qmlplugin (>= 1.2.0) | qml-module-qtwebkit,
          qtdeclarative5-qtquick2-plugin,
          qtdeclarative5-unity-action-plugin,
          qtdeclarative5-ubuntu-ui-toolkit-plugin | qtdeclarative5-ubuntu-ui-toolkit-plugin-gles,
