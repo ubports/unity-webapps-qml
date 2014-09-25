@@ -1,6 +1,5 @@
 import QtQuick 2.0
-import QtWebKit 3.0 
-import QtWebKit.experimental 1.0
+import com.canonical.Oxide 1.0
 import Ubuntu.Components 0.1
 import Ubuntu.UnityWebApps 0.1
 
@@ -17,16 +16,13 @@ MainView {
     anchors.fill: parent
     url: \"file://$$OUT_PWD/runtime-api/www/index.html\"
 
-    experimental.preferences.navigatorQtObjectEnabled: true
-    experimental.preferences.developerExtrasEnabled: true
-
     function getUnityWebappsProxies() {
-        return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webview);
+        return UnityWebAppsUtils.makeProxiesForWebViewBindee(webview);
     }
+  }
 
-    UnityWebApps {
-        id: webapps
-        bindee: webview
-    }
+  UnityWebApps {
+    id: webapps
+    bindee: webview
   }
 }

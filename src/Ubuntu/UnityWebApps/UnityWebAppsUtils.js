@@ -64,7 +64,7 @@ function OxideWebviewAdapter(webview, disposer, makeSignalDisconnecter) {
     this.disposer = disposer;
     this.makeSignalDisconnecter = makeSignalDisconnecter;
     this._userScriptInjected = false;
-    this._WEBAPPS_USER_SCRIPT_CONTEXT = "oxide://UnityWebappsApi";
+    this._WEBAPPS_USER_SCRIPT_CONTEXT = "oxide-private://main-world-private";
 }
 OxideWebviewAdapter.prototype = {
     injectUserScripts: function(userScriptUrls) {
@@ -82,7 +82,8 @@ OxideWebviewAdapter.prototype = {
             var scriptEnd = "}";
             var statement = scriptStart +
                     '"' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"' +
-                    '; matchAllFrames: false; url: "' +  userScriptUrls[i] + '";' + scriptEnd;
+                    '; matchAllFrames: false; emulateGreasemonkey: true; "' +
+                    userScriptUrls[i] + '";' + scriptEnd;
             context.addUserScript(Qt.createQmlObject(statement, this.webview));
         }
         this._userScriptInjected = true;
