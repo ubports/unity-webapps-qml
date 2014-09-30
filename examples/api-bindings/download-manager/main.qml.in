@@ -16,6 +16,8 @@ MainView {
     anchors.fill: parent
     url: \"file://$$OUT_PWD/download-manager/www/index.html\"
 
+    context: WebContext { }
+
     function getUnityWebappsProxies() {
         return UnityWebAppsUtils.makeProxiesForWebViewBindee(webview);
     }

@@ -14,9 +14,7 @@ Window {
         url: "file:///usr/share/unity-webapps-qml/examples/data/html/big-test.html"
         anchors.fill: parent
 
-        context: WebContext {
-            userAgent: "Mozilla/5.0 (Linux; Ubuntu 14.04 like Android 4.4) AppleWebKit/537.36 Chromium/35.0.1870.2 Mobile Safari"
-        }
+        context: WebContext { }
 
         function getUnityWebappsProxies() {
             var proxies = UnityWebAppsUtils.makeProxiesForWebViewBindee(webView);

@@ -32,6 +32,8 @@ Window {
         width: parent.width
         height: parent.height
 
+        context: WebContext { }
+
         function getUnityWebappsProxies() {
             return UnityWebAppsUtils.makeProxiesForWebViewBindee(webView);
         }

@@ -392,7 +392,11 @@ Item {
       \internal
 
      */
-    onModelChanged: model.modelContentChanged.connect(__setupNamedWebappEnvironment)
+    onModelChanged: {
+        if (model) {
+            model.modelContentChanged.connect(__setupNamedWebappEnvironment)
+        }
+    }
 
     /*!
       \internal

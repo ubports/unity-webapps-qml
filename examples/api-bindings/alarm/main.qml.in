@@ -16,6 +16,8 @@ Item {
     anchors.fill: parent
     url: \"file://$$OUT_PWD/alarm/www/index.html\"
 
+    context: WebContext { }
+
     function getUnityWebappsProxies() {
         return UnityWebAppsUtils.makeProxiesForWebViewBindee(webview);
     }

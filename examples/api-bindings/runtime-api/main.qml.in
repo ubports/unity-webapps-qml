@@ -16,6 +16,8 @@ MainView {
     anchors.fill: parent
     url: \"file://$$OUT_PWD/runtime-api/www/index.html\"
 
+    context: WebContext { }
+
     function getUnityWebappsProxies() {
         return UnityWebAppsUtils.makeProxiesForWebViewBindee(webview);
     }
