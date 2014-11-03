@@ -184,7 +184,9 @@ function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
         // inject common function
 
         proxy.navigateTo = function(url) {
-            webViewId.url = url;
+            if (url.length !== 0) {
+                webViewId.url = url;
+	    }
         };
         // called from the UnityWebApps side
         proxy.onAppRaised = function () {
