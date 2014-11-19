@@ -64,7 +64,7 @@ function OxideWebviewAdapter(webview, disposer, makeSignalDisconnecter) {
     this.disposer = disposer;
     this.makeSignalDisconnecter = makeSignalDisconnecter;
     this._userScriptInjected = false;
-    this._WEBAPPS_USER_SCRIPT_CONTEXT = "oxide-private://main-world-private";
+    this._WEBAPPS_USER_SCRIPT_CONTEXT = "oxide://main-world";
 }
 OxideWebviewAdapter.prototype = {
     injectUserScripts: function(userScriptUrls) {

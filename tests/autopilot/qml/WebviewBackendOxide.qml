@@ -54,7 +54,8 @@ Oxide.WebView {
     }
 
     context: Oxide.WebContext {
-        userAgent: webView.localUserAgentOverride.length === 0 ? "" : webView.localUserAgentOverride
+        userAgent: webView.localUserAgentOverride.length === 0
+                   ? "" : webView.localUserAgentOverride
         userScripts: [
             Oxide.UserScript {
                 context: "webview-oxide://test/"

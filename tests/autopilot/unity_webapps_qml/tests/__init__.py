@@ -90,7 +90,7 @@ class UnityWebappsTestCaseBase(UnityTestCase):
         self.assert_url_eventually_loaded(url)
 
     def launch_application(self, args):
-        print 'Launching test with params:', args, "with", self.get_qml_launcher_path()
+        print('Launching test with params:', args, "with", self.get_qml_launcher_path())
 
         self.app = self.launch_test_application(self.get_qml_launcher_path(),
             *args,
@@ -121,11 +121,7 @@ class UnityWebappsTestCaseBase(UnityTestCase):
 
     def eval_expression_in_page_unsafe(self, expr):
         webview = self.get_webviewContainer()
-        prev_emissions = self.watcher.num_emissions
-        webview.slots.evalInPageUnsafe(expr)
-        self.assertThat(lambda: self.watcher.num_emissions, Eventually(GreaterThan(prev_emissions)))
-        results = json.loads(webview.get_signal_emissions('resultUpdated(QString)')[-1][0])
-        return results.has_key('result') and results['result'] or None
+        return webview.slots.evalInPageUnsafe(expr)
 
 class WebappsTestCaseBaseWithLocalHttpContentBase(UnityWebappsTestCaseBase):
     def setUp(self):

@@ -35,21 +35,9 @@ Window {
     signal resultUpdated(string message)
 
     function evalInPageUnsafe(expr) {
-        if (webView && webView.experimental) {
-            webView.experimental.evaluateJavaScript(DomIntrospectionUtils.wrapJsCommands(expr),
-                function(result) {
-                    console.log('Result: ' + result);
-                    root.resultUpdated(DomIntrospectionUtils.createResult(result));
-                });
-        }
-        else {
-            root.resultUpdated(DomIntrospectionUtils.createResult(webView.evaluateCode("return navigator.userAgent", true)))
-        }
+        return webView.evaluateCode(expr, true);
     }
 
-    property var webView: null
-
-    property bool useOxide: false
     property string url: ""
 
     property string apiBackendQmlFileUrl: ""
@@ -67,24 +55,14 @@ Window {
         active: true
     }
 
-    Loader {
-        id: webviewLoader
-        onLoaded: {
-            webView = webviewLoader.item
-        }
+    WebviewBackendOxide {
+        id: webView
+        url: root.url
+        localUserAgentOverride: webappName && webappModel.exists(webappName)
+                                ? webappModel.userAgentOverrideFor(webappName) : ""
     }
 
-    Component.onCompleted: {
-        var webviewSource = useOxide ?
-                    Qt.resolvedUrl("WebviewBackendOxide.qml")
-                  : Qt.resolvedUrl("WebviewBackendWebkit.qml");
-        var override =  webappName && webappModel.exists(webappName) ?
-                    webappModel.userAgentOverrideFor(webappName) : ""
-        webviewLoader.setSource(webviewSource,
-            { url: root.url,
-            localUserAgentOverride: override})
-    }
-
+    // Offers a way to override/mock the API backends
     Loader {
         id: apiBackendQmlFileLoader
         source: apiBackendQmlFileUrl.length !== 0 ? apiBackendQmlFileUrl : ""
@@ -93,10 +71,8 @@ Window {
     Loader {
         id: unityWebappsComponentLoader
         anchors.fill: parent
-        sourceComponent: webView !== null ?
-                    (apiBackendQmlFileUrl.length !== 0 ?
-                      (apiBackendQmlFileLoader.item ? unityWebappsComponent : undefined)
-                      : unityWebappsComponent) : null
+        sourceComponent: apiBackendQmlFileUrl.length !== 0 && !apiBackendQmlFileLoader.item ?
+                             undefined : unityWebappsComponent
     }
 
     UnityWebappsAppModel {
