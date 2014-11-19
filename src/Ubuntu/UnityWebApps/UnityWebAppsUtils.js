@@ -84,6 +84,7 @@ OxideWebviewAdapter.prototype = {
                     '"' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"' +
                     '; matchAllFrames: false; emulateGreasemonkey: true; url: "' +
                     userScriptUrls[i] + '";' + scriptEnd;
+            console.log(statement)
             context.addUserScript(Qt.createQmlObject(statement, this.webview));
         }
         this._userScriptInjected = true;

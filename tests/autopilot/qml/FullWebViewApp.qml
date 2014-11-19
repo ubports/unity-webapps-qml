@@ -71,8 +71,9 @@ Window {
     Loader {
         id: unityWebappsComponentLoader
         anchors.fill: parent
-        sourceComponent: apiBackendQmlFileUrl.length !== 0 && !apiBackendQmlFileLoader.item ?
-                             undefined : unityWebappsComponent
+        sourceComponent: (apiBackendQmlFileUrl.length !== 0
+                            && !apiBackendQmlFileLoader.item)
+                         ? undefined : unityWebappsComponent
     }
 
     UnityWebappsAppModel {
