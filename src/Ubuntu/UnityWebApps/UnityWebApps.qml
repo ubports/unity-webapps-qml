@@ -168,17 +168,20 @@ Item {
     property string _opt_homepage: ""
 
 
+    /*!
+     \qmlsignal UnityWebApps::userScriptsInjected()
+
+     This signal is emitted when the component has completed its initialization and
+     the userscripts have been injected into the binded webview.
+     */
+    signal userScriptsInjected()
+
+
     Settings {
         id: settings
         injectExtraContentShareCapabilities: name && name.length && name.length !== 0
     }
 
-/*
-    Loader {
-        id: apiBindingModelComponentLoader
-        sourceComponent: settings.injectExtraUbuntuApis ? apiBindingModelComponent : undefined
-    }
-*/
 
     /*!
       \internal
@@ -237,6 +240,8 @@ Item {
 
         if (internal.backends)
             internal.instance.setBackends(internal.backends)
+
+        userScriptsInjected();
     }
 
     /*!

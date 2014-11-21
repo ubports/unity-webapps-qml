@@ -81,12 +81,17 @@ OxideWebviewAdapter.prototype = {
             var scriptStart = "import com.canonical.Oxide 1.0 as Oxide; Oxide.UserScript { context:";
             var scriptEnd = " }";
             var statement = scriptStart +
-                    '"' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"' +
+                    '"' +
+                    this._WEBAPPS_USER_SCRIPT_CONTEXT +
+                    '"' +
                     '; matchAllFrames: false; emulateGreasemonkey: true; url: "' +
-                    userScriptUrls[i] + '";' + scriptEnd;
-            console.log(statement)
+                    userScriptUrls[i] +
+                    '";'
+                    + scriptEnd;
+
             context.addUserScript(Qt.createQmlObject(statement, this.webview));
         }
+
         this._userScriptInjected = true;
     },
     sendToPage: function (message) {
