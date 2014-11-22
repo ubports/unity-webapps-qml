@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<service id="com.ubuntu.developer.webapps.webapp-facebook_webapp-facebook">
-  <type>webapps</type>
-  <name>Facebook Webapp</name>
-  <provider>facebook</provider>
-</service>

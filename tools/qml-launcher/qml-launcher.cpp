@@ -68,7 +68,6 @@ int main(int argc, char *argv[])
     const QString QML_FILE_IMPORT_ARG_HEADER = "--import=";
     const QString QML_APP_ID_ARG_HEADER = "--app-id=";
     const QString QML_INSPECTOR_ARG_HEADER = "--inspector=";
-    const QString QML_USE_OXIDE_ARG_HEADER = "--useOxide";
     const QString ARG_HEADER = "--";
     const QString VALUE_HEADER = "=";
     QHash<QString, QString> properties;
@@ -76,7 +75,6 @@ int main(int argc, char *argv[])
     QString appid;
     QString importPath;
     QString inspector;
-    bool useOxide = false;
     bool maximized = false;
 
     Q_FOREACH(QString argument, app.arguments())
@@ -99,11 +97,6 @@ int main(int argc, char *argv[])
         if (argument.contains(QML_INSPECTOR_ARG_HEADER))
         {
             inspector = argument.right(argument.count() - QML_INSPECTOR_ARG_HEADER.count());
-        }
-        else
-        if (argument.contains(QML_USE_OXIDE_ARG_HEADER))
-        {
-            useOxide = true;
         }
         else
         if (argument.contains(QML_MAXIMIZED_ARG))
@@ -199,9 +192,6 @@ int main(int argc, char *argv[])
         object->setProperty(it.key().toStdString().c_str(), QUrl(it.value()));
     }
 
-    if (useOxide) {
-        object->setProperty("useOxide", true);
-    }
     component.completeCreate();
 
     if (window)

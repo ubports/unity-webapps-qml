@@ -9,29 +9,31 @@
 
 import os
 import os.path
-import shutil
-import tempfile
-import json
 
-from testtools.matchers import Contains, Equals, GreaterThan
+from testtools.matchers import Equals
 from autopilot.matchers import Eventually
 from unity_webapps_qml.tests import fake_servers
 
-from unity.emulators.unity import Unity
+from autopilot.testcase import AutopilotTestCase
 
-from unity.tests import UnityTestCase
+LOCAL_QML_LAUNCHER_APP_PATH = "{}/{}".format(
+    os.path.dirname(os.path.realpath(__file__)),
+    '../../../../tools/qml-launcher/unity-webapps-qml-launcher')
 
-LOCAL_QML_LAUNCHER_APP_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../../../tools/qml-launcher/unity-webapps-qml-launcher')
 INSTALLED_QML_LAUNCHER_APP_PATH = 'unity-webapps-qml-launcher'
 
 # TODO create __init__.py.in
-LOCAL_BROWSER_CONTAINER_PATH = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../qml/FullWebViewApp.qml')
-INSTALLED_BROWSER_CONTAINER_PATH = '/usr/share/unity-webapps-qml/autopilot-tests/qml/FullWebViewApp.qml'
+LOCAL_BROWSER_CONTAINER_PATH = "{}/{}".format(
+    os.path.dirname(os.path.realpath(__file__)),
+    '../../qml/FullWebViewApp.qml')
+
+INSTALLED_BROWSER_CONTAINER_PATH = \
+    '/usr/share/unity-webapps-qml/autopilot-tests/qml/FullWebViewApp.qml'
 
 BASE_URL = ''
 
-class UnityWebappsTestCaseBase(UnityTestCase):
 
+class UnityWebappsTestCaseBase(AutopilotTestCase):
     def setUp(self):
         super(UnityWebappsTestCaseBase, self).setUp()
         self.use_oxide = False
@@ -52,17 +54,18 @@ class UnityWebappsTestCaseBase(UnityTestCase):
             return LOCAL_QML_LAUNCHER_APP_PATH
         return INSTALLED_QML_LAUNCHER_APP_PATH
 
-    def get_launch_params(self,
-                          url,
-                          webapp_name='unitywebappsqmllauncher',
-                          webapp_search_path="",
-                          webapp_homepage="",
-                          use_oxide=False,
-                          extra_params=[]):
+    def get_launch_params(
+            self,
+            url,
+            webapp_name='unitywebappsqmllauncher',
+            webapp_search_path="",
+            webapp_homepage="",
+            use_oxide=False,
+            extra_params=[]):
         base_params = ['--qml=' + self.get_qml_browser_container_path(),
-            '--app-id=' + webapp_name,
-            '--webappName=' + webapp_name,
-            '--webappSearchPath=' + webapp_search_path]
+                       '--app-id=' + webapp_name,
+                       '--webappName=' + webapp_name,
+                       '--webappSearchPath=' + webapp_search_path]
 
         if len(webapp_homepage) != 0:
             base_params.append('--webappHomepage=' + webapp_homepage)
@@ -75,8 +78,10 @@ class UnityWebappsTestCaseBase(UnityTestCase):
 
         if os.path.exists(LOCAL_QML_LAUNCHER_APP_PATH):
             # we are local
-            base_params.append('--import=' + os.path.join (os.path.dirname(os.path.realpath(__file__)),
-                               '../../../../src'))
+            base_params.append(
+                '--import={}'.format(
+                    os.path.join(os.path.dirname(os.path.realpath(__file__))),
+                    '../../../../src'))
 
         base_params += extra_params
 
@@ -86,18 +91,25 @@ class UnityWebappsTestCaseBase(UnityTestCase):
         self.assertThat(os.path.exists(html_filepath), Equals(True))
         url = self.create_file_url(html_filepath)
 
-        self.launch_application(self.get_launch_params(url, 'unitywebappsqmllauncher', '', '', False, extra_params))
+        self.launch_application(
+            self.get_launch_params(
+                url,
+                'unitywebappsqmllauncher',
+                '',
+                '',
+                False,
+                extra_params))
         self.assert_url_eventually_loaded(url)
 
     def launch_application(self, args):
-        print 'Launching test with params:', args, "with", self.get_qml_launcher_path()
-
-        self.app = self.launch_test_application(self.get_qml_launcher_path(),
+        self.app = self.launch_test_application(
+            self.get_qml_launcher_path(),
             *args,
             app_type='qt')
 
         self.webviewContainer = self.get_webviewContainer()
-        self.watcher = self.webviewContainer.watch_signal('resultUpdated(QString)')
+        self.watcher = self.webviewContainer.watch_signal(
+            'resultUpdated(QString)')
 
     def pick_app_launcher(self, app_path):
         # force Qt app introspection:
@@ -121,11 +133,8 @@ class UnityWebappsTestCaseBase(UnityTestCase):
 
     def eval_expression_in_page_unsafe(self, expr):
         webview = self.get_webviewContainer()
-        prev_emissions = self.watcher.num_emissions
-        webview.slots.evalInPageUnsafe(expr)
-        self.assertThat(lambda: self.watcher.num_emissions, Eventually(GreaterThan(prev_emissions)))
-        results = json.loads(webview.get_signal_emissions('resultUpdated(QString)')[-1][0])
-        return results.has_key('result') and results['result'] or None
+        return webview.slots.evalInPageUnsafe(expr)
+
 
 class WebappsTestCaseBaseWithLocalHttpContentBase(UnityWebappsTestCaseBase):
     def setUp(self):
@@ -136,5 +145,11 @@ class WebappsTestCaseBaseWithLocalHttpContentBase(UnityWebappsTestCaseBase):
 
     def launch_with_webapp(self, name, webapp_search_path, use_oxide=False):
         self.use_oxide = use_oxide
-        self.launch_application(self.get_launch_params("", name, webapp_search_path, self.base_url, use_oxide))
+        self.launch_application(
+            self.get_launch_params(
+                "",
+                name,
+                webapp_search_path,
+                self.base_url,
+                use_oxide))
         self.assert_url_eventually_loaded(self.base_url)

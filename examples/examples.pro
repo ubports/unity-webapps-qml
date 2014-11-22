@@ -41,6 +41,9 @@ facebookmessenger_example_install.files = $$system(ls unity-webapps-example-face
 basic_webview_install.path = /usr/share/unity-webapps-qml/examples/basic-webview
 basic_webview_install.files = $$system(ls basic-webview/*)
 
+html5_api_bindings_install.path = /usr/share/unity-webapps-qml/examples/api-bindings
+html5_api_bindings_install.files = $$system(ls api-bindings/*)
+
 webapps_apps_model_install.path = /usr/share/unity-webapps-qml/examples/webapps-apps-model
 webapps_apps_model_install.files = $$system(ls webapps-app-model/*)
 

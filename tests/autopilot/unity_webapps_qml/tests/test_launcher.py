@@ -6,78 +6,102 @@
 # by the Free Software Foundation.
 
 import os
-import time
 
-from gi.repository import Unity, GObject
+from gi.repository import Unity
 
-from testtools.matchers import Equals, GreaterThan, NotEquals
+from testtools.matchers import Equals, NotEquals
 from testtools import skipUnless
 
 from autopilot import platform
 from autopilot.matchers import Eventually
 
-from unity.emulators.icons import HudLauncherIcon
-from unity.emulators import ensure_unity_is_running
-
 from unity_webapps_qml.tests import UnityWebappsTestCaseBase
 
-class UnityWebappsLauncherTestCase(UnityWebappsTestCaseBase):
-    LOCAL_HTML_TEST_FILE = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), '../../html/test_webapps_launcher.html')
-    INSTALLED_HTML_TEST_FILE = '/usr/share/unity-webapps-qml/autopilot-tests/html/test_webapps_launcher.html'
+LOCAL_HTML_TEST_FILE = "{}/{}".format(
+    os.path.dirname(os.path.realpath(__file__)),
+    '../../html/test_webapps_launcher.html')
 
+INSTALLED_HTML_TEST_FILE = \
+    '/usr/share/unity-webapps-qml/' \
+    'autopilot-tests/html/test_webapps_launcher.html'
+
+
+class UnityWebappsLauncherTestCase(UnityWebappsTestCaseBase):
     def get_html_test_file(self):
-        if os.path.exists(self.LOCAL_HTML_TEST_FILE):
-            return os.path.abspath(self.LOCAL_HTML_TEST_FILE)
-        return self.INSTALLED_HTML_TEST_FILE
+        if os.path.exists(LOCAL_HTML_TEST_FILE):
+            return os.path.abspath(LOCAL_HTML_TEST_FILE)
+        return INSTALLED_HTML_TEST_FILE
 
     def setUp(self):
         super(UnityWebappsLauncherTestCase, self).setUp()
-        # On Touch the dbus unity if does is not exposed
-        if platform.model() == 'Desktop':
-            ensure_unity_is_running()
         self.launch_with_html_filepath(self.get_html_test_file())
 
     @skipUnless(platform.model() == 'Desktop', "Only runs on the Desktop")
     def test_checkCounts(self):
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('launcher-updated')))
+        self.assertThat(
+            lambda: self.eval_expression_in_page_unsafe(
+                "return document.getElementById('status').innerHTML;"),
+            Eventually(Equals('launcher-updated')))
 
-        launcher_icon = self.unity.launcher.model.get_icon(desktop_id='unitywebappsqmllauncher.desktop')
+        launcher_icon = self.unity.launcher.model.get_icon(
+            desktop_id='unitywebappsqmllauncher.desktop')
         self.assertThat(launcher_icon, NotEquals(None))
 
         expr = """
-           document.addEventListener('unity-webapps-do-call-response', function(e) {
+           document.addEventListener('unity-webapps-do-call-response',
+            function(e) {
                 var response = e.detail;
                 document.getElementById('status').innerHTML = '' + e.detail;
            });
 
-           var e = new CustomEvent ("unity-webapps-do-call", {"detail": JSON.stringify({"name": 'Launcher.__get', 'with_callback': true, 'args': ['count']})});
+           var e = new CustomEvent (
+                "unity-webapps-do-call",
+                {"detail": JSON.stringify(
+                    {"name": 'Launcher.__get',
+                    'with_callback': true,
+                    'args': ['count']})});
            document.dispatchEvent (e);
            return true;
         """
         self.eval_expression_in_page_unsafe(expr)
 
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('42')))
+        self.assertThat(
+            lambda: self.eval_expression_in_page_unsafe(
+                "return document.getElementById('status').innerHTML;"),
+            Eventually(Equals('42')))
 
         # self.assertThat(launcher.get_property('progress'), Equals(0.09375))
 
     @skipUnless(platform.model() == 'Desktop', "Only runs on the Desktop")
     def test_checkProgress(self):
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('launcher-updated')))
+        self.assertThat(
+            lambda: self.eval_expression_in_page_unsafe(
+                "return document.getElementById('status').innerHTML;"),
+            Eventually(Equals('launcher-updated')))
 
-        launcher_icon = self.unity.launcher.model.get_icon(desktop_id='unitywebappsqmllauncher.desktop')
+        launcher_icon = self.unity.launcher.model.get_icon(
+            desktop_id='unitywebappsqmllauncher.desktop')
         self.assertThat(launcher_icon, NotEquals(None))
 
         expr = """
-           document.addEventListener('unity-webapps-do-call-response', function(e) {
+           document.addEventListener(
+            'unity-webapps-do-call-response', function(e) {
                 var response = e.detail;
                 document.getElementById('status').innerHTML = '' + e.detail;
            });
 
-           var e = new CustomEvent ("unity-webapps-do-call", {"detail": JSON.stringify({"name": 'Launcher.__get', 'with_callback': true, 'args': ['progress']})});
+           var e = new CustomEvent (
+                "unity-webapps-do-call",
+                {"detail": JSON.stringify(
+                    {"name": 'Launcher.__get',
+                    'with_callback': true,
+                    'args': ['progress']})});
            document.dispatchEvent (e);
            return true;
         """
         self.eval_expression_in_page_unsafe(expr)
 
-        self.assertThat(lambda: self.eval_expression_in_page_unsafe("return document.getElementById('status').innerHTML;"), Eventually(Equals('0.09375')))
-
+        self.assertThat(
+            lambda: self.eval_expression_in_page_unsafe(
+                "return document.getElementById('status').innerHTML;"),
+            Eventually(Equals('0.09375')))

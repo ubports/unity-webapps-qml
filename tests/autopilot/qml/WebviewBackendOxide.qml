@@ -9,6 +9,9 @@ Oxide.WebView {
 
     property string localUserAgentOverride: ""
 
+    preferences.localStorageEnabled: true
+    preferences.appCacheEnabled: true
+
     function _waitForResult(req, timeout) {
       var result;
       var error;
@@ -46,7 +49,7 @@ Oxide.WebView {
     function evaluateCode(code, wrap) {
       var value = webView._waitForResult(
           webView.rootFrame.sendMessage(
-            "webview-oxide://test/",
+            "oxide://main-world",
             "EVALUATE-CODE",
             { code: code,
               wrap: wrap === undefined ? false : wrap }));
@@ -54,10 +57,12 @@ Oxide.WebView {
     }
 
     context: Oxide.WebContext {
-        userAgent: webView.localUserAgentOverride.length === 0 ? "" : webView.localUserAgentOverride
+        userAgent: webView.localUserAgentOverride.length === 0
+                   ? "" : webView.localUserAgentOverride
         userScripts: [
             Oxide.UserScript {
-                context: "webview-oxide://test/"
+                context: "oxide://main-world"
+                emulateGreasemonkey: true
                 url: Qt.resolvedUrl("message-server.js")
                 matchAllFrames: true
             }

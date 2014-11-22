@@ -20,7 +20,6 @@ OTHER_FILES += \
     $$system(ls ./data/*/*) \
     unity_webapps_qml/tests/test_installedWebapp.py \
     unity_webapps_qml/tests/fake_servers.py \
-    qml/WebviewBackendWebkit.qml \
     qml/WebviewBackendOxide.qml \
     qml/message-server.js \
     $$system(ls ./data/installed-webapps/*) \
