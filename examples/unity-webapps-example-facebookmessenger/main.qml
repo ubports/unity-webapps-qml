@@ -18,8 +18,7 @@
 
 import QtQuick 2.0
 import QtQuick.Window 2.0
-import QtWebKit 3.0
-import QtWebKit.experimental 1.0
+import com.canonical.Oxide 1.0
 import Ubuntu.UnityWebApps 0.1
 
 Window {
@@ -33,19 +32,17 @@ Window {
         width: parent.width
         height: parent.height
 
-        experimental.userScripts: []
-        experimental.preferences.navigatorQtObjectEnabled: true
-        experimental.preferences.developerExtrasEnabled: true
+        context: WebContext { }
 
         function getUnityWebappsProxies() {
-            return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
+            return UnityWebAppsUtils.makeProxiesForWebViewBindee(webView);
         }
+    }
 
-        UnityWebApps {
-            id: webapps
-            name: "FacebookMessenger"
-            bindee: webView
-            model: UnityWebappsAppModel { searchPath: '/usr/share/unity-webapps-qml/examples/data/userscripts'}
-        }
+    UnityWebApps {
+        id: webapps
+        name: "FacebookMessenger"
+        bindee: webView
+        model: UnityWebappsAppModel { searchPath: '/usr/share/unity-webapps-qml/examples/data/userscripts'}
     }
 }

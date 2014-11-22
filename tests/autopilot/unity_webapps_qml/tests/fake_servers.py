@@ -15,12 +15,12 @@
 
 """ Autopilot tests for the unity_webapps_qml package """
 
-import BaseHTTPServer
+import http.server as http
 import logging
 import threading
 
 
-class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class RequestHandler(http.BaseHTTPRequestHandler):
     def serve_content(self, content, mime_type='text/html'):
         self.send_header('Content-type', mime_type)
         self.end_headers()
@@ -51,7 +51,7 @@ This is some content
 class WebappsQmlContentHttpServer(object):
     def __init__(self):
         super(WebappsQmlContentHttpServer, self).__init__()
-        self.server = BaseHTTPServer.HTTPServer(("", 0), RequestHandler)
+        self.server = http.HTTPServer(("", 0), RequestHandler)
         self.server.allow_reuse_address = True
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()

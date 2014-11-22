@@ -1,3 +1,7 @@
+// ==UserScript==
+// @inject_in_main_world
+// ==/UserScript==
+
 /*
  * Copyright 2013 Canonical Ltd.
  *
