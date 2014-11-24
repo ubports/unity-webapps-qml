@@ -19,10 +19,10 @@
 #include <QDir>
 #include <QDebug>
 #include <QtCore/QTextStream>
+#include <QtCore/QtGlobal>
 
 #include "unity-webapps-app-model.h"
 #include "unity-webapps-app-manifest-parser.h"
-
 
 /*!
   \qmltype UnityWebappsAppModel
@@ -56,7 +56,6 @@
   paths, all other "values" are ignored.
 */
 
-
 // TODO add local folders
 QString UnityWebappsAppModel::_commonScriptsDirName = "common";
 QString UnityWebappsAppModel::_webappDirPrefix = "unity-webapps-";
@@ -77,6 +76,13 @@ UnityWebappsAppModel::doCorrectSearchPath(const QString & p)
 QString
 UnityWebappsAppModel::getDefaultWebappsInstallationSearchPath()
 {
+    const char *WEBAPP_QML_DEFAULT_WEBAPPS_INSTALL_FOLDER_ENV_VAR =
+            "WEBAPP_QML_DEFAULT_WEBAPPS_INSTALL_FOLDER";
+    if (qEnvironmentVariableIsSet(
+                WEBAPP_QML_DEFAULT_WEBAPPS_INSTALL_FOLDER_ENV_VAR))
+    {
+        return qgetenv(WEBAPP_QML_DEFAULT_WEBAPPS_INSTALL_FOLDER_ENV_VAR);
+    }
     return "/usr/share/unity-webapps/userscripts";
 }
 
