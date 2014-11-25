@@ -81,7 +81,8 @@ UnityWebappsAppModel::getDefaultWebappsInstallationSearchPath()
     if (qEnvironmentVariableIsSet(
                 WEBAPP_QML_DEFAULT_WEBAPPS_INSTALL_FOLDER_ENV_VAR))
     {
-        return qgetenv(WEBAPP_QML_DEFAULT_WEBAPPS_INSTALL_FOLDER_ENV_VAR);
+        return QString::fromUtf8(
+            qgetenv(WEBAPP_QML_DEFAULT_WEBAPPS_INSTALL_FOLDER_ENV_VAR));
     }
     return "/usr/share/unity-webapps/userscripts";
 }
