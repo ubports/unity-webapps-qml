@@ -784,7 +784,8 @@ Item {
                 return AlarmApiBackend.createAlarmApi(UnityBackends.backendDelegate)
             }),
 
-            ContentHub: ContentHubApiBackend.createContentHubApi(UnityBackends.backendDelegate),
+            ContentHub: ContentHubApiBackend.createContentHubApi(
+                            UnityBackends.backendDelegate, webapps),
 
             RuntimeApi:  __injectResourceIfExtraApisAreEnabled(function() {
                 return RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate)
