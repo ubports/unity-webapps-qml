@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+15.04.20141126.1-0ubuntu1) vivid; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Improve testability for the desktop webapp search path
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 26 Nov 2014 15:58:51 +0000
+
 unity-webapps-qml (0.1+15.04.20141122-0ubuntu1) vivid; urgency=low
 
   [ Ubuntu daily release ]
