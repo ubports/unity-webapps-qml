@@ -24,15 +24,16 @@
 
 function createContentHubApi(backendDelegate, parent) {
 
+    var bridge = null
     try {
-        var bridge =
-            Qt.createQmlObject(
-                'import QtQuick 2.0; import Ubuntu.Content 0.1 as ContentHubBridge; \
-                QtObject { property var hub: ContentHubBridge }', parent)
+        bridge = Qt.createQmlObject(
+            'import QtQuick 2.0; import Ubuntu.Content 0.1 as ContentHubBridge; \
+            QtObject { property var hub: ContentHubBridge }', parent)
     }
-    catch(e) {
-        console.log('Could not create ContentHub backend \
-            (does not appear to be installed): ' + e.toString())
+    catch(e) { }
+
+    if (!bridge) {
+        console.log('Could not create ContentHub backend (does not appear to be installed)')
         return {};
     }
 
@@ -669,7 +670,6 @@ function createContentHubApi(backendDelegate, parent) {
             var peerModel = Qt.createQmlObject(statement, backendDelegate.parent());
             var onPeersFound = function() {
                 var peers = peerModel.peers;
-
                 var wrappedPeers = [];
                 for (var i = 0; i < peers.length; ++i) {
                     var wrappedPeer = new ContentPeer(peers[i]);
