@@ -41,6 +41,7 @@ function createContentHubApi(backendDelegate, accessPolicy) {
             "Contacts": ContentHubBridge.ContentType.Contacts,
             "Videos": ContentHubBridge.ContentType.Videos,
             "Links": ContentHubBridge.ContentType.Links,
+            "EBooks": ContentHubBridge.ContentType.EBooks
         };
         return name in contentTypePerName ?
                     contentTypePerName[name]
@@ -63,6 +64,8 @@ function createContentHubApi(backendDelegate, accessPolicy) {
             return "Videos";
         else if (state === ContentHubBridge.ContentType.Links)
             return "Links";
+        else if (state === ContentHubBridge.ContentType.EBooks)
+            return "EBooks";
         return "Unknown";
     };
 
@@ -643,8 +646,7 @@ function createContentHubApi(backendDelegate, accessPolicy) {
                 return;
             }
 
-            var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerModel {";
-            var filterParams = {};
+            var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerModel { };";
             if (filters.contentType) {
                 statement += " contentType: ContentType." + filters.contentType + ";";
             }
@@ -654,18 +656,14 @@ function createContentHubApi(backendDelegate, accessPolicy) {
             statement += " }";
 
             var peerModel = Qt.createQmlObject(statement, backendDelegate.parent());
-            var onPeersFound = function() {
-                var peers = peerModel.peers;
+            var peers = peerModel.peers;
 
-                var wrappedPeers = [];
-                for (var i = 0; i < peers.length; ++i) {
-                    var wrappedPeer = new ContentPeer(peers[i]);
-                    wrappedPeers.push(wrappedPeer.serialize());
-                }
-                peerModel.onFindPeersCompleted.disconnect(onPeersFound);
-                callback(wrappedPeers);
-            };
-            peerModel.onFindPeersCompleted.connect(onPeersFound);
+            var wrappedPeers = [];
+            for (var i = 0; i < peers.length; ++i) {
+                var wrappedPeer = new ContentPeer(peers[i]);
+                wrappedPeers.push(wrappedPeer.serialize());
+            }
+            callback(wrappedPeers);
         },
 
         getStore: function(scope, callback) {
@@ -692,7 +690,6 @@ function createContentHubApi(backendDelegate, accessPolicy) {
             }
 
             var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerPicker {";
-            var filterParams = {};
             if (filters.contentType) {
                 statement += " contentType: ContentType." + filters.contentType + "";
             }
