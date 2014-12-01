@@ -41,7 +41,6 @@ function createContentHubApi(backendDelegate, accessPolicy) {
             "Contacts": ContentHubBridge.ContentType.Contacts,
             "Videos": ContentHubBridge.ContentType.Videos,
             "Links": ContentHubBridge.ContentType.Links,
-            "EBooks": ContentHubBridge.ContentType.EBooks
         };
         return name in contentTypePerName ?
                     contentTypePerName[name]
@@ -64,8 +63,6 @@ function createContentHubApi(backendDelegate, accessPolicy) {
             return "Videos";
         else if (state === ContentHubBridge.ContentType.Links)
             return "Links";
-        else if (state === ContentHubBridge.ContentType.EBooks)
-            return "EBooks";
         return "Unknown";
     };
 
