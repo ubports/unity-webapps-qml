@@ -670,6 +670,7 @@ function createContentHubApi(backendDelegate, parent) {
             var peerModel = Qt.createQmlObject(statement, backendDelegate.parent());
             var onPeersFound = function() {
                 var peers = peerModel.peers;
+
                 var wrappedPeers = [];
                 for (var i = 0; i < peers.length; ++i) {
                     var wrappedPeer = new ContentPeer(peers[i]);
