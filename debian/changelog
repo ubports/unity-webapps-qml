@@ -1,3 +1,17 @@
+unity-webapps-qml (0.1+15.04.20141202-0ubuntu1) vivid; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Make sure that the content hub bindings are fail safe since the
+    content hub package is a suggests (which is fine since it is not
+    there by default on desktop). (LP: #1395524)
+  * The content hub has been updated with some changes that caused the
+    getPeers() fonction to break on the HTML5 API side.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 02 Dec 2014 02:19:15 +0000
+
 unity-webapps-qml (0.1+15.04.20141126.1-0ubuntu1) vivid; urgency=low
 
   [ Ubuntu daily release ]
