@@ -16,15 +16,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.import Ubuntu.Content 0.1 as ContentHubBridge
-
 /**
  *
  * ContentHub API backend binding
  *
  */
 
-function createContentHubApi(backendDelegate, accessPolicy) {
+function createContentHubApi(backendDelegate, parent) {
+
+    var bridge = null
+    try {
+        bridge = Qt.createQmlObject(
+            'import QtQuick 2.0; import Ubuntu.Content 0.1 as ContentHubBridge; \
+            QtObject { property var hub: ContentHubBridge }', parent)
+    }
+    catch(e) { }
+
+    if (!bridge) {
+        console.log('Could not create ContentHub backend (does not appear to be installed)')
+        return {};
+    }
+
+    var ContentHubBridge = bridge.hub;
+
     var PLUGIN_URI = 'Ubuntu.Content';
     var VERSION = 0.1;
 
