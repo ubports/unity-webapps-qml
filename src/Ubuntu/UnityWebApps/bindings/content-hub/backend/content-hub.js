@@ -657,8 +657,7 @@ function createContentHubApi(backendDelegate, parent) {
                 return;
             }
 
-            var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerModel {";
-            var filterParams = {};
+            var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerModel { ";
             if (filters.contentType) {
                 statement += " contentType: ContentType." + filters.contentType + ";";
             }
@@ -668,18 +667,14 @@ function createContentHubApi(backendDelegate, parent) {
             statement += " }";
 
             var peerModel = Qt.createQmlObject(statement, backendDelegate.parent());
-            var onPeersFound = function() {
-                var peers = peerModel.peers;
+            var peers = peerModel.peers;
 
-                var wrappedPeers = [];
-                for (var i = 0; i < peers.length; ++i) {
-                    var wrappedPeer = new ContentPeer(peers[i]);
-                    wrappedPeers.push(wrappedPeer.serialize());
-                }
-                peerModel.onFindPeersCompleted.disconnect(onPeersFound);
-                callback(wrappedPeers);
-            };
-            peerModel.onFindPeersCompleted.connect(onPeersFound);
+            var wrappedPeers = [];
+            for (var i = 0; i < peers.length; ++i) {
+                var wrappedPeer = new ContentPeer(peers[i]);
+                wrappedPeers.push(wrappedPeer.serialize());
+            }
+            callback(wrappedPeers);
         },
 
         getStore: function(scope, callback) {
@@ -706,7 +701,6 @@ function createContentHubApi(backendDelegate, parent) {
             }
 
             var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerPicker {";
-            var filterParams = {};
             if (filters.contentType) {
                 statement += " contentType: ContentType." + filters.contentType + "";
             }
