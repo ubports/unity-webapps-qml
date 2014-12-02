@@ -643,7 +643,7 @@ function createContentHubApi(backendDelegate, accessPolicy) {
                 return;
             }
 
-            var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerModel { };";
+            var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerModel { ";
             if (filters.contentType) {
                 statement += " contentType: ContentType." + filters.contentType + ";";
             }
