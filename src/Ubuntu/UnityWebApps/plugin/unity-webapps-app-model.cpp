@@ -198,8 +198,6 @@ UnityWebappsAppModel::getWebappFiles(const QFileInfo& webAppInstallLocation)
         QFileInfo manifestFileInfo =
                 installationDir.absolutePath() + QDir::separator() + manifestFileName;
         if ( ! manifestFileInfo.isFile()) {
-            qDebug() << "Skipping" << manifestFileName << "as a webapp definition search: "
-                     << manifestFileInfo.absoluteFilePath();
             continue;
         }
 
@@ -347,7 +345,6 @@ UnityWebappsAppModel::loadUserScript(const QDir& userscriptPath,
             installationSearchPath + QDir::separator() + _commonScriptsDirName;
     READ_USER_SCRIPT(requires,COMMON_BASE_PATH);
     READ_USER_SCRIPT(scripts,userscriptPath.absolutePath());
-
     return script;
 }
 

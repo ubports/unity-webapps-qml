@@ -63,14 +63,12 @@ function OxideWebviewAdapter(webview, disposer, makeSignalDisconnecter) {
     this.webview = webview;
     this.disposer = disposer;
     this.makeSignalDisconnecter = makeSignalDisconnecter;
-    this._userScriptInjected = false;
     this._WEBAPPS_USER_SCRIPT_CONTEXT = "oxide://main-world";
+    this._injectedUserScripts = [];
+    this._scriptMessageReceivedHandler = null;
 }
 OxideWebviewAdapter.prototype = {
     injectUserScripts: function(userScriptUrls) {
-        if (this._userScriptInjected)
-            return;
-
         var context = this.webview.context;
         if (!context) {
             console.error('No context found for the current Oxide webview. Cannot inject user scripts.');
@@ -78,25 +76,33 @@ OxideWebviewAdapter.prototype = {
         }
 
         for (var i = 0; i < userScriptUrls.length; ++i) {
-            var scriptStart = "import com.canonical.Oxide 1.0 as Oxide; Oxide.UserScript { context:";
+            var script = userScriptUrls[i];
+            if (this._injectedUserScripts.some(
+                        function(e) { return e === script; })) {
+                console.log('Skipping already injected script: ' + script)
+                continue;
+            }
+
+            var scriptStart = "import com.canonical.Oxide 1.0 as Oxide; \
+Oxide.UserScript { ";
             var scriptEnd = " }";
-            var statement = scriptStart +
-                    '"' +
-                    this._WEBAPPS_USER_SCRIPT_CONTEXT +
-                    '"' +
-                    '; matchAllFrames: false; emulateGreasemonkey: true; url: "' +
-                    userScriptUrls[i] +
-                    '";'
+            var statement = scriptStart
+                    + 'context: "' +   this._WEBAPPS_USER_SCRIPT_CONTEXT + '";'
+                    + 'matchAllFrames: false;'
+                    + 'emulateGreasemonkey: true;'
+                    + 'url: "' + script + '";'
                     + scriptEnd;
 
-            context.addUserScript(Qt.createQmlObject(statement, this.webview));
+            context.addUserScript(
+                        Qt.createQmlObject(statement, this.webview));
         }
-
-        this._userScriptInjected = true;
+        this._injectedUserScripts.push(script);
     },
     sendToPage: function (message) {
         this.webview.rootFrame.sendMessageNoReply(
-                 this._WEBAPPS_USER_SCRIPT_CONTEXT, "UnityWebappApi-Host-Message", JSON.parse(message));
+                 this._WEBAPPS_USER_SCRIPT_CONTEXT,
+                 "UnityWebappApi-Host-Message",
+                 JSON.parse(message));
     },
     loadingStartedConnect: function (onLoadingStarted) {
         function handler(loadEvent) {
@@ -109,17 +115,24 @@ OxideWebviewAdapter.prototype = {
         this.disposer.addDisposer(this.makeSignalDisconnecter(this.webview.loadingChanged, handler));
     },
     messageReceivedConnect: function (onMessageReceived) {
-        function handler(msg, frame) {
+        function _handler(msg, frame) {
             onMessageReceived(msg.args);
         }
 
-        var script = 'import com.canonical.Oxide 1.0 as Oxide; ' +
-                ' Oxide.ScriptMessageHandler { msgId: "UnityWebappApi-Message"; contexts: ["' +
-                this._WEBAPPS_USER_SCRIPT_CONTEXT +
-                '"]; ' +
-                '}';
-        var messageHandler = Qt.createQmlObject(script, this.webview);
-        messageHandler.callback = handler;
+        if ( ! this._scriptMessageReceivedHandler) {
+            var script = 'import com.canonical.Oxide 1.0 as Oxide; ' +
+            ' Oxide.ScriptMessageHandler { '
+                + 'msgId: "UnityWebappApi-Message"; '
+                + 'contexts: ["' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"]; ' +
+            '}';
+            this._scriptMessageReceivedHandler =
+                 Qt.createQmlObject(script, this.webview);
+        }
+
+        this._scriptMessageReceivedHandler.callback = _handler;
+    },
+    cleanupAdapterInternals: function() {
+        this._scriptMessageReceivedHandler.callback = function() {};
     }
 }
 
@@ -203,6 +216,11 @@ function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
         // called from the UnityWebApps side
         proxy.cleanup = function() {
             disposer.disposeAndCleanupAll();
+
+            if (this.cleanupAdapterInternals
+                    && typeof(this.cleanupAdapterInternals) === "function") {
+                this.cleanupAdapterInternals();
+            }
         };
 
         return proxy;

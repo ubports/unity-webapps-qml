@@ -33,7 +33,13 @@ class InstalledWebappsTestCaseBase(
         return INSTALLED_HTML_TEST_FILE
 
     def test_normalWebappFound(self):
-        self.launch_with_webapp('Normal', self.get_webapp_install_folder())
+        rule = 'MAP *.test.com:80 ' + self.get_base_url_hostname()
+        self.launch_with_webapp(
+            'Normal',
+            self.get_webapp_install_folder(),
+            {'UBUNTU_WEBVIEW_HOST_MAPPING_RULES': rule},
+            False,
+            'http://www.test.com/')
 
         self.assertThat(
             lambda: self.eval_expression_in_page_unsafe(
@@ -49,18 +55,26 @@ class InstalledWebappsTestCaseBase(
             Eventually(Equals("WebApp Script Injected")))
 
     def test_webappWithUAOverrideFound(self):
+        rule = 'MAP *.test.com:80 ' + self.get_base_url_hostname()
         self.launch_with_webapp(
             'AlteredUAWebapp',
-            self.get_webapp_install_folder(), True)
+            self.get_webapp_install_folder(),
+            {'UBUNTU_WEBVIEW_HOST_MAPPING_RULES': rule},
+            True,
+            'http://www.test.com/')
         self.assertThat(
             lambda: self.eval_expression_in_page_unsafe(
                 'return navigator.userAgent;'),
             Eventually(Equals("My Override")))
 
     def test_webappFoundWithSpecialWebappPropertiesFile(self):
+        rule = 'MAP *.test.com:80 ' + self.get_base_url_hostname()
         self.launch_with_webapp(
             'ExtendedWebappProperties',
-            self.get_webapp_install_folder() + '/all-in-same-folder')
+            self.get_webapp_install_folder() + '/all-in-same-folder',
+            {'UBUNTU_WEBVIEW_HOST_MAPPING_RULES': rule},
+            False,
+            'http://www.test.com/')
 
         self.assertThat(
             lambda: self.eval_expression_in_page_unsafe(
@@ -76,18 +90,26 @@ class InstalledWebappsTestCaseBase(
             Eventually(Equals("WebApp Script Injected")))
 
     def test_webappPropertiesFileWithUA(self):
+        rule = 'MAP *.test.com:80 ' + self.get_base_url_hostname()
         self.launch_with_webapp(
             'ExtendedWebappProperties',
-            self.get_webapp_install_folder() + '/all-in-same-folder', True)
+            self.get_webapp_install_folder() + '/all-in-same-folder',
+            {'UBUNTU_WEBVIEW_HOST_MAPPING_RULES': rule},
+            True,
+            'http://www.test.com/')
         self.assertThat(
             lambda: self.eval_expression_in_page_unsafe(
                 'return navigator.userAgent;'),
             Eventually(Equals("My Override")))
 
     def test_webappPropertiesNameUpdated(self):
+        rule = 'MAP *.test.com:80 ' + self.get_base_url_hostname()
         self.launch_with_webapp(
             '',
-            self.get_webapp_install_folder() + '/all-in-same-folder')
+            self.get_webapp_install_folder() + '/all-in-same-folder',
+            {'UBUNTU_WEBVIEW_HOST_MAPPING_RULES': rule},
+            False,
+            'http://www.test.com/')
         self.assertThat(
             lambda: self.eval_expression_in_page_unsafe(
                 'return window.external.getUnityObject("1.0") != null;'),

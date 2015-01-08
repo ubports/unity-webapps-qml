@@ -8,9 +8,10 @@
 """unity-webapps-qml autopilot tests."""
 
 import os
+import json
 import os.path
 
-from testtools.matchers import Equals
+from testtools.matchers import Equals, GreaterThan
 from autopilot.matchers import Eventually
 from unity_webapps_qml.tests import fake_servers
 
@@ -80,9 +81,9 @@ class UnityWebappsTestCaseBase(AutopilotTestCase):
             # we are local
             base_params.append(
                 '--import={}'.format(
-                    os.path.join(os.path.dirname(os.path.realpath(__file__))),
-                    '../../../../src'))
-
+                    os.path.join(
+                        os.path.dirname(os.path.realpath(__file__)),
+                        '../../../../src')))
         base_params += extra_params
 
         return base_params
@@ -101,7 +102,11 @@ class UnityWebappsTestCaseBase(AutopilotTestCase):
                 extra_params))
         self.assert_url_eventually_loaded(url)
 
-    def launch_application(self, args):
+    def launch_application(self, args, envvars={}):
+        if envvars:
+            for envvar_key in envvars:
+                self.patch_environment(envvar_key, envvars[envvar_key])
+
         self.app = self.launch_test_application(
             self.get_qml_launcher_path(),
             *args,
@@ -133,17 +138,37 @@ class UnityWebappsTestCaseBase(AutopilotTestCase):
 
     def eval_expression_in_page_unsafe(self, expr):
         webview = self.get_webviewContainer()
-        return webview.slots.evalInPageUnsafe(expr)
+        p = self.watcher.num_emissions
+        webview.slots.evalInPageUnsafe(expr)
+        self.assertThat(
+            lambda: self.watcher.num_emissions,
+            Eventually(GreaterThan(p)))
+        results = json.loads(
+            webview.get_signal_emissions(
+                'resultUpdated(QString)')[-1][0])
+        return 'result' in results and results['result'] or None
 
 
 class WebappsTestCaseBaseWithLocalHttpContentBase(UnityWebappsTestCaseBase):
+    BASE_URL_SCHEME = 'http://'
+
     def setUp(self):
         super(WebappsTestCaseBaseWithLocalHttpContentBase, self).setUp()
         self.http_server = fake_servers.WebappsQmlContentHttpServer()
         self.addCleanup(self.http_server.shutdown)
-        self.base_url = "http://localhost:{}/".format(self.http_server.port)
+        self.base_url = "{}localhost:{}".format(
+            self.BASE_URL_SCHEME, self.http_server.port)
 
-    def launch_with_webapp(self, name, webapp_search_path, use_oxide=False):
+    def get_base_url_hostname(self):
+        return self.base_url[len(self.BASE_URL_SCHEME):]
+
+    def launch_with_webapp(
+            self,
+            name,
+            webapp_search_path,
+            envvars={},
+            use_oxide=False,
+            expected_homepage=''):
         self.use_oxide = use_oxide
         self.launch_application(
             self.get_launch_params(
@@ -151,5 +176,10 @@ class WebappsTestCaseBaseWithLocalHttpContentBase(UnityWebappsTestCaseBase):
                 name,
                 webapp_search_path,
                 self.base_url,
-                use_oxide))
-        self.assert_url_eventually_loaded(self.base_url)
+                use_oxide),
+            envvars)
+
+        url = self.base_url
+        if expected_homepage:
+            url = expected_homepage
+        self.assert_url_eventually_loaded(url)

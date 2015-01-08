@@ -1,8 +1,8 @@
 {
-    "includes": ["http://localhost:*/*"],
+    "includes": ["http://www.test.com/*"],
     "name": "ExtendedWebappProperties",
     "scripts": ["script.user.js"],
     "domain":"",
-    "homepage":"",
+    "homepage":"http://www.test.com/",
     "user-agent-override": "My Override"
 }
