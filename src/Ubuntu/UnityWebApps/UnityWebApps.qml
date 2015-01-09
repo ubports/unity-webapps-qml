@@ -234,7 +234,7 @@ Item {
                     __getPolicyForContent(settings),
                     customClientApiFileUrl && customClientApiFileUrl.length !== 0
                       ? customClientApiFileUrl
-                      : Qt.resolvedUrl('unity-webapps-api.js'));
+                      : 'unity-webapps-api.js');
 
         internal.instance = instance;
 
@@ -374,7 +374,7 @@ Item {
         if (__isValidWebAppForModel(name)) {
             if (internal.instance) {
                 var userScripts = __gatherWebAppUserscriptsIfAny(name);
-                internal.instance.setUserScriptsToInject(userScripts);
+                internal.instance.injectWebappUserScripts(userScripts);
             }
             __navigateToWebappHomepageInBindee(name);
         }

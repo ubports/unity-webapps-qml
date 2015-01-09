@@ -7,8 +7,6 @@
 
 import os
 
-from gi.repository import Unity
-
 from testtools.matchers import Equals
 from testtools import skipUnless
 

@@ -35,7 +35,8 @@ Window {
     signal resultUpdated(string message)
 
     function evalInPageUnsafe(expr) {
-        return webView.evaluateCode(expr, true);
+        var val = webView.evaluateCode(expr, true);
+        resultUpdated(DomIntrospectionUtils.createResult(val))
     }
 
     property string url: ""

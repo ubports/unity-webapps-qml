@@ -1,1 +1,3 @@
-document.getElementById('content').innerHTML="WebApp Script Injected"
+window.onload = function() {
+    document.getElementById('content').innerHTML="WebApp Script Injected"
+}

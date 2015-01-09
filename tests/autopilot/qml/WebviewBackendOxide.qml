@@ -1,9 +1,10 @@
 import QtQuick 2.0
 import QtTest 1.0
 import com.canonical.Oxide 1.0 as Oxide
+import Ubuntu.Web 0.2
 import Ubuntu.UnityWebApps 0.1
 
-Oxide.WebView {
+WebView {
     id: webView
     objectName: "webview"
 
@@ -56,7 +57,7 @@ Oxide.WebView {
         return value ? value.result : undefined;
     }
 
-    context: Oxide.WebContext {
+    context: WebContext {
         userAgent: webView.localUserAgentOverride.length === 0
                    ? "" : webView.localUserAgentOverride
         userScripts: [

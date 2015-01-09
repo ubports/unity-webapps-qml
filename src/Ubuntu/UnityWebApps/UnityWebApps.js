@@ -40,7 +40,6 @@ var UnityWebApps = (function () {
         this._injected_unity_api_path = injected_api_path;
         this._bindeeProxies = bindeeProxies;
         this._backends = null;
-        this._userscripts = [];
         this._accessPolicy = accessPolicy;
         this._callbackManager = UnityWebAppsUtils.makeCallbackManager();
 
@@ -50,16 +49,22 @@ var UnityWebApps = (function () {
     _UnityWebApps.prototype = {
 
         cleanup: function() {
-            if (this._bindeeProxies.cleanup && typeof(this._bindeeProxies.cleanup) == 'function')
+            if (this._bindeeProxies.cleanup
+                    && typeof(this._bindeeProxies.cleanup) == 'function') {
                 this._bindeeProxies.cleanup();
+            }
         },
 
         proxies: function() {
             return this._bindeeProxies;
         },
 
-        setUserScriptsToInject: function(userscripts) {
-            this._userscripts = userscripts;
+        injectWebappUserScripts: function(userscripts) {
+            if (this._bindeeProxies) {
+                this._bindeeProxies.injectUserScripts(
+                         userscripts.map(function(script) {
+                             return Qt.resolvedUrl(script); }));
+            }
         },
 
         setBackends: function(backends) {
@@ -75,24 +80,18 @@ var UnityWebApps = (function () {
             var cb = this._onMessageReceivedCallback.bind(self);
             self._bindeeProxies.messageReceivedConnect(cb);
 
-            this._onLoadingStartedCallback();
+            this._injectCoreBindingUserScripts();
         },
 
         /**
          * \internal
          *
          */
-        _onLoadingStartedCallback: function () {
-            var scripts = [this._injected_unity_api_path];
-            for(var i = 0; i < this._userscripts.length; ++i) {
-                scripts.push(Qt.resolvedUrl(this._userscripts[i]));
+        _injectCoreBindingUserScripts: function () {
+            if (this._bindeeProxies) {
+                this._bindeeProxies.injectUserScripts(
+                         [Qt.resolvedUrl(this._injected_unity_api_path)]);
             }
-
-            for (i = 0; i < scripts.length; ++i)
-                console.debug('Injecting webapps script[' + i + '] : '
-                              + scripts[i]);
-
-            this._bindeeProxies.injectUserScripts(scripts);
         },
 
         /**
