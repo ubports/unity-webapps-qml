@@ -1,3 +1,14 @@
+unity-webapps-qml (0.1+15.04.20150109-0ubuntu1) vivid; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * When using a webapp-properties file for an unamed webapp the user
+    script does not get injected. (LP: #1409051)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 09 Jan 2015 19:11:29 +0000
+
 unity-webapps-qml (0.1+15.04.20141202-0ubuntu1) vivid; urgency=low
 
   [ Ubuntu daily release ]
