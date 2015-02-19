@@ -640,7 +640,14 @@ Item {
 
                 var uicomponent;
                 function onCreated() {
-                    var uiobject = uicomponent.createObject(p, {"fileToShare": params.fileToShare.url, "visible": true});
+                    var args = {}
+                    for (var k in params) {
+                        if (params.hasOwnProperty(k)) {
+                            args[k] = params[k]
+                        }
+                    }
+                    args.visible = true
+                    var uiobject = uicomponent.createObject(p, args);
                     if ( ! uiobject.onCompleted) {
                         console.error("launchEmbeddedUI: The local UI component to be launched does not expose a mandatory 'completed' signal");
                         uiobject.destroy();
