@@ -795,6 +795,10 @@ Item {
                 return DownloadApiBackend.createDownloadApi(UnityBackends.backendDelegate)
             }),
 
+            Tools:  __injectResourceIfExtraApisAreEnabled(function() {
+                return ToolsApiBackend.createToolsApi(UnityBackends.backendDelegate)
+            }),
+
             Launcher: {
                 setCount: function (count) {
                     if (!initialized)

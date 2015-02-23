@@ -30,6 +30,7 @@
 #include "unity-webapps-app-infos.h"
 
 #include "application-api.h"
+#include "tools-api.h"
 #include "abstract-item-model-adaptor.h"
 #include "callback.h"
 
@@ -41,6 +42,14 @@ static QObject *createApplicationApi(QQmlEngine *engine, QJSEngine *scriptEngine
     Q_UNUSED(scriptEngine);
 
     return new ApplicationApi();
+}
+
+static QObject *createToolsApi(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine);
+    Q_UNUSED(scriptEngine);
+
+    return new ToolsApi();
 }
 
 void WebappsQmlPlugin::registerTypes(const char *uri)
@@ -60,7 +69,9 @@ void WebappsQmlPlugin::registerTypes(const char *uri)
     // TODO bump version
     qmlRegisterType<AbstractItemModelAdaptor> (uri, 0, 1, "AbstractItemModelAdaptor");
 
-    //
+    // Application Api entry point
     qmlRegisterSingletonType<ApplicationApi>(uri, 0, 1, "ApplicationApi", createApplicationApi);
-}
 
+    // Tools Api entry point
+    qmlRegisterSingletonType<ToolsApi>(uri, 0, 2, "ToolsApi", createToolsApi);
+}

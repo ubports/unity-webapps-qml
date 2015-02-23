@@ -34,6 +34,7 @@
     };
 
     //@include UnityWebAppsUtils.js
+    //@include ./bindings/alarm-api/client/tools.js
     //@include ./bindings/alarm-api/client/alarm-api.js
     //@include ./bindings/content-hub/client/content-hub.js
     //@include ./bindings/online-accounts/client/online-accounts.js
