@@ -20,6 +20,10 @@
 #define UNITY_WEBAPPS_TOOLSAPI_H
 
 #include <QObject>
+#include <QNetworkReply>
+
+
+class ToolsApiPrivate;
 
 class ToolsApi : public QObject
 {
@@ -28,6 +32,7 @@ class ToolsApi : public QObject
 
 public:
     explicit ToolsApi(QObject *parent = 0);
+    ~ToolsApi();
 
     enum CryptographicAlgorithm
     {
@@ -41,6 +46,24 @@ public:
             const QString &hmac,
             CryptographicAlgorithm algorithm,
             const QString& key) const;
+
+    Q_INVOKABLE QString sendHttpRequest(
+            const QUrl& url,
+            const QUrl& location,
+            const QVariant& request,
+            const QString& payload);
+
+Q_SIGNALS:
+    void requestFinished(bool success, const QString& message);
+    void requestUpdate(float uploadedRatio);
+
+private Q_SLOTS:
+    void onRequestFinished();
+    void onRequestUploadProgress(qint64,qint64);
+
+private:
+    ToolsApiPrivate* d_ptr;
+    Q_DECLARE_PRIVATE(ToolsApi)
 };
 
 #endif // UNITY_WEBAPPS_TOOLSAPI_H

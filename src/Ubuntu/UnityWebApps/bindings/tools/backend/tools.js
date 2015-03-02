@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.import Ubuntu.UnityWebApps 0.1 as UnityWebAppsBridge
+.import Ubuntu.UnityWebApps 0.2 as UnityWebAppsBridge
 
 
 /**
@@ -35,6 +35,12 @@ function createToolsApi(backendDelegate) {
         return algos.some(function(e) { return e === algorithm; })
     };
 
+    function isHttpRequestParameters(request) {
+        return request.verb != null
+            && request.url != null
+            && request.location != null
+    };
+
     return {
         getHmacHash: function(hmac, algorithm, key, callback) {
             if ( ! isValidAlgorithm(algorithm)) {
@@ -43,7 +49,28 @@ function createToolsApi(backendDelegate) {
                 return;
             }
             callback({errorMsg: "",
-                         result: toolsApiInstance.getHmacHash()});
+                 result: toolsApiInstance.getHmacHash(hmac, algorithm, key)});
+        },
+        sendHttpRequest: function(url, location, request, payload, callback) {
+            if ( ! isHttpRequestParameters(request)) {
+                callback({errorMsg: "Invalid request", success: false});
+                return;
+            }
+
+            var requestFinished = function(success, message) {
+                callback({errorMsg: message, success: success})
+                toolsApiInstance.requestFinished.disconnect(requestFinished)
+                toolsApiInstance.requestUpdate.disconnect(requestUpdated)
+            }
+            toolsApiInstance.requestFinished.connect(requestFinished)
+
+            var requestUpdated = function(uploadRatio) {
+                callback({uploadedRatio: uploadRatio})
+            }
+            toolsApiInstance.requestUpdate.connect(requestUpdated)
+
+            callback(toolsApiInstance.sendHttpRequest(
+                         url, location, request, payload))
         },
     };
 }

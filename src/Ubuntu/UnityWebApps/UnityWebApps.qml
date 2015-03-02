@@ -502,6 +502,7 @@ Item {
         if (settings.injectExtraContentShareCapabilities) {
             policy.add("launchEmbeddedUI");
             policy.add("ContentHub.onShareRequested");
+            policy.add("ToolsApi.getHmacHash");
         }
         return policy;
     }
@@ -796,9 +797,7 @@ Item {
                 return DownloadApiBackend.createDownloadApi(UnityBackends.backendDelegate)
             }),
 
-            ToolsApi:  __injectResourceIfExtraApisAreEnabled(function() {
-                return ToolsApiBackend.createToolsApi(UnityBackends.backendDelegate)
-            }),
+            ToolsApi: ToolsApiBackend.createToolsApi(UnityBackends.backendDelegate),
 
             Launcher: {
                 setCount: function (count) {

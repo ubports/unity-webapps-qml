@@ -86,6 +86,22 @@ function createToolsApi(backendBridge) {
             backendBridge.call('ToolsApi.getHmacHash'
                                , [hmac, algorithm, key]
                                , callback);
+        },
+
+        /**
+         * Generates a .
+         *
+         * @method sendHttpRequest
+         * @param callback {Function ({errorMsg: String, success: bool, uploadRatio: float})}
+         */
+        sendHttpRequest: function(url, request, payload, callback) {
+            if (! callback || typeof(callback) !== 'function') {
+                return;
+            }
+            var location = window && window.location ? window.location.href : ""
+            backendBridge.call('ToolsApi.sendHttpRequest'
+                               , [url, location, request, payload]
+                               , callback);
         }
     };
 };

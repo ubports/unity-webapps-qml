@@ -21,6 +21,9 @@
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QMessageAuthenticationCode>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QString>
 
 
@@ -52,7 +55,40 @@ bool enumToQtCryptoAlgorithm(
     return false;
 }
 
+QString getSecondLevelDomain(const QUrl& url)
+{
+    QString tld = url.topLevelDomain();
+    QString host = url.host().replace(tld, "");
+    QStringList s = host.split(".", QString::SkipEmptyParts);
+    return s.size() > 0 ? (s[s.size() - 1] + tld) : tld;
 }
+
+bool isCompatibleCorsRequest(
+        const QUrl& requestUrl,
+        const QUrl& locationUrl)
+{
+    return requestUrl.scheme() == locationUrl.scheme()
+        && requestUrl.topLevelDomain() == locationUrl.topLevelDomain()
+        && getSecondLevelDomain(requestUrl) == getSecondLevelDomain(locationUrl);
+}
+
+}
+
+
+class ToolsApiPrivate
+{
+public:
+    ToolsApiPrivate()
+        : _currentHttpReply(NULL)
+    {}
+
+    bool hasOnGoingHttpRequest() const
+    {
+        return _currentHttpReply != NULL;
+    }
+
+    QNetworkReply* _currentHttpReply;
+};
 
 
 /**
@@ -60,8 +96,15 @@ bool enumToQtCryptoAlgorithm(
  * @param parent
  */
 ToolsApi::ToolsApi(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    d_ptr(new ToolsApiPrivate())
 {}
+
+ToolsApi::~ToolsApi()
+{
+    delete d_ptr;
+    d_ptr = NULL;
+}
 
 /**
  * Compute a HMAC for a given message given a cryptographic key
@@ -89,4 +132,116 @@ QString ToolsApi::getHmacHash(
             code(method, key.toUtf8());
     code.addData(message.toUtf8());
     return QString::fromUtf8(code.result().toBase64());
+}
+
+QString ToolsApi::sendHttpRequest(
+        const QUrl& url,
+        const QUrl& location,
+        const QVariant &params,
+        const QString& payload)
+{
+    Q_D(ToolsApi);
+
+    if (! isCompatibleCorsRequest(url, location))
+    {
+        return QString("Invalid request (cross origin)");
+    }
+    if (d->hasOnGoingHttpRequest())
+    {
+        return QString("Cannot send multiple simultaneous requests");
+    }
+    if (!params.canConvert(QVariant::Map)
+            || !params.toMap().contains("verb"))
+    {
+        return QString("Invalid request content, missing 'verb'");
+    }
+
+    QVariantMap m(params.toMap());
+
+    QNetworkRequest request(url.toString());
+
+    if (m.contains("headers")
+            && m.value("headers").canConvert(QVariant::Map))
+    {
+        QVariantMap headers = m.value("headers").toMap();
+        Q_FOREACH(const QVariant& name, headers.values())
+        {
+            request.setRawHeader(
+                name.toString().toUtf8(),
+                headers.value(name.toString()).toString().toUtf8());
+        }
+    }
+
+    QNetworkAccessManager manager;
+
+    QString verb = m.value("verb").toString().toLower();
+    if (verb == "post")
+    {
+        d->_currentHttpReply =
+                manager.post(request, payload.toUtf8());
+    }
+    else if (verb == "get")
+    {
+        d->_currentHttpReply =
+                manager.get(request);
+    }
+    else
+    {
+        return QString("Invalid request verb");
+    }
+
+    QObject::connect(
+        d->_currentHttpReply, SIGNAL(finished()),
+        this, SLOT(requestFinished()));
+    QObject::connect(
+        d->_currentHttpReply, SIGNAL(uploadProgress(qint64,qint64)),
+        this, SLOT(requestUploadProgress(qint64,qint64)));
+
+    return QString();
+}
+
+void ToolsApi::onRequestFinished()
+{
+    Q_D(ToolsApi);
+    if (Q_UNLIKELY(!d->_currentHttpReply))
+    {
+        Q_EMIT requestFinished(false, "Internal error");
+        return;
+    }
+
+    QVariant statusCode =
+        d->_currentHttpReply->attribute(
+            QNetworkRequest::HttpStatusCodeAttribute);
+    if (!statusCode.isValid())
+    {
+        Q_EMIT requestFinished(false, "Invalid reply status code");
+        return;
+    }
+    int status = statusCode.toInt();
+    Q_EMIT requestFinished(
+        status == 200,
+        d->_currentHttpReply->attribute(
+            QNetworkRequest::HttpReasonPhraseAttribute).toString());
+
+    QObject::disconnect(
+        d->_currentHttpReply, SIGNAL(finished()),
+        this, SLOT(requestFinished()));
+    QObject::disconnect(
+        d->_currentHttpReply, SIGNAL(uploadProgress(qint64,qint64)),
+        this, SLOT(requestUploadProgress(qint64,qint64)));
+
+    d->_currentHttpReply->deleteLater();
+    d->_currentHttpReply = NULL;
+}
+
+void ToolsApi::onRequestUploadProgress(
+        qint64 bytesSent, qint64 bytesTotal)
+{
+    Q_D(ToolsApi);
+    if (Q_UNLIKELY(!d->_currentHttpReply))
+    {
+        return;
+    }
+
+    Q_EMIT requestUpdate(((float)bytesSent)/bytesTotal);
 }
