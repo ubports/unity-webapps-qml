@@ -26,7 +26,7 @@
  */
 function createToolsApi(backendDelegate) {
     var PLUGIN_URI = 'Ubuntu.UnityWebApps';
-    var VERSION = 0.1;
+    var VERSION = 0.2;
 
     var toolsApiInstance = UnityWebAppsBridge.ToolsApi;
 

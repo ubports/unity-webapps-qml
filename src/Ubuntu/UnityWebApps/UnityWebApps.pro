@@ -68,6 +68,9 @@ runtime_api_binding_backend_js_files.files = ./bindings/runtime-api/backend/runt
 download_api_binding_backend_js_files.path = $$installPath/bindings/download-manager/backend/
 download_api_binding_backend_js_files.files = ./bindings/download-manager/backend/download-api.js
 
+tools_api_binding_backend_js_files.path = $$installPath/bindings/tools/backend/
+tools_api_binding_backend_js_files.files = ./bindings/tools/backend/tools.js
+
 INSTALLS += qmldir_file \
     qml_files \
     js_files \
@@ -75,5 +78,5 @@ INSTALLS += qmldir_file \
     alarm_binding_backend_js_files \
     online_accounts_binding_backend_js_files \
     runtime_api_binding_backend_js_files \
-    download_api_binding_backend_js_files
-
+    download_api_binding_backend_js_files \
+    tools_api_binding_backend_js_files
