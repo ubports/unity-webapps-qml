@@ -83,7 +83,7 @@ function createToolsApi(backendBridge) {
             if (! callback || typeof(callback) !== 'function') {
                 return;
             }
-            backendBridge.call('Tools.getHmacHash'
+            backendBridge.call('ToolsApi.getHmacHash'
                                , [hmac, algorithm, key]
                                , callback);
         },

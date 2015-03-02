@@ -796,7 +796,7 @@ Item {
                 return DownloadApiBackend.createDownloadApi(UnityBackends.backendDelegate)
             }),
 
-            Tools:  __injectResourceIfExtraApisAreEnabled(function() {
+            ToolsApi:  __injectResourceIfExtraApisAreEnabled(function() {
                 return ToolsApiBackend.createToolsApi(UnityBackends.backendDelegate)
             }),
 

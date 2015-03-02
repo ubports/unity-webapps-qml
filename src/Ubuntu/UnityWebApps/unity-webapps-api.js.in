@@ -40,6 +40,7 @@
     //@include ./bindings/online-accounts/client/online-accounts.js
     //@include ./bindings/runtime-api/client/runtime-api.js
     //@include ./bindings/download-manager/client/download-api.js
+    //@include ./bindings/tools/client/tools.js
     //@include ./common/js/unity-backend-messaging-proxy.js
     //@include ./common/js/unity-binding-proxy.js
     //@include ./common/js/unity-binding-bridge.js
@@ -295,6 +296,7 @@
             ContentHub: createContentHubApi(backend),
             RuntimeApi: createRuntimeApi(backend),
             DownloadApi: createDownloadApi(backend),
+            ToolsApi: createToolsApi(backend),
         };
 
         return api;
