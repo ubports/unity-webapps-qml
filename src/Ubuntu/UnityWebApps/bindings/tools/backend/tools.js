@@ -43,7 +43,7 @@ function createToolsApi(backendDelegate) {
                 return;
             }
             callback({errorMsg: "",
-                         result: applicationApiInstance.getHmacHash()});
+                         result: toolsApiInstance.getHmacHash()});
         },
     };
 }

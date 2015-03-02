@@ -295,7 +295,7 @@
             ContentHub: createContentHubApi(backend),
             RuntimeApi: createRuntimeApi(backend),
             DownloadApi: createDownloadApi(backend),
-            ToolsApi: createToolsApi(backend),
+            ToolsApi: createToolsApi(backend)
         };
 
         return api;

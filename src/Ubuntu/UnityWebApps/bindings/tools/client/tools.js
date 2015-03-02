@@ -67,7 +67,7 @@ function createToolsApi(backendBridge) {
 
             SHA256: "SHA256",
 
-            SHA512: "SHA512",
+            SHA512: "SHA512"
         },
 
         /**
@@ -86,7 +86,7 @@ function createToolsApi(backendBridge) {
             backendBridge.call('ToolsApi.getHmacHash'
                                , [hmac, algorithm, key]
                                , callback);
-        },
+        }
     };
 };
 
