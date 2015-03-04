@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+15.04.20150304-0ubuntu1) vivid; urgency=medium
+
+  [ Alberto Mardegan ]
+  * Bindings for the OnlineAccounts.Client module (LP: #1427649)
+
+  [ CI Train Bot ]
+  * New rebuild forced.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Wed, 04 Mar 2015 21:32:24 +0000
+
 unity-webapps-qml (0.1+15.04.20150109-0ubuntu1) vivid; urgency=low
 
   [ Ubuntu daily release ]
