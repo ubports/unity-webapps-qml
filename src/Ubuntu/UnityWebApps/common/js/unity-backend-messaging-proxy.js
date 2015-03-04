@@ -4,7 +4,7 @@ function createMessagingProxyForCurrentWebRuntime() {
             navigator.qt.postMessage) {
         return new UnityQtWebkitBackendMessagingProxy();
     }
-    else if (window.oxide) {
+    else if (oxide) {
         return new UnityOxideBackendMessagingProxy();
     }
     return null;

@@ -36,11 +36,12 @@ var UnityWebApps = (function () {
      * \param backends
      * \param userscriptContent
      */
-    function _UnityWebApps(parentItem, bindeeProxies) {
-        this._injected_unity_api_path = Qt.resolvedUrl('unity-webapps-api.js');
+    function _UnityWebApps(parentItem, bindeeProxies, accessPolicy, injected_api_path) {
+        this._injected_unity_api_path = injected_api_path;
         this._bindeeProxies = bindeeProxies;
         this._backends = null;
-        this._userscripts = [];
+        this._accessPolicy = accessPolicy;
+        this._callbackManager = UnityWebAppsUtils.makeCallbackManager();
 
         this._bind();
     };
@@ -48,16 +49,22 @@ var UnityWebApps = (function () {
     _UnityWebApps.prototype = {
 
         cleanup: function() {
-            if (this._bindeeProxies.cleanup && typeof(this._bindeeProxies.cleanup) == 'function')
+            if (this._bindeeProxies.cleanup
+                    && typeof(this._bindeeProxies.cleanup) == 'function') {
                 this._bindeeProxies.cleanup();
+            }
         },
 
         proxies: function() {
             return this._bindeeProxies;
         },
 
-        setUserScriptsToInject: function(userscripts) {
-            this._userscripts = userscripts;
+        injectWebappUserScripts: function(userscripts) {
+            if (this._bindeeProxies) {
+                this._bindeeProxies.injectUserScripts(
+                         userscripts.map(function(script) {
+                             return Qt.resolvedUrl(script); }));
+            }
         },
 
         setBackends: function(backends) {
@@ -70,29 +77,21 @@ var UnityWebApps = (function () {
          */
         _bind: function () {
             var self = this;
-
             var cb = this._onMessageReceivedCallback.bind(self);
             self._bindeeProxies.messageReceivedConnect(cb);
 
-            cb = this._onLoadingStartedCallback.bind(self);
-            self._bindeeProxies.loadingStartedConnect(cb);
+            this._injectCoreBindingUserScripts();
         },
 
         /**
          * \internal
          *
          */
-        _onLoadingStartedCallback: function () {
-            var scripts = [this._injected_unity_api_path];
-            for(var i = 0; i < this._userscripts.length; ++i) {
-                scripts.push(Qt.resolvedUrl(this._userscripts[i]));
+        _injectCoreBindingUserScripts: function () {
+            if (this._bindeeProxies) {
+                this._bindeeProxies.injectUserScripts(
+                         [Qt.resolvedUrl(this._injected_unity_api_path)]);
             }
-
-            for (i = 0; i < scripts.length; ++i)
-                console.debug('Injecting webapps script[' + i + '] : '
-                              + scripts[i]);
-
-            this._bindeeProxies.injectUserScripts(scripts);
         },
 
         /**
@@ -110,7 +109,7 @@ var UnityWebApps = (function () {
          *
          */
         _onMessage: function(msg) {
-            if ( ! this._isValidWebAppsMessage(msg)) {
+            if ( ! this._isValidWebAppsMessage(msg) && ! this._isValidCallbackMessage(msg)) {
                 this._log ('Invalid message received: ' + json.stringify(msg));
 
                 return;
@@ -128,6 +127,7 @@ var UnityWebApps = (function () {
 
             return true;
         },
+
 
         /**
          * \internal
@@ -147,6 +147,13 @@ var UnityWebApps = (function () {
                     var cb = this._wrapCallbackIds (message.callback);
                     params.push(cb);
                 }
+
+                var apiCallName = message.name;
+                if (this._accessPolicy && this._accessPolicy.allowed && !this._accessPolicy.allowed(apiCallName)) {
+                    console.error("Unauthorize API call blocked: " + apiCallName);
+                    return;
+                }
+
                 this._dispatchApiCall (message.name, params);
 
             } else if (target === UnityWebAppsUtils.UBUNTU_WEBAPPS_BINDING_OBJECT_METHOD_CALL_MESSAGE) {
@@ -168,6 +175,23 @@ var UnityWebApps = (function () {
                                           objectid: objectid,
                                           class_name: class_name,
                                           method_name: method_name}]);
+
+            } else if (target === UnityWebAppsUtils.UBUNTU_WEBAPPS_BINDING_API_CALLBACK_MESSAGE) {
+
+                var id = message.id;
+
+                if (! id || ! params)
+                    return;
+
+                var cbfunc = this._callbackManager.get(id);
+                if (!cbfunc || !(cbfunc instanceof Function)) {
+                    try {
+                        console.log('Invalid callback id: ' + id);
+                    }
+                    catch (e) {}
+                    return;
+                }
+                cbfunc.apply(null, params);
             }
         },
 
@@ -208,6 +232,10 @@ var UnityWebApps = (function () {
                     return;
 
                 var callback_args = Array.prototype.slice.call(arguments);
+                callback_args = callback_args.map (function (arg) {
+                    return UnityWebAppsUtils.transformCallbacksToIds(arg, self._callbackManager);
+                });
+
                 var message = UnityWebAppsUtils.formatUnityWebappsCallbackCall(callbackid, callback_args);
 
                 self._bindeeProxies.sendToPage(JSON.stringify(message));
@@ -251,7 +279,7 @@ var UnityWebApps = (function () {
                 }
             }
             return ret;
-          },
+        },
 
         /**
          * \internal
@@ -273,6 +301,17 @@ var UnityWebApps = (function () {
                     message.target &&
                     message.target.indexOf('ubuntu-webapps-binding-call') === 0 &&
                     message.name &&
+                    message.args;
+        },
+
+        /**
+         * \internal
+         *
+         */
+        _isValidCallbackMessage: function(message) {
+            return message != null &&
+                    message.target &&
+                    message.target.indexOf('ubuntu-webapps-binding-callback-call') === 0 &&
                     message.args;
         }
     };

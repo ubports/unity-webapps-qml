@@ -1,1 +1,45 @@
-#
+unity-webapps-qml offers a QML component that depending on runtime
+settings and configurations:
+
+- allows one to inject the UbuntuTouch Javascript platform bindings,
+
+- allows one to inject a restricted set of API bindings when running as a webapp
+(see http://developer.ubuntu.com/publish/webapp/packaging-web-apps/),
+
+- allows one to load local javscript snipets that are to be dynamically injected
+in the webview as part of a webapp,
+
+The QML component supports Oxide and QtWebkit as a web engine backend.
+
+= Building =
+
+The build system uses qmake.
+To compile, simply invoke qmake and then make:
+
+    $ qmake .
+    $ make
+
+= Running =
+
+Some examples are being provided in the examples/ folder. Examples range from
+webapp definitions, to api bindings, etc.
+
+= Unit tests =
+
+To run the unit tests, you can use the commands below:
+
+    $ make test
+
+= Automated UI tests =
+
+The unity-webapps-qml component uses autopilot (https://launchpad.net/autopilot) to test its
+internal sub-componenets.
+To run the tests, you will need to install python3-autopilot and libautopilot-qt.
+Then do the following:
+
+    $ cd tests/autopilot/
+    $ autopilot3 run unity_webapps_qml
+
+You can get a list of all available tests with the following command:
+
+    $ autopilot3 list unity_webapps_qml

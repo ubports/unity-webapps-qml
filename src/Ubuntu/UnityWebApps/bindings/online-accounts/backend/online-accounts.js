@@ -21,7 +21,7 @@
  * Online Accounts API backend binding
  *
  */
-function createOnlineAccountsApi(backendDelegate) {
+function createOnlineAccountsApi(backendDelegate, accessPolicy) {
     var PLUGIN_URI = 'Ubuntu.OnlineAccounts';
     var VERSION = 0.1;
 

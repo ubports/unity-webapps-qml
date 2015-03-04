@@ -58,7 +58,8 @@ public:
         Scripts,
         ScriptsContent,
         Chrome,
-        UserAgentOverride
+        UserAgentOverride,
+        Path
     };
 
     // QAbstractListModel implementation
@@ -75,6 +76,19 @@ public:
     void setDoSearchHomeFolder (bool searchLocalHome);
 
     // Exposed to QML
+    /*!
+     * \brief providesSingleWebappName
+     * \return
+     */
+    Q_INVOKABLE bool providesSingleInlineWebapp() const;
+
+    /*!
+     * \brief providesSingleWebappName
+     * \return
+     */
+    Q_INVOKABLE QString getSingleInlineWebappName() const;
+
+
     /*!
      * \brief exists
      * \param webappName
@@ -108,6 +122,11 @@ public:
      */
     Q_INVOKABLE QString userAgentOverrideFor(const QString & webappName) const;
 
+    /*!
+     * \brief
+     */
+    Q_INVOKABLE QString path(const QString & webappName) const;
+
 
     /*!
      * \brief
@@ -131,7 +150,7 @@ public:
 Q_SIGNALS:
 
     void searchPathChanged(const QString & path);
-    void modelChanged();
+    void modelContentChanged();
 
 
 private Q_SLOTS:
@@ -149,13 +168,23 @@ private:
      */
     struct WebappFileInfo
     {
+        enum WebappType
+        {
+            IS_LOCAL_INLINE_WEBAPP,
+            IS_NON_LOCAL_INLINE_WEBAPP
+        };
+
         WebappFileInfo ()
+            : isLocalInlineWebapp(false)
         {}
-        WebappFileInfo(const QString& m, const QString& s)
-            : manifestFilename(m), userscript(s)
+        WebappFileInfo(const QString& m, const QString& s, WebappType type)
+            : manifestFilename(m),
+              userscript(s),
+              isLocalInlineWebapp(type == IS_LOCAL_INLINE_WEBAPP)
         {}
         QString manifestFilename;
         QString userscript;
+        bool isLocalInlineWebapp;
     };
     /*!
      * \brief Option type for WebappFileInfo
@@ -199,7 +228,8 @@ private:
     void addWebApp(const QString& userscriptLocation,
                    const QString& requiresLocation,
                    const ManifestFileInfo& manifest,
-                   const QString& content);
+                   const QString& content,
+                   bool isLocalInlineWebapp);
 
     /*!
      * \brief isValidInstall
@@ -223,6 +253,7 @@ private:
     {
         QString userscriptLocation;
         QString requiresLocation;
+        bool isLocalInlineWebapp;
 
         struct
         {

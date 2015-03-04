@@ -1,0 +1,57 @@
+<html>
+
+<head>
+<title>Unity Webapps QML test: callback</title>
+
+<script>
+
+window.onload = function () {
+    var unity;
+    function init() {
+        unity = window.external.getUnityObject('1.0');
+        doCallbackLoop();
+    }
+
+    var CALLBACK_COUNT_MAX_COUNT = 10;
+    var callbackLoopCount = 0;
+    function doCallbackLoop(callback) {
+        if (callbackLoopCount >= CALLBACK_COUNT_MAX_COUNT) {
+            document.getElementById('content').innerHTML = 'callback-loop-count-reached';
+            return;
+        }
+        ++callbackLoopCount;
+
+        if (callback && typeof callback === 'Function') {
+            callback(doCallbackLoop);
+        }
+        else {
+            unity.withCallback(doCallbackLoop);
+        }
+    }
+
+        init();
+
+    if (window.external.getUnityObject) {
+        init();
+    }
+    else {
+        document.addEventListener('ubuntu-webapps-api-ready', function () {
+            init();
+        }, false);
+    }
+}
+
+</script>
+
+</head>
+
+<body>
+
+HELLO WORLD
+
+<div id="content">
+</div>
+
+</body>
+
+</html>

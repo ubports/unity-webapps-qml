@@ -1,3 +1,121 @@
+unity-webapps-qml (0.1+15.04.20150109-0ubuntu1) vivid; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * When using a webapp-properties file for an unamed webapp the user
+    script does not get injected. (LP: #1409051)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 09 Jan 2015 19:11:29 +0000
+
+unity-webapps-qml (0.1+15.04.20141202-0ubuntu1) vivid; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Make sure that the content hub bindings are fail safe since the
+    content hub package is a suggests (which is fine since it is not
+    there by default on desktop). (LP: #1395524)
+  * The content hub has been updated with some changes that caused the
+    getPeers() fonction to break on the HTML5 API side.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 02 Dec 2014 02:19:15 +0000
+
+unity-webapps-qml (0.1+15.04.20141126.1-0ubuntu1) vivid; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Improve testability for the desktop webapp search path
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 26 Nov 2014 15:58:51 +0000
+
+unity-webapps-qml (0.1+15.04.20141122-0ubuntu1) vivid; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Port qml bindings to oxide (LP: #1374100)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Sat, 22 Nov 2014 00:47:26 +0000
+
+unity-webapps-qml (0.1+15.04.20141103.1-0ubuntu1) vivid; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Add small guard before url navigation (LP: #1378437)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 03 Nov 2014 18:47:01 +0000
+
+unity-webapps-qml (0.1+14.10.20140813-0ubuntu2) utopic; urgency=low
+
+  * debian/control:
+    - update libqt5webkit5-qmlwebkitplugin -> qml-module-qtwebkit
+      (fixes a multiarch install failure)
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Thu, 04 Sep 2014 15:49:40 +0200
+
+unity-webapps-qml (0.1+14.10.20140813-0ubuntu1) utopic; urgency=low
+
+  [ Ken VanDine ]
+  * handle qtdeclarative5-ubuntu-content1 package rename
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 13 Aug 2014 14:54:42 +0000
+
+unity-webapps-qml (0.1+14.10.20140731-0ubuntu1) utopic; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Alexandre Abreu ]
+  * Simplify the click webapp definition for things like overrides etc.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 31 Jul 2014 21:34:33 +0000
+
+unity-webapps-qml (0.1+14.10.20140718.1-0ubuntu1) utopic; urgency=low
+
+  [ Alexandre Abreu ]
+  * Add bidirectional callback support between js <-> qml,
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 18 Jul 2014 17:40:27 +0000
+
+unity-webapps-qml (0.1+14.10.20140709-0ubuntu1) utopic; urgency=low
+
+  [ Alexandre Abreu ]
+  * Fix issue with qmlplugindump using 100% cpu Fix and expanded AP
+    tests to properly test the installed webapps case (LP: #1300957)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 09 Jul 2014 20:05:56 +0000
+
+unity-webapps-qml (0.1+14.10.20140626.1-0ubuntu1) utopic; urgency=low
+
+  [ Ken VanDine ]
+  * add content share
+
+  [ Alexandre Abreu ]
+  * add content share
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 26 Jun 2014 01:48:37 +0000
+
+unity-webapps-qml (0.1+14.10.20140620-0ubuntu1) utopic; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Olivier Tilloy ]
+  * Do not override existing message handlers. Oxide has this nice
+    feature that it automatically attaches the instantiated message
+    handler to the webview anyway, so this line was useless. (LP:
+    #1323735)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 20 Jun 2014 09:37:13 +0000
+
 unity-webapps-qml (0.1+14.10.20140520-0ubuntu1) utopic; urgency=low
 
   [ Ubuntu daily release ]

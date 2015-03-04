@@ -19,6 +19,7 @@
 .pragma library
 
 var UBUNTU_WEBAPPS_BINDING_API_CALL_MESSAGE = "ubuntu-webapps-binding-call";
+var UBUNTU_WEBAPPS_BINDING_API_CALLBACK_MESSAGE = "ubuntu-webapps-binding-callback-call";
 var UBUNTU_WEBAPPS_BINDING_OBJECT_METHOD_CALL_MESSAGE = "ubuntu-webapps-binding-call-object-method";
 
 
@@ -62,24 +63,46 @@ function OxideWebviewAdapter(webview, disposer, makeSignalDisconnecter) {
     this.webview = webview;
     this.disposer = disposer;
     this.makeSignalDisconnecter = makeSignalDisconnecter;
-    this._WEBAPPS_USER_SCRIPT_CONTEXT = "oxide://UnityWebappsApi";
+    this._WEBAPPS_USER_SCRIPT_CONTEXT = "oxide://main-world";
+    this._injectedUserScripts = [];
+    this._scriptMessageReceivedHandler = null;
 }
 OxideWebviewAdapter.prototype = {
     injectUserScripts: function(userScriptUrls) {
         var context = this.webview.context;
+        if (!context) {
+            console.error('No context found for the current Oxide webview. Cannot inject user scripts.');
+            return;
+        }
 
         for (var i = 0; i < userScriptUrls.length; ++i) {
-            var scriptStart = "import com.canonical.Oxide 1.0 as Oxide; Oxide.UserScript { context:";
-            var scriptEnd = "}";
-            var statement = scriptStart +
-                    '"' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"' +
-                    '; matchAllFrames: false; url: "' +  userScriptUrls[i] + '";' + scriptEnd;
-            context.addUserScript(Qt.createQmlObject(statement, this.webview));
+            var script = userScriptUrls[i];
+            if (this._injectedUserScripts.some(
+                        function(e) { return e === script; })) {
+                console.log('Skipping already injected script: ' + script)
+                continue;
+            }
+
+            var scriptStart = "import com.canonical.Oxide 1.0 as Oxide; \
+Oxide.UserScript { ";
+            var scriptEnd = " }";
+            var statement = scriptStart
+                    + 'context: "' +   this._WEBAPPS_USER_SCRIPT_CONTEXT + '";'
+                    + 'matchAllFrames: false;'
+                    + 'emulateGreasemonkey: true;'
+                    + 'url: "' + script + '";'
+                    + scriptEnd;
+
+            context.addUserScript(
+                        Qt.createQmlObject(statement, this.webview));
         }
+        this._injectedUserScripts.push(script);
     },
     sendToPage: function (message) {
         this.webview.rootFrame.sendMessageNoReply(
-                 this._WEBAPPS_USER_SCRIPT_CONTEXT, "UnityWebappApi-Host-Message", JSON.parse(message));
+                 this._WEBAPPS_USER_SCRIPT_CONTEXT,
+                 "UnityWebappApi-Host-Message",
+                 JSON.parse(message));
     },
     loadingStartedConnect: function (onLoadingStarted) {
         function handler(loadEvent) {
@@ -92,18 +115,24 @@ OxideWebviewAdapter.prototype = {
         this.disposer.addDisposer(this.makeSignalDisconnecter(this.webview.loadingChanged, handler));
     },
     messageReceivedConnect: function (onMessageReceived) {
-        function handler(msg, frame) {
+        function _handler(msg, frame) {
             onMessageReceived(msg.args);
         }
 
-        var script = 'import com.canonical.Oxide 1.0 as Oxide; ' +
-                ' Oxide.ScriptMessageHandler { msgId: "UnityWebappApi-Message"; contexts: ["' +
-                this._WEBAPPS_USER_SCRIPT_CONTEXT +
-                '"]; ' +
-                '}';
-        var messageHandler = Qt.createQmlObject(script, this.webview);
-        messageHandler.callback = handler;
-        this.webview.messageHandlers = [ messageHandler ];
+        if ( ! this._scriptMessageReceivedHandler) {
+            var script = 'import com.canonical.Oxide 1.0 as Oxide; ' +
+            ' Oxide.ScriptMessageHandler { '
+                + 'msgId: "UnityWebappApi-Message"; '
+                + 'contexts: ["' + this._WEBAPPS_USER_SCRIPT_CONTEXT + '"]; ' +
+            '}';
+            this._scriptMessageReceivedHandler =
+                 Qt.createQmlObject(script, this.webview);
+        }
+
+        this._scriptMessageReceivedHandler.callback = _handler;
+    },
+    cleanupAdapterInternals: function() {
+        this._scriptMessageReceivedHandler.callback = function() {};
     }
 }
 
@@ -175,7 +204,9 @@ function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
         // inject common function
 
         proxy.navigateTo = function(url) {
-            webViewId.url = url;
+            if (url.length !== 0) {
+                webViewId.url = url;
+	    }
         };
         // called from the UnityWebApps side
         proxy.onAppRaised = function () {
@@ -185,6 +216,11 @@ function makeProxiesForQtWebViewBindee(webViewId, eventHandlers) {
         // called from the UnityWebApps side
         proxy.cleanup = function() {
             disposer.disposeAndCleanupAll();
+
+            if (this.cleanupAdapterInternals
+                    && typeof(this.cleanupAdapterInternals) === "function") {
+                this.cleanupAdapterInternals();
+            }
         };
 
         return proxy;
@@ -323,4 +359,71 @@ var toISODate = function(d) {
         + pad(d.getUTCSeconds()) + 'Z';
 };
 
+function transformFunctionToCallbackIdIfNecessary(obj, callbackManager) {
+    var ret = obj;
+    if (obj instanceof Function && callbackManager && callbackManager.store) {
+        var id = callbackManager.store(obj);
+        ret = {callbackid: id};
+    }
+    return ret;
+}
+
+function transformCallbacksToIds(obj, callbackManager) {
+    if ( ! isIterableObject(obj)) {
+        return transformFunctionToCallbackIdIfNecessary(obj, callbackManager);
+    }
+    var ret = (obj instanceof Array) ? [] : {};
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            if (obj[key] instanceof Function) {
+                ret[key] = transformFunctionToCallbackIdIfNecessary(obj[key], callbackManager);
+            }
+            else if (isIterableObject (obj[key])) {
+                ret[key] = transformCallbacksToIds(obj[key]);
+            }
+            else {
+                ret[key] = obj[key];
+            }
+        }
+    }
+    return ret;
+}
+
+/**
+ * Wraps callback ids in proper callback that dispatch to the
+ * webpage thru a proper event
+ *
+ */
+function wrapCallbackIds(obj) {
+    if ( ! obj)
+        return obj;
+
+    if (!UnityWebAppsUtils.isIterableObject(obj)) {
+        return obj;
+    }
+
+    if (obj
+        && obj.hasOwnProperty('callbackid')
+        && obj.callbackid !== null) {
+      return this._makeWebpageCallback (obj.callbackid);
+    }
+
+    var ret = (obj instanceof Array) ? [] : {};
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            if (UnityWebAppsUtils.isIterableObject (obj[key])) {
+                if (obj[key].callbackid !== null) {
+                    ret[key] = this._makeWebpageCallback (obj[key].callbackid);
+                }
+                else {
+                    ret[key] = this._wrapCallbackIds (obj[key]);
+                }
+            }
+            else {
+                ret[key] = obj[key];
+            }
+        }
+    }
+    return ret;
+}
 

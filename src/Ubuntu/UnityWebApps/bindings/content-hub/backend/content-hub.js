@@ -16,15 +16,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.import Ubuntu.Content 0.1 as ContentHubBridge
-
 /**
  *
  * ContentHub API backend binding
  *
  */
 
-function createContentHubApi(backendDelegate) {
+function createContentHubApi(backendDelegate, parent) {
+
+    var bridge = null
+    try {
+        bridge = Qt.createQmlObject(
+            'import QtQuick 2.0; import Ubuntu.Content 0.1 as ContentHubBridge; \
+            QtObject { property var hub: ContentHubBridge }', parent)
+    }
+    catch(e) { }
+
+    if (!bridge) {
+        console.log('Could not create ContentHub backend (does not appear to be installed)')
+        return {};
+    }
+
+    var ContentHubBridge = bridge.hub;
+
     var PLUGIN_URI = 'Ubuntu.Content';
     var VERSION = 0.1;
 
@@ -39,6 +53,8 @@ function createContentHubApi(backendDelegate) {
             "Documents": ContentHubBridge.ContentType.Documents,
             "Music": ContentHubBridge.ContentType.Music,
             "Contacts": ContentHubBridge.ContentType.Contacts,
+            "Videos": ContentHubBridge.ContentType.Videos,
+            "Links": ContentHubBridge.ContentType.Links,
         };
         return name in contentTypePerName ?
                     contentTypePerName[name]
@@ -57,6 +73,10 @@ function createContentHubApi(backendDelegate) {
             return "Music";
         else if (state === ContentHubBridge.ContentType.Contacts)
             return "Contacts";
+        else if (state === ContentHubBridge.ContentType.Videos)
+            return "Videos";
+        else if (state === ContentHubBridge.ContentType.Links)
+            return "Links";
         return "Unknown";
     };
 
@@ -146,6 +166,8 @@ function createContentHubApi(backendDelegate) {
             "Collected": ContentHubBridge.ContentTransfer.Collected,
             "Aborted": ContentHubBridge.ContentTransfer.Aborted,
             "Finalized": ContentHubBridge.ContentTransfer.Finalized,
+            "Downloading": ContentHubBridge.ContentTransfer.Downloading,
+            "Downloaded": ContentHubBridge.ContentTransfer.Downloaded,
         };
         return name in contentTransferStatePerName ?
                     contentTransferStatePerName[name]
@@ -166,6 +188,10 @@ function createContentHubApi(backendDelegate) {
             return "Aborted";
         else if (state === ContentHubBridge.ContentTransfer.Finalized)
             return "Finalized";
+        else if (state === ContentHubBridge.ContentTransfer.Downloading)
+            return "Downloading";
+        else if (state === ContentHubBridge.ContentTransfer.Downloaded)
+            return "Downloaded";
         return "<Unknown State>";
     };
 
@@ -631,8 +657,7 @@ function createContentHubApi(backendDelegate) {
                 return;
             }
 
-            var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerModel {";
-            var filterParams = {};
+            var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerModel { ";
             if (filters.contentType) {
                 statement += " contentType: ContentType." + filters.contentType + ";";
             }
@@ -642,18 +667,14 @@ function createContentHubApi(backendDelegate) {
             statement += " }";
 
             var peerModel = Qt.createQmlObject(statement, backendDelegate.parent());
-            var onPeersFound = function() {
-                var peers = peerModel.peers;
+            var peers = peerModel.peers;
 
-                var wrappedPeers = [];
-                for (var i = 0; i < peers.length; ++i) {
-                    var wrappedPeer = new ContentPeer(peers[i]);
-                    wrappedPeers.push(wrappedPeer.serialize());
-                }
-                peerModel.onFindPeersCompleted.disconnect(onPeersFound);
-                callback(wrappedPeers);
-            };
-            peerModel.onFindPeersCompleted.connect(onPeersFound);
+            var wrappedPeers = [];
+            for (var i = 0; i < peers.length; ++i) {
+                var wrappedPeer = new ContentPeer(peers[i]);
+                wrappedPeers.push(wrappedPeer.serialize());
+            }
+            callback(wrappedPeers);
         },
 
         getStore: function(scope, callback) {
@@ -680,7 +701,6 @@ function createContentHubApi(backendDelegate) {
             }
 
             var statement = "import QtQuick 2.0; import Ubuntu.Content 0.1; ContentPeerPicker {";
-            var filterParams = {};
             if (filters.contentType) {
                 statement += " contentType: ContentType." + filters.contentType + "";
             }
@@ -765,6 +785,20 @@ function createContentHubApi(backendDelegate) {
         onExportRequested: function(callback) {
             _contenthub.exportRequested.connect(function(exportTransfer) {
                 var wrapped = new ContentTransfer(exportTransfer);
+                callback(wrapped.serialize());
+            });
+        },
+
+        onImportRequested: function(callback) {
+            _contenthub.onImportRequested.connect(function(importTransfer) {
+                var wrapped = new ContentTransfer(importTransfer);
+                callback(wrapped.serialize());
+            });
+        },
+
+        onShareRequested: function(callback) {
+            _contenthub.shareRequested.connect(function(shareTransfer) {
+                var wrapped = new ContentTransfer(shareTransfer);
                 callback(wrapped.serialize());
             });
         },

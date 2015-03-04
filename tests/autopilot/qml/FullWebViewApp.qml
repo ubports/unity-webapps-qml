@@ -18,10 +18,9 @@
 
 import QtQuick 2.0
 import QtQuick.Window 2.0
-import QtWebKit 3.0
-import QtWebKit.experimental 1.0
 import Ubuntu.Unity.Action 1.0 as UnityActions
 import Ubuntu.UnityWebApps 0.1
+import "."
 
 import "dom-introspection-utils.js" as DomIntrospectionUtils
 
@@ -36,15 +35,18 @@ Window {
     signal resultUpdated(string message)
 
     function evalInPageUnsafe(expr) {
-        var tid = DomIntrospectionUtils.gentid();
-        console.log(DomIntrospectionUtils.wrapJsCommands(expr))
-        webView.experimental.evaluateJavaScript(DomIntrospectionUtils.wrapJsCommands(expr),
-            function(result) { console.log('Result: ' + result); root.resultUpdated(DomIntrospectionUtils.createResult(result)); });
+        var val = webView.evaluateCode(expr, true);
+        resultUpdated(DomIntrospectionUtils.createResult(val))
     }
 
-    property alias url: webView.url
+    property string url: ""
+
+    property string apiBackendQmlFileUrl: ""
+    property string clientApiFileUrl: ""
+
     property string webappName: ""
     property string webappSearchPath: ""
+    property string webappHomepage: ""
 
     UnityActions.ActionManager {
         localContexts: [webappsActionsContext]
@@ -54,30 +56,49 @@ Window {
         active: true
     }
 
-    WebView {
+    WebviewBackendOxide {
         id: webView
-        objectName: "webview"
+        url: root.url
+        localUserAgentOverride: webappName && webappModel.exists(webappName)
+                                ? webappModel.userAgentOverrideFor(webappName) : ""
+    }
 
+    // Offers a way to override/mock the API backends
+    Loader {
+        id: apiBackendQmlFileLoader
+        source: apiBackendQmlFileUrl.length !== 0 ? apiBackendQmlFileUrl : ""
+    }
+
+    Loader {
+        id: unityWebappsComponentLoader
         anchors.fill: parent
-        width: parent.width
-        height: parent.height
+        sourceComponent: (apiBackendQmlFileUrl.length !== 0
+                            && !apiBackendQmlFileLoader.item)
+                         ? undefined : unityWebappsComponent
+    }
 
-        experimental.userScripts: []
-        experimental.preferences.navigatorQtObjectEnabled: true
-        experimental.preferences.developerExtrasEnabled: true
+    UnityWebappsAppModel {
+        id: webappModel
+        searchPath: root.webappSearchPath
+    }
 
-        function getUnityWebappsProxies() {
-            return UnityWebAppsUtils.makeProxiesForQtWebViewBindee(webView);
-        }
+    Component {
+        id: unityWebappsComponent
 
         UnityWebApps {
             id: webapps
             objectName: "webappsContainer"
             actionsContext: webappsActionsContext
             name: root.webappName
+            injectExtraUbuntuApis: true
+            customBackendProxies: apiBackendQmlFileLoader.item
+                                 ? apiBackendQmlFileLoader.item.buildapi()
+                                 : undefined
+            customClientApiFileUrl: root.clientApiFileUrl
             bindee: webView
-            //searchPath: '/home/alex/dev/work/webapps/branches/webapps-qml/latest/examples/data/userscripts'
-            model: UnityWebappsAppModel { }
+            _opt_homepage: root.webappHomepage
+            model: webappModel
         }
     }
 }
+

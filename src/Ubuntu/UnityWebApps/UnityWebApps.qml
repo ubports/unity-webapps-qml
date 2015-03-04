@@ -29,7 +29,6 @@ import "./bindings/online-accounts/backend/online-accounts.js" as OnlineAccounts
 import "./bindings/online-accounts/backend/online-accounts-client.js" as OnlineAccountsClientApiBackend
 import "./bindings/download-manager/backend/download-api.js" as DownloadApiBackend
 
-
 /*!
     \qmltype UnityWebApps
     \inqmlmodule Ubuntu.UnityWebApps 0.1
@@ -116,20 +115,22 @@ Item {
 
 
     /*!
-      \qmlproperty UnityWebappsAppModel UnityWebApps::extraApisSource
-
-      An optional model used in conjunction with the 'name' property
-        as a location for looking up the desired webapps.
+      \qmlproperty bool UnityWebApps::injectExtraUbuntuApis
 
      */
     property alias injectExtraUbuntuApis: settings.injectExtraUbuntuApis
 
     /*!
-      \qmlproperty UnityWebappsAppModel UnityWebApps::extraApisSource
+      \qmlproperty bool UnityWebApps::injectExtraContentShareCapabilities
+
+     */
+    property alias injectExtraContentShareCapabilities: settings.injectExtraContentShareCapabilities
+
+    /*!
+      \qmlproperty bool UnityWebApps::requiresInit
 
      */
     property alias requiresInit: settings.requiresInit
-
 
     /*!
       \qmlproperty UnityActions.Context UnityWebApps::actionsContext
@@ -140,27 +141,48 @@ Item {
      */
     property var actionsContext: null
 
-
     /*!
-      \qmlproperty string UnityWebApps::_opt_backendProxies
+      \qmlproperty string UnityWebApps::customBackendProxies
 
       Used only for testing.
       Allows optional (not the default ones) mocked backends to be used.
 
      */
-    property var _opt_backendProxies: null
+    property var customBackendProxies: null
+
+    /*!
+      \qmlproperty string UnityWebApps::_opt_clientApiFileUrl
+
+      Used only for testing.
+      Allows optional (not the default ones) client api to be used instead of the default one.
+
+     */
+    property string customClientApiFileUrl: ""
+
+    /*!
+      \qmlproperty string UnityWebApps::_opt_homepage
+
+      Used only for testing.
+      Allows an optional a homepage to be specified when running a local http server.
+
+     */
+    property string _opt_homepage: ""
+
+
+    /*!
+     \qmlsignal UnityWebApps::userScriptsInjected()
+
+     This signal is emitted when the component has completed its initialization and
+     the userscripts have been injected into the binded webview.
+     */
+    signal userScriptsInjected()
 
 
     Settings {
         id: settings
+        injectExtraContentShareCapabilities: name && name.length && name.length !== 0
     }
 
-/*
-    Loader {
-        id: apiBindingModelComponentLoader
-        sourceComponent: settings.injectExtraUbuntuApis ? apiBindingModelComponent : undefined
-    }
-*/
 
     /*!
       \internal
@@ -206,14 +228,21 @@ Item {
             console.debug('__bind: ERROR bindee proxies not valid')
             return;
         }
+        var instance =
+            new UnityWebAppsJs.UnityWebApps(
+                    webapps,
+                    bindeeProxies,
+                    __getPolicyForContent(settings),
+                    customClientApiFileUrl && customClientApiFileUrl.length !== 0
+                      ? customClientApiFileUrl
+                      : 'unity-webapps-api.js');
 
-        var instance = new UnityWebAppsJs.UnityWebApps(webapps,
-                                                       bindeeProxies,
-                                                       webappUserscripts);
         internal.instance = instance;
 
         if (internal.backends)
             internal.instance.setBackends(internal.backends)
+
+        userScriptsInjected();
     }
 
     /*!
@@ -222,8 +251,8 @@ Item {
      */
     function __createBackendsIfNeeded() {
         var backends;
-        if (_opt_backendProxies != null)
-            backends = _opt_backendProxies;
+        if (customBackendProxies != null)
+            backends = customBackendProxies;
         else {
             backends = __makeBackendProxies();
         }
@@ -235,7 +264,7 @@ Item {
 
      */
     function __initBackends() {
-        if (__isValidWebAppName(webapps.name) || injectExtraUbuntuApis) {
+        if (customBackendProxies || __isValidWebAppName(webapps.name) || injectExtraUbuntuApis) {
             internal.backends = __createBackendsIfNeeded();
             if (internal.backends && internal.instance)
                 internal.instance.setBackends(internal.backends);
@@ -324,6 +353,9 @@ Item {
             var idx = model.getWebappIndex(webappName);
             var homepage = model.data(idx, UbuntuUnityWebApps.UnityWebappsAppModel.Homepage);
 
+            if (!homepage || homepage.length === 0) {
+                homepage = _opt_homepage;
+            }
             console.debug('Requesting the bindee to navigate to homepage: ' + homepage);
 
             // We recreate a bindee object, but we call any function that requires
@@ -343,7 +375,7 @@ Item {
         if (__isValidWebAppForModel(name)) {
             if (internal.instance) {
                 var userScripts = __gatherWebAppUserscriptsIfAny(name);
-                internal.instance.setUserScriptsToInject(userScripts);
+                internal.instance.injectWebappUserScripts(userScripts);
             }
             __navigateToWebappHomepageInBindee(name);
         }
@@ -351,7 +383,24 @@ Item {
 
     Component.onCompleted: {
         if (model) {
-            model.modelChanged.connect(function() { __setupNamedWebappEnvironment() });
+            if (model.providesSingleInlineWebapp() && webapps.name.length === 0) {
+                webapps.name = model.getSingleInlineWebappName();
+
+                console.log('Webapp name updated to ' + webapps.name)
+            }
+            __setupNamedWebappEnvironment();
+        }
+    }
+
+    onCustomBackendProxiesChanged: __initBackends()
+
+    /*!
+      \internal
+
+     */
+    onModelChanged: {
+        if (model) {
+            model.modelContentChanged.connect(__setupNamedWebappEnvironment)
         }
     }
 
@@ -414,6 +463,48 @@ Item {
         return null;
     }
 
+    /*!
+      \internal
+
+     */
+    function __getPolicyForContent(settings) {
+        function PassthroughPolicy() {};
+        PassthroughPolicy.prototype.allowed = function(signature) {
+            return true;
+        };
+
+        var BASIC_WEBAPPS_ALLOWED_APIS = ["init"];
+        function RestrictedPolicy(restrictions) {
+            this.restrictions = restrictions || BASIC_WEBAPPS_ALLOWED_APIS;
+        };
+        RestrictedPolicy.prototype.allowed = function(signature) {
+            return this.restrictions.some(function(e) { return signature.match(e); });
+        };
+        RestrictedPolicy.prototype.add = function(signature) {
+            if (! this.restrictions.some(function(e) { return e === signature; })) {
+                this.restrictions.push(signature);
+            }
+        };
+
+        if (settings.injectExtraUbuntuApis)
+            return new PassthroughPolicy();
+
+        var policy = new RestrictedPolicy(['init',
+                                           'addAction',
+                                           'clearAction',
+                                           'clearActions',
+                                           'acceptData',
+                                           'Launcher.*',
+                                           'Notification.*',
+                                           'Launcher.*',
+                                           'MediaPlayer.*',
+                                           'MessagingIndicator.*']);
+        if (settings.injectExtraContentShareCapabilities) {
+            policy.add("launchEmbeddedUI");
+            policy.add("ContentHub.onShareRequested");
+        }
+        return policy;
+    }
 
     /*!
       \internal
@@ -523,6 +614,52 @@ Item {
                     return;
                 // hud remove all action
                 UnityBackends.get("hud").clearActions();
+            },
+
+            launchEmbeddedUI: function(name, callback, params) {
+                if (!model || !webapps || !webapps.name) {
+                    console.error("launchEmbeddedUI: could not find a valid webapp model or webapp name");
+                    return;
+                }
+
+                var path = model.path(webapps.name);
+                if (!path || path.length === 0) {
+                    console.error("launchEmbeddedUI: Invalid or empty webapp path name");
+                    return;
+                }
+
+                var backendDelegate = UnityBackends.backendDelegate;
+
+                var parentItem = backendDelegate.parentView();
+                if (!parentItem || !parentItem.visible || !parentItem.height || !parentItem.width) {
+                    console.error("launchEmbeddedUI: Cannot launch the embedded UI, invalid or malformed parent item: " + parentItem);
+                    callback({result: "cancelled"});
+                    return;
+                }
+
+                var p = parentItem.parent ? parentItem.parent : parentItem
+
+                var uicomponent;
+                function onCreated() {
+                    var uiobject = uicomponent.createObject(p, {"fileToShare": params.fileToShare.url, "visible": true});
+                    if ( ! uiobject.onCompleted) {
+                        console.error("launchEmbeddedUI: The local UI component to be launched does not expose a mandatory 'completed' signal");
+                        uiobject.destroy();
+                        return;
+                    }
+                    function _onCompleted(data, onResourceUploadedCallback) {
+                        p.visible = true;
+                        uiobject.onCompleted.disconnect(_onCompleted);
+                        callback(data, onResourceUploadedCallback);
+                    }
+                    uiobject.onCompleted.connect(_onCompleted);
+                };
+
+                var uicomponent = Qt.createComponent(path + "/" + name + ".qml");
+                if (uicomponent.status === Component.Ready)
+                    onCreated()
+                else
+                    uicomponent.statusChanged.connect(onCreated)
             },
 
             Notification: {
@@ -642,17 +779,14 @@ Item {
                 }
             },
 
-            OnlineAccounts: __injectResourceIfExtraApisAreEnabled(function() {
-                return OnlineAccountsApiBackend.createOnlineAccountsApi(UnityBackends.backendDelegate)
-            }),
+            OnlineAccounts: OnlineAccountsApiBackend.createOnlineAccountsApi(UnityBackends.backendDelegate),
 
             Alarm: __injectResourceIfExtraApisAreEnabled(function() {
                 return AlarmApiBackend.createAlarmApi(UnityBackends.backendDelegate)
             }),
 
-            ContentHub:  __injectResourceIfExtraApisAreEnabled(function() {
-                return ContentHubApiBackend.createContentHubApi(UnityBackends.backendDelegate)
-            }),
+            ContentHub: ContentHubApiBackend.createContentHubApi(
+                            UnityBackends.backendDelegate, webapps),
 
             RuntimeApi:  __injectResourceIfExtraApisAreEnabled(function() {
                 return RuntimeApiBackend.createRuntimeApi(UnityBackends.backendDelegate)
