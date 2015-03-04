@@ -26,6 +26,7 @@ import "./bindings/runtime-api/backend/runtime-api.js" as RuntimeApiBackend
 import "./bindings/alarm-api/backend/alarm-api.js" as AlarmApiBackend
 import "./bindings/content-hub/backend/content-hub.js" as ContentHubApiBackend
 import "./bindings/online-accounts/backend/online-accounts.js" as OnlineAccountsApiBackend
+import "./bindings/online-accounts/backend/online-accounts-client.js" as OnlineAccountsClientApiBackend
 import "./bindings/download-manager/backend/download-api.js" as DownloadApiBackend
 
 /*!

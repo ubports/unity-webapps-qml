@@ -4,13 +4,23 @@ window.onload = function() {
     var api = external.getUnityObject('1.0');
     var oa = api.OnlineAccounts;
 
-    oa.api.getProviders({"applicationId": "webbrowser-app"}, function(providers) {
+    var appId = "shotwell";
+
+    oa.api.getProviders({"applicationId": appId}, function(providers) {
         var ul = document.querySelector('#providers ul');
 
         for (var i = 0; i < providers.length; ++i) {
             var li = document.createElement('li');
+            var button = document.createElement('input');
+            button.type = 'button';
+            button.providerId = providers[i].providerId;
+            button.value = 'Request account';
+            button.addEventListener('click', function() {
+                oa.api.requestAccount(appId, this.providerId, function() {});
+            });
             li.innerHTML = 'displayName: ' + providers[i].displayName
                     + ', providerId: ' + providers[i].providerId;
+            li.appendChild(button);
             ul.appendChild(li);
         }
     });

@@ -673,6 +673,8 @@ function createOnlineAccountsApi(backendDelegate, accessPolicy) {
             }
         },
 
+        Client: OnlineAccountsClientApiBackend.createOnlineAccountsClientApi(backendDelegate),
+
         // Internal
 
         dispatchToObject: function(infos) {
