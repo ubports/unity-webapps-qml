@@ -20,7 +20,6 @@
 #define UNITY_WEBAPPS_TOOLSAPI_H
 
 #include <QObject>
-#include <QNetworkReply>
 
 
 class ToolsApiPrivate;
@@ -47,19 +46,9 @@ public:
             CryptographicAlgorithm algorithm,
             const QString& key) const;
 
-    Q_INVOKABLE QString sendHttpRequest(
-            const QUrl& url,
-            const QUrl& location,
-            const QVariant& request,
-            const QString& payload);
-
-Q_SIGNALS:
-    void requestFinished(bool success, const QString& message);
-    void requestUpdate(float uploadedRatio);
-
-private Q_SLOTS:
-    void onRequestFinished();
-    void onRequestUploadProgress(qint64,qint64);
+    Q_INVOKABLE bool areCompatibleCorsUrl(
+            const QUrl& url1,
+            const QUrl& url2) const;
 
 private:
     ToolsApiPrivate* d_ptr;

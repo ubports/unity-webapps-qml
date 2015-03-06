@@ -35,11 +35,24 @@ function createToolsApi(backendDelegate) {
         return algos.some(function(e) { return e === algorithm; })
     };
 
-    function isHttpRequestParameters(request) {
-        return request.verb != null
-            && request.url != null
-            && request.location != null
-    };
+    function generateRandomAlphaString(size) {
+        var random_string_size = size || 32
+        var random_string = ''
+        for (var i = 0; i < random_path_size; ++i) {
+            var pick = String.random_string_size(
+                Math.floor(Math.random() * 72) + 48)
+
+            if (pick >= 58 && pick <= 64) {
+                pick = String.fromCharCode(
+                    Math.floor(Math.random() * 9) + 48)
+            } else if (pick >= 91 && pick <= 96) {
+                pick = String.fromCharCode(
+                    Math.floor(Math.random() * 25) + 65)
+            }
+            random_string += pick;
+        }
+        return random_string
+    }
 
     return {
         getHmacHash: function(hmac, algorithm, key, callback) {
@@ -52,25 +65,31 @@ function createToolsApi(backendDelegate) {
                  result: toolsApiInstance.getHmacHash(hmac, algorithm, key)});
         },
         sendHttpRequest: function(url, location, request, payload, callback) {
-            if ( ! isHttpRequestParameters(request)) {
-                callback({errorMsg: "Invalid request", success: false});
-                return;
-            }
+            var xmlrequest = new XMLHttpRequest();
+            xmlrequest.open("POST", url, true);
 
-            var requestFinished = function(success, message) {
-                callback({errorMsg: message, success: success})
-                toolsApiInstance.requestFinished.disconnect(requestFinished)
-                toolsApiInstance.requestUpdate.disconnect(requestUpdated)
-            }
-            toolsApiInstance.requestFinished.connect(requestFinished)
+            xmlrequest.onload = xmlrequest.onerror = function() {
+                callback({errorMsg: xmlrequest.statusText,
+                            success: xmlrequest.status == 200,
+                            response: xmlrequest.responseText})
+            };
 
-            var requestUpdated = function(uploadRatio) {
-                callback({uploadedRatio: uploadRatio})
-            }
-            toolsApiInstance.requestUpdate.connect(requestUpdated)
+            var crlf = '\r\n';
+            var boundary = "boundary-" + generateRandomAlphaString();
+            var dashes = "--";
 
-            callback(toolsApiInstance.sendHttpRequest(
-                         url, location, request, payload))
+            var data = dashes +
+                boundary + crlf +
+                "Content-Disposition:form-data;name=\"media\";" +
+                "filename=\"" + unescape(generateRandomAlphaString()) + "\"" + crlf +
+                "Content-Type: application/octet-stream" + crlf + crlf +
+                payload + crlf +
+                dashes + boundary + dashes;
+
+            xmlHttpRequest.setRequestHeader(
+                "Content-Type",
+                "multipart/form-data;boundary=" + boundary);
+            xmlHttpRequest.sendAsBinary(data);
         },
     };
 }

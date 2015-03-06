@@ -115,7 +115,7 @@ var UnityWebApps = (function () {
                 return;
             }
 
-            this._log ('WebApps API message received: ' + json.stringify(msg));
+            this._log ('WebApps API message received: ' + json.stringify(msg).name);
 
             var self = this;
             var args = json.parse(msg.args);

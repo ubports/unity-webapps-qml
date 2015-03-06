@@ -503,6 +503,7 @@ Item {
             policy.add("launchEmbeddedUI");
             policy.add("ContentHub.onShareRequested");
             policy.add("ToolsApi.getHmacHash");
+            policy.add("ToolsApi.sendHttpRequest");
         }
         return policy;
     }
