@@ -35,61 +35,91 @@ function createToolsApi(backendDelegate) {
         return algos.some(function(e) { return e === algorithm; })
     };
 
+    function stringToCryptoAlgorithm(algorithm) {
+        var assoc = {
+            "MD5": toolsApiInstance.MD5
+            , "SHA1": toolsApiInstance.SHA1
+            , "SHA256": toolsApiInstance.SHA256
+            , "SHA512": toolsApiInstance.SHA512
+        };
+        return assoc[algorithm]
+    };
+
     function generateRandomAlphaString(size) {
         var random_string_size = size || 32
         var random_string = ''
-        for (var i = 0; i < random_path_size; ++i) {
-            var pick = String.random_string_size(
-                Math.floor(Math.random() * 72) + 48)
-
+        for (var i = 0; i < random_string_size; ++i) {
+            var pick = Math.floor(Math.random() * 72) + 48
             if (pick >= 58 && pick <= 64) {
-                pick = String.fromCharCode(
-                    Math.floor(Math.random() * 9) + 48)
+                pick = Math.floor(Math.random() * 9) + 48
             } else if (pick >= 91 && pick <= 96) {
-                pick = String.fromCharCode(
-                    Math.floor(Math.random() * 25) + 65)
+                pick = Math.floor(Math.random() * 25) + 65
             }
-            random_string += pick;
+            random_string += String.fromCharCode(pick);
         }
         return random_string
     }
 
     return {
-        getHmacHash: function(hmac, algorithm, key, callback) {
+        getHmacHash: function(message, algorithm, key, callback) {
             if ( ! isValidAlgorithm(algorithm)) {
                 callback({errorMsg: "Invalid algorithm",
                              result: null});
                 return;
             }
+            console.log(stringToCryptoAlgorithm(algorithm))
             callback({errorMsg: "",
-                 result: toolsApiInstance.getHmacHash(hmac, algorithm, key)});
+                 result: toolsApiInstance.getHmacHash(
+                             message, stringToCryptoAlgorithm(algorithm), key)});
         },
         sendHttpRequest: function(url, location, request, payload, callback) {
             var xmlrequest = new XMLHttpRequest();
+
             xmlrequest.open("POST", url, true);
 
-            xmlrequest.onload = xmlrequest.onerror = function() {
-                callback({errorMsg: xmlrequest.statusText,
-                            success: xmlrequest.status == 200,
-                            response: xmlrequest.responseText})
+            console.log(url)
+
+            xmlrequest.onreadystatechange = function() {
+                console.log('xmlrequest.readyState ' + xmlrequest.readyState)
+
+                if (xmlrequest.readyState == XMLHttpRequest.DONE) {
+                    console.log('DONE ' + xmlrequest.statusText + ', ' + xmlrequest.responseText)
+
+                    callback({errorMsg: xmlrequest.statusText,
+                                success: xmlrequest.status == 200,
+                                response: xmlrequest.responseText})
+                }
             };
+
+            for (var header in request.headers) {
+                if (request.headers.hasOwnProperty(header)) {
+                    xmlrequest.setRequestHeader(header, request.headers[header])
+                    console.log(request.headers[header])
+                }
+            }
 
             var crlf = '\r\n';
             var boundary = "boundary-" + generateRandomAlphaString();
-            var dashes = "--";
+            var boundary_prefix = "--";
 
-            var data = dashes +
-                boundary + crlf +
-                "Content-Disposition:form-data;name=\"media\";" +
-                "filename=\"" + unescape(generateRandomAlphaString()) + "\"" + crlf +
-                "Content-Type: application/octet-stream" + crlf + crlf +
-                payload + crlf +
-                dashes + boundary + dashes;
+            xmlrequest.setRequestHeader(
+                "Content-Type", "multipart/form-data; boundary=" + boundary);
 
-            xmlHttpRequest.setRequestHeader(
-                "Content-Type",
-                "multipart/form-data;boundary=" + boundary);
-            xmlHttpRequest.sendAsBinary(data);
+            console.log('boundary : ' + boundary)
+
+            var request_data_head = boundary_prefix + boundary + crlf +
+                "Content-Disposition: form-data; name=\"media\"; filename=\"" + generateRandomAlphaString() + "\"" + crlf +
+                "Content-Transfer-Encoding: base64" + crlf +
+                "Content-Type: application/octet-stream" + crlf +
+                crlf;
+
+            console.log('request_data_head ' + request_data_head);
+
+            var request_data_tail = boundary_prefix + boundary + boundary_prefix;
+
+            console.log('request_data_tail ' + request_data_tail);
+
+            xmlrequest.send(request_data_head + payload + crlf + request_data_tail);
         },
     };
 }

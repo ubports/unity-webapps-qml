@@ -79,12 +79,12 @@ function createToolsApi(backendBridge) {
          * @param key {Function (Application)}
          * @param callback {Function (Application)}
          */
-        getHmacHash: function(hmac, algorithm, key, callback) {
+        getHmacHash: function(message, algorithm, key, callback) {
             if (! callback || typeof(callback) !== 'function') {
                 return;
             }
             backendBridge.call('ToolsApi.getHmacHash'
-                               , [hmac, algorithm, key]
+                               , [message, algorithm, key]
                                , callback);
         },
 
