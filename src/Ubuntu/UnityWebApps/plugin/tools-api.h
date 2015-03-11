@@ -50,6 +50,8 @@ public:
             const QUrl& url1,
             const QUrl& url2) const;
 
+    Q_INVOKABLE QByteArray fileContent(const QUrl& fileUri) const;
+
 private:
     ToolsApiPrivate* d_ptr;
     Q_DECLARE_PRIVATE(ToolsApi)

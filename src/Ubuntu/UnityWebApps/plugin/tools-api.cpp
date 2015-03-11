@@ -23,6 +23,8 @@
 #include <QMessageAuthenticationCode>
 #include <QUrl>
 #include <QString>
+#include <QFileInfo>
+#include <QFile>
 
 
 namespace {
@@ -129,4 +131,22 @@ bool ToolsApi::areCompatibleCorsUrl(
     return url1.scheme() == url2.scheme()
         && url1.topLevelDomain() == url2.topLevelDomain()
         && getSecondLevelDomain(url1) == getSecondLevelDomain(url2);
+}
+
+QByteArray ToolsApi::fileContent(const QUrl& fileUri) const
+{
+    QFileInfo fi(fileUri.toLocalFile());
+    if (!fi.exists())
+    {
+        qDebug() << "Unknown file:" << fileUri;
+        return QByteArray();
+    }
+
+    QFile f(fileUri.toLocalFile());
+    if (f.open(QIODevice::ReadOnly))
+    {
+        return f.readAll();
+    }
+
+    return QByteArray();
 }
