@@ -75,51 +75,34 @@ function createToolsApi(backendDelegate) {
         sendHttpRequest: function(url, location, request, payload, callback) {
             var xmlrequest = new XMLHttpRequest();
 
-            xmlrequest.open("POST", url, true);
+            var verb = payload && payload.length !== 0 ? "POST" : "GET"
+            var ispost = (verb === "POST");
 
-            console.log(url)
+            xmlrequest.open(verb, url, true);
 
             xmlrequest.onreadystatechange = function() {
-                console.log('xmlrequest.readyState ' + xmlrequest.readyState)
-
                 if (xmlrequest.readyState == XMLHttpRequest.DONE) {
-                    console.log('DONE ' + xmlrequest.statusText + ', ' + xmlrequest.responseText)
-
-                    callback({errorMsg: xmlrequest.statusText,
-                                success: xmlrequest.status == 200,
-                                response: xmlrequest.responseText})
+                    callback({
+                        errorMsg: xmlrequest.statusText,
+                        success: xmlrequest.status == 200,
+                        response: xmlrequest.responseText
+                    });
                 }
             };
 
             for (var header in request.headers) {
                 if (request.headers.hasOwnProperty(header)) {
                     xmlrequest.setRequestHeader(header, request.headers[header])
-                    console.log(request.headers[header])
                 }
             }
 
-            var crlf = '\r\n';
-            var boundary = "boundary-" + generateRandomAlphaString();
-            var boundary_prefix = "--";
+            if (verb === "POST") {
+                xmlrequest.setRequestHeader(
+                    "Content-Length",
+                    String(payload.length));
+            }
 
-            xmlrequest.setRequestHeader(
-                "Content-Type", "multipart/form-data; boundary=" + boundary);
-
-            console.log('boundary : ' + boundary)
-
-            var request_data_head = boundary_prefix + boundary + crlf +
-                "Content-Disposition: form-data; name=\"media\"; filename=\"" + generateRandomAlphaString() + "\"" + crlf +
-                "Content-Transfer-Encoding: base64" + crlf +
-                "Content-Type: application/octet-stream" + crlf +
-                crlf;
-
-            console.log('request_data_head ' + request_data_head);
-
-            var request_data_tail = boundary_prefix + boundary + boundary_prefix;
-
-            console.log('request_data_tail ' + request_data_tail);
-
-            xmlrequest.send(request_data_head + payload + crlf + request_data_tail);
+            xmlrequest.send(payload);
         },
     };
 }
