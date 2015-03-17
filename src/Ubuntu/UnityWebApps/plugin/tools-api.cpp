@@ -66,28 +66,14 @@ QString getSecondLevelDomain(const QUrl& url)
 }
 
 
-class ToolsApiPrivate
-{
-public:
-    ToolsApiPrivate()
-    {}
-};
-
-
 /**
  * @brief ToolsApi::ToolsApi
  * @param parent
  */
 ToolsApi::ToolsApi(QObject *parent) :
-    QObject(parent),
-    d_ptr(new ToolsApiPrivate())
+    QObject(parent)
 {}
 
-ToolsApi::~ToolsApi()
-{
-    delete d_ptr;
-    d_ptr = NULL;
-}
 
 /**
  * Compute a HMAC for a given message given a cryptographic key
@@ -131,22 +117,4 @@ bool ToolsApi::areCompatibleCorsUrl(
     return url1.scheme() == url2.scheme()
         && url1.topLevelDomain() == url2.topLevelDomain()
         && getSecondLevelDomain(url1) == getSecondLevelDomain(url2);
-}
-
-QByteArray ToolsApi::fileContent(const QUrl& fileUri) const
-{
-    QFileInfo fi(fileUri.toLocalFile());
-    if (!fi.exists())
-    {
-        qDebug() << "Unknown file:" << fileUri;
-        return QByteArray();
-    }
-
-    QFile f(fileUri.toLocalFile());
-    if (f.open(QIODevice::ReadOnly))
-    {
-        return f.readAll();
-    }
-
-    return QByteArray();
 }

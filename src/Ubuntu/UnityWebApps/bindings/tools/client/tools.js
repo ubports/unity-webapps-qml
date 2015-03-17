@@ -89,21 +89,18 @@ function createToolsApi(backendBridge) {
         },
 
         /**
-         * Generates a .
-         *
-         * @method sendHttpRequest
-         * @param callback {Function ({errorMsg: String, success: bool, uploadRatio: float})}
+         * @internal
          */
-        sendHttpRequest: function(url, request, payload, callback) {
-            if (! callback || typeof(callback) !== 'function') {
-                return;
+        __private__: {
+            sendHttpRequest: function(url, request, payload, callback) {
+                if (! callback || typeof(callback) !== 'function') {
+                    return;
+                }
+                var location = window && window.location ? window.location.href : ""
+                backendBridge.call('ToolsApi.sendHttpRequest'
+                                   , [url, location, request, payload]
+                                   , callback);
             }
-            var location = window && window.location ? window.location.href : ""
-            backendBridge.call('ToolsApi.sendHttpRequest'
-                               , [url, location, request, payload]
-                               , callback);
         }
     };
 };
-
-

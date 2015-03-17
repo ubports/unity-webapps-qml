@@ -22,8 +22,6 @@
 #include <QObject>
 
 
-class ToolsApiPrivate;
-
 class ToolsApi : public QObject
 {
     Q_OBJECT
@@ -31,7 +29,6 @@ class ToolsApi : public QObject
 
 public:
     explicit ToolsApi(QObject *parent = 0);
-    ~ToolsApi();
 
     enum CryptographicAlgorithm
     {
@@ -49,12 +46,6 @@ public:
     Q_INVOKABLE bool areCompatibleCorsUrl(
             const QUrl& url1,
             const QUrl& url2) const;
-
-    Q_INVOKABLE QByteArray fileContent(const QUrl& fileUri) const;
-
-private:
-    ToolsApiPrivate* d_ptr;
-    Q_DECLARE_PRIVATE(ToolsApi)
 };
 
 #endif // UNITY_WEBAPPS_TOOLSAPI_H

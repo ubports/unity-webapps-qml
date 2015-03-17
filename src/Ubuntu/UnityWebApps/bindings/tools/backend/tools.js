@@ -45,21 +45,6 @@ function createToolsApi(backendDelegate) {
         return assoc[algorithm]
     };
 
-    function generateRandomAlphaString(size) {
-        var random_string_size = size || 32
-        var random_string = ''
-        for (var i = 0; i < random_string_size; ++i) {
-            var pick = Math.floor(Math.random() * 72) + 48
-            if (pick >= 58 && pick <= 64) {
-                pick = Math.floor(Math.random() * 9) + 48
-            } else if (pick >= 91 && pick <= 96) {
-                pick = Math.floor(Math.random() * 25) + 65
-            }
-            random_string += String.fromCharCode(pick);
-        }
-        return random_string
-    }
-
     return {
         getHmacHash: function(message, algorithm, key, callback) {
             if ( ! isValidAlgorithm(algorithm)) {
@@ -67,21 +52,25 @@ function createToolsApi(backendDelegate) {
                              result: null});
                 return;
             }
-            console.log(stringToCryptoAlgorithm(algorithm))
             callback({errorMsg: "",
                  result: toolsApiInstance.getHmacHash(
                              message, stringToCryptoAlgorithm(algorithm), key)});
         },
         sendHttpRequest: function(url, location, request, payload, callback) {
+            if ( ! toolsApiInstance.areCompatibleCorsUrl(url, location)) {
+                console.error('sendHttpRequest: incompatible CORS request urls')
+                return;
+            }
+
             var xmlrequest = new XMLHttpRequest();
 
-            var verb = payload && payload.length !== 0 ? "POST" : "GET"
-            var ispost = (verb === "POST");
+            var verb = payload && payload.length !== 0
+                    ? "POST" : "GET"
 
             xmlrequest.open(verb, url, true);
 
             xmlrequest.onreadystatechange = function() {
-                if (xmlrequest.readyState == XMLHttpRequest.DONE) {
+                if (xmlrequest.readyState === XMLHttpRequest.DONE) {
                     callback({
                         errorMsg: xmlrequest.statusText,
                         success: xmlrequest.status == 200,
@@ -96,13 +85,11 @@ function createToolsApi(backendDelegate) {
                 }
             }
 
-            if (verb === "POST") {
-                xmlrequest.setRequestHeader(
-                    "Content-Length",
-                    String(payload.length));
-            }
+            xmlrequest.setRequestHeader(
+                "Content-Length",
+                String(payload.length));
 
             xmlrequest.send(payload);
-        },
+        }
     };
 }
