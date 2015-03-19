@@ -28,6 +28,7 @@ import "./bindings/content-hub/backend/content-hub.js" as ContentHubApiBackend
 import "./bindings/online-accounts/backend/online-accounts.js" as OnlineAccountsApiBackend
 import "./bindings/online-accounts/backend/online-accounts-client.js" as OnlineAccountsClientApiBackend
 import "./bindings/download-manager/backend/download-api.js" as DownloadApiBackend
+import "./bindings/tools/backend/tools.js" as ToolsApiBackend
 
 /*!
     \qmltype UnityWebApps
@@ -502,6 +503,8 @@ Item {
         if (settings.injectExtraContentShareCapabilities) {
             policy.add("launchEmbeddedUI");
             policy.add("ContentHub.onShareRequested");
+            policy.add("ToolsApi.getHmacHash");
+            policy.add("ToolsApi.sendHttpRequest");
         }
         return policy;
     }
@@ -795,6 +798,8 @@ Item {
             DownloadApi:  __injectResourceIfExtraApisAreEnabled(function() {
                 return DownloadApiBackend.createDownloadApi(UnityBackends.backendDelegate)
             }),
+
+            ToolsApi: ToolsApiBackend.createToolsApi(UnityBackends.backendDelegate),
 
             Launcher: {
                 setCount: function (count) {

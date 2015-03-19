@@ -41,6 +41,7 @@ SOURCES += \
     callback.cpp \
     abstract-item-model-adaptor.cpp \
     application-api.cpp \
+    tools-api.cpp \
     application-signal-to-qt-bridge.cpp
 
 HEADERS += \
@@ -59,6 +60,7 @@ HEADERS += \
     callback.h \
     abstract-item-model-adaptor.h \
     application-api.h \
+    tools-api.h \
     application-signal-to-qt-bridge.h
 
 DEFINES += \

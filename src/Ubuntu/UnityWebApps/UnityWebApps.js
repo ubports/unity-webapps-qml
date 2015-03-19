@@ -115,8 +115,6 @@ var UnityWebApps = (function () {
                 return;
             }
 
-            this._log ('WebApps API message received: ' + json.stringify(msg));
-
             var self = this;
             var args = json.parse(msg.args);
             args = args.map (function (arg) {
@@ -153,6 +151,8 @@ var UnityWebApps = (function () {
                     console.error("Unauthorize API call blocked: " + apiCallName);
                     return;
                 }
+
+                this._log ('WebApps API message being dispatch: ' + apiCallName);
 
                 this._dispatchApiCall (message.name, params);
 
