@@ -58,9 +58,9 @@ bool enumToQtCryptoAlgorithm(
 QString getSecondLevelDomain(const QUrl& url)
 {
     QString tld = url.topLevelDomain();
-    QString host = url.host().replace(tld, "");
+    QString host = url.host().left(url.host.length() - tld.length());
     QStringList s = host.split(".", QString::SkipEmptyParts);
-    return s.size() > 0 ? (s[s.size() - 1] + tld) : tld;
+    return s.isEmpty() ? tld : (s.last() + tld);
 }
 
 }
@@ -86,7 +86,7 @@ ToolsApi::ToolsApi(QObject *parent) :
  * @return HMAC of the message
  */
 QString ToolsApi::getHmacHash(
-        const QString &message,
+        const QString& message,
         ToolsApi::CryptographicAlgorithm algorithm,
         const QString& key) const
 {
