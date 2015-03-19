@@ -58,7 +58,7 @@ bool enumToQtCryptoAlgorithm(
 QString getSecondLevelDomain(const QUrl& url)
 {
     QString tld = url.topLevelDomain();
-    QString host = url.host().left(url.host.length() - tld.length());
+    QString host = url.host().left(url.host().length() - tld.length());
     QStringList s = host.split(".", QString::SkipEmptyParts);
     return s.isEmpty() ? tld : (s.last() + tld);
 }
