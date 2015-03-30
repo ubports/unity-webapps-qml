@@ -1,0 +1,253 @@
+{
+    "project": {
+        "name": "Online Accounts JS API",
+        "description": "Ubuntu App Platform Online Accounts JavaScript API docs",
+        "version": "0.1"
+    },
+    "files": {
+        "online-accounts.js": {
+            "name": "online-accounts.js",
+            "modules": {
+                "OnlineAccounts": 1
+            },
+            "classes": {
+                "AccountService": 1,
+                "OnlineAccounts": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "OnlineAccounts": {
+            "name": "OnlineAccounts",
+            "submodules": {},
+            "classes": {
+                "AccountService": 1,
+                "OnlineAccounts": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "online-accounts.js",
+            "line": 144,
+            "description": "OnlineAccounts is the entry point to online accounts service access."
+        }
+    },
+    "classes": {
+        "AccountService": {
+            "name": "AccountService",
+            "shortname": "AccountService",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "OnlineAccounts",
+            "namespace": "",
+            "file": "online-accounts.js",
+            "line": 10,
+            "description": "AccountService represents an instance of a service in an Online Accounts.\n\nThe AcountService object is not directly constructible but returned as a result of\nOnlineAccounts api calls."
+        },
+        "OnlineAccounts": {
+            "name": "OnlineAccounts",
+            "shortname": "OnlineAccounts",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "OnlineAccounts",
+            "namespace": "",
+            "file": "online-accounts.js",
+            "line": 144,
+            "description": "The OnlineAccounts object is the entry point to online accounts service access.",
+            "example": [
+                "\n\n       var api = external.getUnityObject(1.0);\n       var oa = api.OnlineAccounts;\n\n       oa.api.getAccounts({'provider': 'facebook'}, function(result) { [...] });"
+            ]
+        }
+    },
+    "classitems": [
+        {
+            "file": "online-accounts.js",
+            "line": 38,
+            "description": "Returns the account's numeric ID; note that all\nAccountService objects which work on the same online account will have the same ID.",
+            "itemtype": "method",
+            "name": "accountId",
+            "return": {
+                "description": "Value for the accountId",
+                "type": "String"
+            },
+            "class": "AccountService",
+            "module": "OnlineAccounts"
+        },
+        {
+            "file": "online-accounts.js",
+            "line": 49,
+            "description": "This read-only property returns whether the AccountService is enabled.\nAn application shouldn't use an AccountService which is disabled",
+            "itemtype": "method",
+            "name": "enabled",
+            "return": {
+                "description": "Value for the enabled flag",
+                "type": "Boolean"
+            },
+            "class": "AccountService",
+            "module": "OnlineAccounts"
+        },
+        {
+            "file": "online-accounts.js",
+            "line": 60,
+            "description": "Returns The account's display name (usually the user's login or ID).\nNote that all AccountService objects which work on the same online account\nwill share the same display name.",
+            "itemtype": "method",
+            "name": "displayName",
+            "return": {
+                "description": "Value of the displayName",
+                "type": "String"
+            },
+            "class": "AccountService",
+            "module": "OnlineAccounts"
+        },
+        {
+            "file": "online-accounts.js",
+            "line": 72,
+            "description": "Returns an object representing the provider which provides the account.\n\nThe returned object will have at least these properties:\n  - 'id' is the unique identifier for this provider\n  - 'displayName'\n  - 'iconName'",
+            "itemtype": "method",
+            "name": "provider",
+            "return": {
+                "description": "Value object for the provider",
+                "type": "Object"
+            },
+            "class": "AccountService",
+            "module": "OnlineAccounts"
+        },
+        {
+            "file": "online-accounts.js",
+            "line": 87,
+            "description": "Returns an object representing the service which this AccountService instantiates\n\nThe returned object will have at least these properties:\n  - 'id' is the unique identifier for this service\n  - 'displayName'\n  - 'iconName'\n  - 'serviceTypeId' identifies the provided service type",
+            "itemtype": "method",
+            "name": "service",
+            "return": {
+                "description": "Value object for the service",
+                "type": "Object"
+            },
+            "class": "AccountService",
+            "module": "OnlineAccounts"
+        },
+        {
+            "file": "online-accounts.js",
+            "line": 105,
+            "description": "Perform the authentication on this account.\n\nThe callback will be called with the authentication result object which will have\nthese properties:\n  - 'error': error message if the authentication was a failure\n  - 'authenticated': boolean value that identifies if the operation was a success\n  - 'data': Object with the data returned by the authentication process. An 'AccessToken' property can be usually found (when it applies) with the OAuth access token.\n\nIf the callback parameter is not set, the current \"local\" value is retrieved.",
+            "itemtype": "method",
+            "name": "authenticate",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function(Object)"
+                }
+            ],
+            "class": "AccountService",
+            "module": "OnlineAccounts"
+        },
+        {
+            "file": "online-accounts.js",
+            "line": 125,
+            "description": "Destroys the remote object. This proxy object is not valid anymore.",
+            "itemtype": "method",
+            "name": "destroy",
+            "class": "AccountService",
+            "module": "OnlineAccounts"
+        },
+        {
+            "file": "online-accounts.js",
+            "line": 159,
+            "description": "Gets the configured accounts satisfying the given filters.",
+            "itemtype": "method",
+            "name": "api.getAccounts",
+            "params": [
+                {
+                    "name": "filters",
+                    "description": "A dictionary of parameters to filter the result. The filtering keys are:\n- applicationId: the ID of a application (see /usr/share/accounts/applications/ or ~/.local/share/accounts/applications/ for a list of the available applications)\n- provider: the ID of a provider (see /usr/share/accounts/providers/ or ~/.local/share/accounts/providers/ for a list of the available providers)\n- service: the ID of a service (see /usr/share/accounts/services/ or ~/.local/share/accounts/services/ for a list of the available services)",
+                    "type": "Object"
+                },
+                {
+                    "name": "callback",
+                    "description": "Callback that receives the result or null",
+                    "type": "Function(List of AccountService objects)"
+                }
+            ],
+            "example": [
+                "\n              var api = external.getUnityObject(1.0);\n              var oa = api.OnlineAccounts;\n            \n              oa.api.getAccounts({'provider': 'facebook'}, function(result) {\n                for (var i = 0; i < result.length; ++i) {\n                  console.log(\"name: \" + result[i].displayName()\n                              + ', id: ' + result[i].accountId()\n                              + ', providerName: ' + result[i].provider().displayName\n                              + ', enabled: ' + (result[i].enabled() ? \"true\" : \"false\")\n                              );\n                }               \n              });\n"
+            ],
+            "class": "OnlineAccounts",
+            "module": "OnlineAccounts"
+        },
+        {
+            "file": "online-accounts.js",
+            "line": 190,
+            "description": "Gets list of available providers.",
+            "itemtype": "method",
+            "name": "api.getProviders",
+            "params": [
+                {
+                    "name": "filters",
+                    "description": "A dictionary of parameters to filter the result. The filtering keys are:\n- applicationId: the ID of a application (see /usr/share/accounts/applications/ or ~/.local/share/accounts/applications/ for a list of the available applications)",
+                    "type": "Object"
+                },
+                {
+                    "name": "callback",
+                    "description": "Callback that receives the result or null.\n                                                           The result is a dictionary with the following keys:\n         - displayName: the display name for the corresponding provider\n         - providerId: the provider id",
+                    "type": "Function(List of AccountService objects)"
+                }
+            ],
+            "example": [
+                "\n              var api = external.getUnityObject(1.0);\n              var oa = api.OnlineAccounts;\n\n              oa.api.getProviders({}, function(result) {\n                for (var i = 0; i < result.length; ++i) {\n                  console.log(\"displayName: \" + result[i].displayName\n                              + ', providerId: ' + result[i].providerId);\n                }\n              });\n"
+            ],
+            "class": "OnlineAccounts",
+            "module": "OnlineAccounts"
+        },
+        {
+            "file": "online-accounts.js",
+            "line": 218,
+            "description": "Requests access to an account.\n\nApplications must invoke this method in order to obtain access\nto an account.  The user will be prompted to grant access to\neither an existing account, to create a new one or to decline\nthe request.",
+            "itemtype": "method",
+            "name": "api.requestAccount",
+            "params": [
+                {
+                    "name": "applicationId",
+                    "description": "The ID of the application\nrequesting the account (see /usr/share/accounts/applications/ or\n~/.local/share/accounts/applications/ for a list of the\navailable applications)",
+                    "type": "String"
+                },
+                {
+                    "name": "providerId",
+                    "description": "The ID of the provider of the desired\naccount (see /usr/share/accounts/providers/ or\n~/.local/share/accounts/providers/ for a list of the available\nproviders)",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "Callback which will be invoked\nafter the access request has been decided (either with the\naccess to an account being granted, or with a refusal).",
+                    "type": "Function()"
+                }
+            ],
+            "example": [
+                "\n              var api = external.getUnityObject(1.0);\n              var oa = api.OnlineAccounts;\n\n              var appId = 'com.ubuntu.developer.me.MyPackage_MyApp';\n              oa.api.requestAccount(appId,\n                                    'facebook',\n                                    function() {\n                oa.api.getAccounts({ 'application': appId }, function(result) {\n                  for (var i = 0; i < result.length; ++i) {\n                    console.log(\"name: \" + result[i].displayName()\n                                + ', id: ' + result[i].accountId()\n                                + ', providerName: ' + result[i].provider().displayName\n                                + ', enabled: ' + (result[i].enabled() ? \"true\" : \"false\")\n                                );\n                  }\n                });\n              });"
+            ],
+            "class": "OnlineAccounts",
+            "module": "OnlineAccounts"
+        },
+        {
+            "file": "online-accounts.js",
+            "line": 268,
+            "access": "private",
+            "tagname": "",
+            "class": "OnlineAccounts",
+            "module": "OnlineAccounts"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type",
+            "line": " online-accounts.js:268"
+        }
+    ]
+}

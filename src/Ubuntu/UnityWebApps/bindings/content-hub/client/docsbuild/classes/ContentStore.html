@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>ContentStore - Content Hub JS API</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.8.0pr2/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <script src="http://yui.yahooapis.com/combo?3.8.0pr2/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            <h1><a href="../index.html"><img src="../assets/css/logo.png">Content Hub JS API: ContentStore</a></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.1</em>
+        </div>
+    </div>
+    <div class="yui3-g">
+
+        <div id="sidebar" class="yui3-u">
+            <div id="modules" class="sidebox">
+                <div class="hd">
+                    <h2 class="no-toc">Modules</h2>
+                </div>
+                <div class="bd">
+                    <ul>
+                            <li><a href="../modules/ContentHub.html">ContentHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="classes" class="sidebox">
+                <div class="hd">
+                    <h2 class="no-toc">Classes</h2>
+                </div>
+                <div class="bd">
+                    <ul>
+                            <li><a href="../classes/ContentHub.html">ContentHub</a></li>
+                            <li><a href="../classes/ContentPeer.html">ContentPeer</a></li>
+                            <li><a href="../classes/ContentStore.html">ContentStore</a></li>
+                            <li><a href="../classes/ContentTransfer.html">ContentTransfer</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="methods-on-page" class="sidebox on-page">
+                <div class="hd">
+                    <h2 class="no-toc">Methods On Page</h2>
+                </div>
+                <div class="bd">
+                    <ul>
+                            <li><a href="#methods_destroy">destroy</a></li>
+                            <li><a href="#methods_scope">scope</a></li>
+                            <li><a href="#methods_setScope">setScope</a></li>
+                            <li><a href="#methods_uri">uri</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            
+            
+            
+            <div id="fileTree" class="sidebox">
+                <div class="hd">
+                    <h2 class="no-toc">Files</h2>
+                </div>
+                <div class="bd">
+                    <ul><li>content-hub.js/<ul></ul></li></ul>
+                </div>
+            </div>
+            
+        </div>
+
+        <div id="main" class="yui3-u">
+            <div class="content"><h4>Class ContentStore</h4>
+<span class="foundat">Class defined in: <a href="../../files/content-hub.js.html#l456"><code>content-hub.js:456</code></a></span>
+<div class="intro"><p>ContentStore is an object returned by the ContentHub.</p>
+<p>It represents a location where the resources imported or
+exported from a peer during a transfer operation are to be
+either saved or found.</p>
+</div>
+
+    <a name="methods_ContentStore"></a>
+    <div class="method item">
+         <strong class="name"><code>ContentStore</code></strong>( <code>  </code> ) 
+        <br>
+        <span class="foundat">
+            
+            <a href="../../files/content-hub.js.html#l456"><code>content-hub.js:456</code></a>
+        </span><br>
+        
+            <h5>Example</h5>
+            <pre class="code prettyprint"><code>  var api = external.getUnityObject('1.0');
+      var hub = api.ContentHub;
+    
+      var pictureContentType = hub.ContentType.Pictures;
+    
+      hub.defaultStoreForType(pictureContentType, function(store) {
+        [do something with the store]
+        });</code></pre>
+    
+    </div>
+
+<div id="classdocs">
+    <ul>
+        <li><a href="#methods">Methods</a></li>
+    </ul>
+    <div>
+            <div id="methods">
+                <a name="methods_destroy"></a>
+                <div class="method item">
+                     <strong class="name"><code>destroy</code></strong>( <code>  </code> ) 
+                    <br>
+                    <span class="foundat">
+                        
+                        <a href="../../files/content-hub.js.html#l547"><code>content-hub.js:547</code></a>
+                    </span><br>
+                    <p>Destroys the remote object. This proxy object is not valid anymore.</p>
+                
+                </div>
+                <a name="methods_scope"></a>
+                <div class="method item">
+                    ContentScope <strong class="name"><code>scope</code></strong>( <code>callback </code> ) 
+                    <br>
+                    <span class="foundat">
+                        
+                        <a href="../../files/content-hub.js.html#l518"><code>content-hub.js:518</code></a>
+                    </span><br>
+                    <p>Retrieves the current scope.</p>
+                <p>If the callback parameter is not set, the current &quot;local&quot; value is retrieved.</p>
+                
+                    <strong>Parameters:</strong>
+                    <ul class="params">
+                        <li>
+                            <code>callback</code> <strong>&lt;Function(ContentScope)&gt;</strong>
+                        <p>(optional)</p>
+                
+                        </li>
+                    </ul>
+                    <br><div class="returns"><strong>Returns:</strong> &lt;ContentScope&gt; <p>current scope</p>
+                </div>
+                </div>
+                <a name="methods_setScope"></a>
+                <div class="method item">
+                     <strong class="name"><code>setScope</code></strong>( <code>scope, callback </code> ) 
+                    <br>
+                    <span class="foundat">
+                        
+                        <a href="../../files/content-hub.js.html#l534"><code>content-hub.js:534</code></a>
+                    </span><br>
+                    <p>Sets the current scope.</p>
+                
+                    <strong>Parameters:</strong>
+                    <ul class="params">
+                        <li>
+                            <code>scope</code> <strong>&lt;ContentScope&gt;</strong>
+                         
+                        </li>
+                        <li>
+                            <code>callback</code> <strong>&lt;Function()&gt;</strong>
+                        <p>called when the scope has been updated</p>
+                
+                        </li>
+                    </ul>
+                </div>
+                <a name="methods_uri"></a>
+                <div class="method item">
+                    String <strong class="name"><code>uri</code></strong>( <code>callback </code> ) 
+                    <br>
+                    <span class="foundat">
+                        
+                        <a href="../../files/content-hub.js.html#l501"><code>content-hub.js:501</code></a>
+                    </span><br>
+                    <p>Retrieves the uri of the associated store.</p>
+                <p>If the callback parameter is not set, the current &quot;local&quot; value is retrieved.</p>
+                
+                    <strong>Parameters:</strong>
+                    <ul class="params">
+                        <li>
+                            <code>callback</code> <strong>&lt;Function(String)&gt;</strong>
+                        <p>(optional)</p>
+                
+                        </li>
+                    </ul>
+                    <br><div class="returns"><strong>Returns:</strong> &lt;String&gt; <p>current uri</p>
+                </div>
+                </div>
+            </div>
+    </div>
+</div>
+</div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/js/tabs.js"></script>
+</body>
+</html>

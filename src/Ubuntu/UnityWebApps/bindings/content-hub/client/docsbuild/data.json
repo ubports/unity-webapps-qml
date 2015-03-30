@@ -1,0 +1,909 @@
+{
+    "project": {
+        "name": "Content Hub JS API",
+        "description": "Ubuntu App Platform Content Hub JavaScript API docs",
+        "version": "0.1"
+    },
+    "files": {
+        "content-hub.js": {
+            "name": "content-hub.js",
+            "modules": {
+                "ContentHub": 1
+            },
+            "classes": {
+                "ContentTransfer": 1,
+                "ContentPeer": 1,
+                "ContentStore": 1,
+                "ContentHub": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "ContentHub": {
+            "name": "ContentHub",
+            "submodules": {},
+            "classes": {
+                "ContentTransfer": 1,
+                "ContentPeer": 1,
+                "ContentStore": 1,
+                "ContentHub": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "content-hub.js",
+            "line": 568,
+            "description": "ContentHub is the entry point to resource io transfer\n  from/to remote applications (peers)."
+        }
+    },
+    "classes": {
+        "ContentTransfer": {
+            "name": "ContentTransfer",
+            "shortname": "ContentTransfer",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "ContentHub",
+            "namespace": "",
+            "file": "content-hub.js",
+            "line": 11,
+            "description": "ContentTransfer is an object created by the ContentHub to\n  and allows one to properly setup and manage a data\n  transfer between two peers.",
+            "is_constructor": 1,
+            "example": [
+                "\n\n      var api = external.getUnityObject('1.0');\n      var hub = api.ContentHub;\n\n      var pictureContentType = hub.ContentType.Pictures;\n\n      hub.defaultSourceForType(\n         pictureContentType\n         , function(peer) {\n           hub.importContentForPeer(\n             pictureContentType,\n             peer,\n             function(transfer) {\n               [setup the transfer options and store]\n               transfer.start(function(state) { [...] });\n             });\n          });"
+            ]
+        },
+        "ContentPeer": {
+            "name": "ContentPeer",
+            "shortname": "ContentPeer",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "ContentHub",
+            "namespace": "",
+            "file": "content-hub.js",
+            "line": 230,
+            "description": "ContentPeer is an object returned by the ContentHub.\n  It represents a remote peer that can be used in a request\n  to import, export or share content.",
+            "is_constructor": 1,
+            "example": [
+                "\n\n      var api = external.getUnityObject('1.0');\n      var hub = api.ContentHub;\n\n      var pictureContentType = hub.ContentType.Pictures;\n\n      hub.defaultSourceForType(\n         pictureContentType\n         , function(peer) {\n            [do something with the peer]\n          });"
+            ]
+        },
+        "ContentStore": {
+            "name": "ContentStore",
+            "shortname": "ContentStore",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "ContentHub",
+            "namespace": "",
+            "file": "content-hub.js",
+            "line": 456,
+            "description": "ContentStore is an object returned by the ContentHub.\n\n  It represents a location where the resources imported or\n  exported from a peer during a transfer operation are to be\n  either saved or found.",
+            "is_constructor": 1,
+            "example": [
+                "\n\n      var api = external.getUnityObject('1.0');\n      var hub = api.ContentHub;\n\n      var pictureContentType = hub.ContentType.Pictures;\n\n      hub.defaultStoreForType(pictureContentType, function(store) {\n        [do something with the store]\n        });"
+            ]
+        },
+        "ContentHub": {
+            "name": "ContentHub",
+            "shortname": "ContentHub",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "ContentHub",
+            "namespace": "",
+            "file": "content-hub.js",
+            "line": 568,
+            "description": "The ContentHub object.",
+            "static": 1,
+            "is_constructor": 1
+        }
+    },
+    "classitems": [
+        {
+            "file": "content-hub.js",
+            "line": 64,
+            "description": "Retrieves the current store.\n\nIf the callback parameter is not set, the current \"local\" value is retrieved.",
+            "itemtype": "method",
+            "name": "store",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "(optional)",
+                    "type": "Function(String)"
+                }
+            ],
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 79,
+            "description": "Sets the current store for the ContentTransfer.",
+            "itemtype": "method",
+            "name": "setStore",
+            "params": [
+                {
+                    "name": "store",
+                    "description": "",
+                    "type": "ContentStore"
+                },
+                {
+                    "name": "callback",
+                    "description": "(optional)  called when the store has been updated",
+                    "type": "Function()"
+                }
+            ],
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 90,
+            "description": "Retrieves the current state.\n\nIf the callback parameter is not set, the current \"local\" value is retrieved.",
+            "itemtype": "method",
+            "name": "state",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "(optional)",
+                    "type": "Function(ContentTransfer.State)"
+                }
+            ],
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 105,
+            "description": "Sets the state of the transfer.",
+            "itemtype": "method",
+            "name": "setState",
+            "params": [
+                {
+                    "name": "state",
+                    "description": "",
+                    "type": "ContentTransfer.State"
+                },
+                {
+                    "name": "callback",
+                    "description": "called when the state has been updated",
+                    "type": "Function()"
+                }
+            ],
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 115,
+            "description": "Notifies the listener when the state of the transfer changes.",
+            "itemtype": "method",
+            "name": "onStateChanged",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function(ContentTransfer.State)"
+                }
+            ],
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 125,
+            "description": "Retrieves the current selection type.",
+            "itemtype": "method",
+            "name": "selectionType",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function(ContentTransfer.SelectionType)"
+                }
+            ],
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 138,
+            "description": "Sets the selection type (single or multiple).",
+            "itemtype": "method",
+            "name": "setSelectionType",
+            "params": [
+                {
+                    "name": "selectionType",
+                    "description": "",
+                    "type": "ContentTransfer.SelectionType"
+                },
+                {
+                    "name": "callback",
+                    "description": "called when the state has been updated",
+                    "type": "Function()"
+                }
+            ],
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 150,
+            "description": "Retrieves the current transfer direction.\n\nIf the callback parameter is not set, the current \"local\" value is retrieved.",
+            "itemtype": "method",
+            "name": "direction",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "(optional)",
+                    "type": "Function(ContentTransfer.Direction)"
+                }
+            ],
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 165,
+            "description": "Sets the transfer direction (import or export).",
+            "itemtype": "method",
+            "name": "setDirection",
+            "params": [
+                {
+                    "name": "direction",
+                    "description": "",
+                    "type": "ContentTransfer.Direction"
+                },
+                {
+                    "name": "callback",
+                    "description": "called when the state has been updated",
+                    "type": "Function()"
+                }
+            ],
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 177,
+            "description": "Retrieves the list of items associated with the ContentTransfer.",
+            "itemtype": "method",
+            "name": "items",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "} )}",
+                    "type": "Function( Objectname: , url:"
+                }
+            ],
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 186,
+            "description": "Sets the list of items for the associated ContentTransfer (used when exporting).",
+            "itemtype": "method",
+            "name": "setItems",
+            "params": [
+                {
+                    "name": "items",
+                    "description": "}",
+                    "type": "Array of Objectname: String, url: String"
+                },
+                {
+                    "name": "callback",
+                    "description": "called when the state has been updated",
+                    "type": "Function()"
+                }
+            ],
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 199,
+            "description": "Starts a transfer",
+            "itemtype": "method",
+            "name": "start",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function(ContentTransfer.State)"
+                }
+            ],
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 209,
+            "description": "Sets State to ContentTransfer.Finalized and cleans up temporary files.",
+            "itemtype": "method",
+            "name": "finalize",
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 220,
+            "description": "Destroys the remote object. This proxy object is not valid anymore.",
+            "itemtype": "method",
+            "name": "destroy",
+            "class": "ContentTransfer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 281,
+            "description": "Retrieves the app Id of the associated peer.\n\nIf the callback parameter is not set, the current \"local\" value is retrieved.",
+            "itemtype": "method",
+            "name": "appId",
+            "return": {
+                "description": "Application Id for this peer",
+                "type": "String"
+            },
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "(optional)",
+                    "type": "Function(String)"
+                }
+            ],
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 297,
+            "description": "Sets the app Id of the associated peer.",
+            "itemtype": "method",
+            "name": "setAppId",
+            "params": [
+                {
+                    "name": "appId",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "called when the appId has been updated",
+                    "type": "Function()"
+                }
+            ],
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 308,
+            "description": "Retrieves the specific ContentHandler for this peer.\n\nIf the callback parameter is not set, the current \"local\" value is retrieved.",
+            "itemtype": "method",
+            "name": "handler",
+            "return": {
+                "description": "ContentHandler for this peer",
+                "type": "String"
+            },
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "(optional)",
+                    "type": "Function(String)"
+                }
+            ],
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 324,
+            "description": "Sets specific ContentHandler for this peer.",
+            "itemtype": "method",
+            "name": "setHandler",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "",
+                    "type": "ContentHandler"
+                },
+                {
+                    "name": "callback",
+                    "description": "called when the appId has been updated",
+                    "type": "Function()"
+                }
+            ],
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 335,
+            "description": "Retrieves the specific ContentType for this peer.\n\nIf the callback parameter is not set, the current \"local\" value is retrieved.",
+            "itemtype": "method",
+            "name": "contentType",
+            "return": {
+                "description": "ContentType for this peer",
+                "type": "String"
+            },
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "(optional)",
+                    "type": "Function(String)"
+                }
+            ],
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 351,
+            "description": "Sets specific ContentType for this peer.",
+            "itemtype": "method",
+            "name": "setContentType",
+            "params": [
+                {
+                    "name": "contentType",
+                    "description": "",
+                    "type": "ContentType"
+                },
+                {
+                    "name": "callback",
+                    "description": "called when the content type has been updated",
+                    "type": "Function()"
+                }
+            ],
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 362,
+            "description": "Retrieves the specific SelectionType for this peer.\n\nIf the callback parameter is not set, the current \"local\" value is retrieved.",
+            "itemtype": "method",
+            "name": "selectionType",
+            "return": {
+                "description": "ContentTransfer.SelectionType for this peer",
+                "type": "String"
+            },
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "(optional)",
+                    "type": "Function(String)"
+                }
+            ],
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 378,
+            "description": "Sets specific SelectionType for this peer.",
+            "itemtype": "method",
+            "name": "setSelectionType",
+            "params": [
+                {
+                    "name": "selectionType",
+                    "description": "",
+                    "type": "ContentTransfer.SelectionType"
+                },
+                {
+                    "name": "callback",
+                    "description": "called when the content type has been updated",
+                    "type": "Function()"
+                }
+            ],
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 389,
+            "description": "Retrieves the name of the associated peer.\n\nIf the callback parameter is not set, the current \"local\" value is retrieved.",
+            "itemtype": "method",
+            "name": "name",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "(optional)",
+                    "type": "Function(String)"
+                }
+            ],
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 405,
+            "description": "Returns true if the peer is a default one, false otherwise.\n\nIf the callback parameter is not set, the current \"local\" value is retrieved.",
+            "itemtype": "method",
+            "name": "isDefaultPeer",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "(optional)",
+                    "type": "Function(Bool)"
+                }
+            ],
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 423,
+            "description": "Request to exchange content with this ContentPeer.",
+            "itemtype": "method",
+            "name": "request",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Called with the resulting content transfer",
+                    "type": "Function(ContentTransfer)"
+                }
+            ],
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 433,
+            "description": "Request to import content from this ContentPeer and use a ContentStore for permanent storage.",
+            "itemtype": "method",
+            "name": "requestForStore",
+            "params": [
+                {
+                    "name": "store",
+                    "description": "Store used as a permanent storage",
+                    "type": "ContentStore"
+                },
+                {
+                    "name": "callback",
+                    "description": "Called with the resulting content transfer",
+                    "type": "Function(ContentTransfer)"
+                }
+            ],
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 446,
+            "description": "Destroys the remote object. This proxy object is not valid anymore.",
+            "itemtype": "method",
+            "name": "destroy",
+            "class": "ContentPeer",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 501,
+            "description": "Retrieves the uri of the associated store.\n\nIf the callback parameter is not set, the current \"local\" value is retrieved.",
+            "itemtype": "method",
+            "name": "uri",
+            "return": {
+                "description": "current uri",
+                "type": "String"
+            },
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "(optional)",
+                    "type": "Function(String)"
+                }
+            ],
+            "class": "ContentStore",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 518,
+            "description": "Retrieves the current scope.\n\nIf the callback parameter is not set, the current \"local\" value is retrieved.",
+            "itemtype": "method",
+            "name": "scope",
+            "return": {
+                "description": "current scope",
+                "type": "ContentScope"
+            },
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "(optional)",
+                    "type": "Function(ContentScope)"
+                }
+            ],
+            "class": "ContentStore",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 534,
+            "description": "Sets the current scope.",
+            "itemtype": "method",
+            "name": "setScope",
+            "params": [
+                {
+                    "name": "scope",
+                    "description": "",
+                    "type": "ContentScope"
+                },
+                {
+                    "name": "callback",
+                    "description": "called when the scope has been updated",
+                    "type": "Function()"
+                }
+            ],
+            "class": "ContentStore",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 547,
+            "description": "Destroys the remote object. This proxy object is not valid anymore.",
+            "itemtype": "method",
+            "name": "destroy",
+            "class": "ContentStore",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 576,
+            "description": "ContentType is an enumeration of well known content types.\n\n  Values:\n\n    Pictures\n\n    Documents\n    \n    Music\n\n    Contacts\n\n    Videos\n\n    Links",
+            "static": 1,
+            "itemtype": "property",
+            "name": "ContentType",
+            "type": "String",
+            "example": [
+                "\n\n var api = external.getUnityObject('1.0');\n var hub = api.ContentHub;\n\n var pictureContentType = hub.ContentType.Pictures;"
+            ],
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 614,
+            "description": "ContentHandler is an enumeration of well known content handlers.\n\n Values:\n\n   Source\n\n   Destination\n\n   Share",
+            "static": 1,
+            "itemtype": "property",
+            "name": "ContentHandler",
+            "type": "String",
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 634,
+            "description": "ContentScope is an enumeration of well known scope types.\n\n Values:\n\n   System\n\n   User\n\n   App",
+            "static": 1,
+            "itemtype": "property",
+            "name": "ContentScope",
+            "type": "String",
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 656,
+            "description": "ContentTransfer.State is an enumeration of the state of a given ongoing ContentTransfer.\n\n  Values:\n\n   Created: Transfer created, waiting to be initiated.\n\n   Initiated: Transfer has been initiated.\n\n   InProgress: Transfer is in progress.\n\n   Charged: Transfer is charged with items and ready to be collected.\n\n   Collected: Items in the transfer have been collected.\n\n   Aborted: Transfer has been aborted.\n\n   Finalized: Transfer has been finished and cleaned up.\n\n   Downloaded: Download specified by downloadId has completed.\n\n   Downloading: Transfer is downloading item specified by downloadId.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "ContentTransfer.State",
+            "type": "String",
+            "example": [
+                "\n\n var api = external.getUnityObject('1.0');\n var hub = api.ContentHub;\n\n var transferState = hub.ContentTransfer.State;\n var pictureContentType = hub.ContentType.Pictures;\n\n hub.importContentForPeer(\n   pictureContentType,\n   peer,\n   function(transfer) {\n       hub.defaultStoreForType(pictureContentType, function(store) {\n           transfer.setStore(store, function() {\n               transfer.start(function(state) {\n                   if (transferState.Aborted === state) {\n                     [...]\n                   }\n                   [...]\n               });\n           });\n       });\n });\n"
+            ],
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 736,
+            "description": "ContentTransfer.Direction is an enumeration of the directions of a given ContentTransfer.\n\n  Values:\n\n   Import\n\n   Export\n\n   Share",
+            "static": 1,
+            "itemtype": "property",
+            "name": "ContentTransfer.Direction",
+            "type": "String",
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 761,
+            "description": "ContentTransfer.SelectionType is an enumeration of the directions of a given ContentTransfer.\n\n  Values:\n\n   Single: Transfer should contain a single item\n\n   Multiple: Transfer can contain multiple items",
+            "static": 1,
+            "itemtype": "property",
+            "name": "ContentTransfer.SelectionType",
+            "type": "String",
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 782,
+            "description": "Creates a ContentPeer object for the given source type.",
+            "itemtype": "method",
+            "name": "getPeers",
+            "params": [
+                {
+                    "name": "filters",
+                    "description": "A dictionary of parameters to filter the result. The filtering keys are:\n- contentType: desired ContentType\n- handler: desired ContentHandler",
+                    "type": "Object"
+                },
+                {
+                    "name": "callback",
+                    "description": "Callback that receives the result or null",
+                    "type": "Function(List of ContentPeer objects)"
+                }
+            ],
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 798,
+            "description": "Creates a ContentStore object for the given scope type.",
+            "itemtype": "method",
+            "name": "getStore",
+            "params": [
+                {
+                    "name": "scope",
+                    "description": "The content scope for the store",
+                    "type": "ContentScope"
+                },
+                {
+                    "name": "callback",
+                    "description": "Callback that receives the result or null",
+                    "type": "Function(ContentStore)"
+                }
+            ],
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 811,
+            "description": "Launches the content peer picker ui that allows the user to select a peer.",
+            "itemtype": "method",
+            "name": "launchContentPeerPicker",
+            "params": [
+                {
+                    "name": "filters",
+                    "description": "A dictionary of parameters to filter the result. The filtering keys are:\n- contentType: desired ContentType\n- handler: desired ContentHandler\n- showTitle: boolean value indicating if the title should be visible",
+                    "type": "Object"
+                },
+                {
+                    "name": "onPeerSelected",
+                    "description": "Called when the user has selected a peer",
+                    "type": "Function(ContentPeer)"
+                },
+                {
+                    "name": "onCancelPressed",
+                    "description": "Called when the user has pressed cancel",
+                    "type": "Function()"
+                }
+            ],
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 827,
+            "description": "Sets a handler that is to be called when the current application is the\ntarget of an export request.",
+            "itemtype": "method",
+            "name": "onExportRequested",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Function when one requests a resource to be exported.\n                                                         The corresponding ContentTransfer is provided as a parameter.",
+                    "type": "Function(ContentTransfer)"
+                }
+            ],
+            "example": [
+                "\n        \n           var api = external.getUnityObject(1.0);\n           var hub = api.ContentHub;\n        \n           var transferState = hub.ContentTransfer.State;\n           \n           function _exportRequested(transfer) {\n             var url = window.location.href;\n             url = url.substr(0, url.lastIndexOf('/')+1) + 'img/ubuntuone-music.png';\n           \n             transfer.setItems([{name: 'Ubuntu One', url: url}],\n               function() {\n                 transfer.setState(hub.ContentTransfer.State.Charged);\n               });\n             };\n           \n           hub.onExportRequested(_exportRequested);\n        "
+            ],
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 860,
+            "description": "Sets a handler that is to be called when the current application is the\ntarget of an share request.",
+            "itemtype": "method",
+            "name": "onShareRequested",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Function when one requests a resource to be shared.\n                                                         The corresponding ContentTransfer is provided as a parameter.",
+                    "type": "Function(ContentTransfer)"
+                }
+            ],
+            "example": [
+                "\n\n           var api = external.getUnityObject(1.0);\n           var hub = api.ContentHub;\n\n           var transferState = hub.ContentTransfer.State;\n\n           function _shareRequested(transfer) {\n           };\n\n           hub.onShareRequested(_shareRequested);\n"
+            ],
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 886,
+            "description": "Sets a handler that is to be called when the current application is the\ntarget of an import request.",
+            "itemtype": "method",
+            "name": "onImportRequested",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Function when one requests a resource to be imported.\n                                                         The corresponding ContentTransfer is provided as a parameter.",
+                    "type": "Function(ContentTransfer)"
+                }
+            ],
+            "example": [
+                "\n\n           var api = external.getUnityObject(1.0);\n           var hub = api.ContentHub;\n\n           var transferState = hub.ContentTransfer.State;\n\n           function _importRequested(transfer) {\n           };\n\n           hub.onImportRequested(_importRequested);\n"
+            ],
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 914,
+            "description": "Creates a ContentStore object for the given ContentPeer.",
+            "itemtype": "method",
+            "name": "api.importContent",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "type of the content to import",
+                    "type": "ContentType"
+                },
+                {
+                    "name": "peer",
+                    "description": "peer who's content should be imported",
+                    "type": "ContentPeer"
+                },
+                {
+                    "name": "transferOptions",
+                    "description": "a dictionary of transfer options. The options are the following:\n- multipleFiles {Bool}: specified if a transfer should involve multiple files or not\n- scope {ContentScope}: specifies the location where the transferred files should be copied to",
+                    "type": "Object"
+                },
+                {
+                    "name": "onError",
+                    "description": "called when the transfer has failed",
+                    "type": "Function(reason:)"
+                },
+                {
+                    "name": "onSuccess",
+                    "description": ")} called when the transfer has been a success and items are available",
+                    "type": "Function(Array of ContentItem"
+                }
+            ],
+            "class": "ContentHub",
+            "module": "ContentHub"
+        },
+        {
+            "file": "content-hub.js",
+            "line": 934,
+            "access": "private",
+            "tagname": "",
+            "class": "ContentHub",
+            "module": "ContentHub"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type",
+            "line": " content-hub.js:934"
+        }
+    ]
+}

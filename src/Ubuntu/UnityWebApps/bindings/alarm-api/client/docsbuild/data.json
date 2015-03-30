@@ -1,0 +1,491 @@
+{
+    "project": {
+        "name": "Alarms JS API",
+        "description": "Ubuntu App Platform Alarms JavaScript API docs",
+        "version": "0.1"
+    },
+    "files": {
+        "alarm-api.js": {
+            "name": "alarm-api.js",
+            "modules": {
+                "AlarmApi": 1
+            },
+            "classes": {
+                "Alarm": 1,
+                "AlarmApi": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "AlarmApi": {
+            "name": "AlarmApi",
+            "submodules": {},
+            "classes": {
+                "Alarm": 1,
+                "AlarmApi": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "alarm-api.js",
+            "line": 254,
+            "description": "AlarmApi gives access to Alarm management."
+        }
+    },
+    "classes": {
+        "Alarm": {
+            "name": "Alarm",
+            "shortname": "Alarm",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "AlarmApi",
+            "namespace": "",
+            "file": "alarm-api.js",
+            "line": 9,
+            "description": "An Alarm.",
+            "is_constructor": 1,
+            "example": [
+                "\n\n     var date = new Date();\n     <set a valid date in the future>\n\n     var api = external.getUnityObject('1.0');\n     api.AlarmApi.api.createAndSaveAlarmFor(\n         date,\n         api.AlarmApi.AlarmType.OneTime,\n         api.AlarmApi.AlarmDayOfWeek.AutoDetect,\n         \"alarm triggered\",\n         function(errorid) {\n             console.log(api.AlarmApi.api.errorToMessage(errorid));\n         });"
+            ]
+        },
+        "AlarmApi": {
+            "name": "AlarmApi",
+            "shortname": "AlarmApi",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "AlarmApi",
+            "namespace": "",
+            "file": "alarm-api.js",
+            "line": 254,
+            "description": "The AlarmApi object",
+            "is_constructor": 1,
+            "example": [
+                "\n\n      var date = new Date();\n      <set a valid date in the future>\n\n      var api = external.getUnityObject('1.0');\n      api.AlarmApi.api.createAndSaveAlarmFor(\n         date,\n         api.AlarmApi.AlarmType.OneTime,\n         api.AlarmApi.AlarmDayOfWeek.AutoDetect,\n         \"alarm triggered\",\n         function(errorid) {\n             console.log(api.AlarmApi.api.errorToMessage(errorid));\n         });"
+            ]
+        }
+    },
+    "classitems": [
+        {
+            "file": "alarm-api.js",
+            "line": 37,
+            "description": "The property holds the error code occurred during the last performed operation.",
+            "itemtype": "method",
+            "name": "error",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function(Error)"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 47,
+            "description": "Retrieves the alarm date.\n\nThe date property holds the date the alarm will be triggered.\nThe default value is the current date and time the alarm object was created.\nFurther reset calls will bring the value back to the time the reset was called.",
+            "itemtype": "method",
+            "name": "error",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function(Date)"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 63,
+            "description": "Sets the alarm date.",
+            "itemtype": "method",
+            "name": "setDate",
+            "params": [
+                {
+                    "name": "date",
+                    "description": "",
+                    "type": "Date"
+                },
+                {
+                    "name": "callback",
+                    "description": "(optional)  To be called after the date is set.",
+                    "type": "Function()"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 74,
+            "description": "Retrieves the alarm's enabled state.\n\nThe property specifies whether the alarm is enabled or not.\nDisable dalarms are not scheduled. The default value is true",
+            "itemtype": "method",
+            "name": "enabled",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function(Boolean)"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 86,
+            "description": "Sets the alarm's enabled state.",
+            "itemtype": "method",
+            "name": "setEnabled",
+            "params": [
+                {
+                    "name": "enabled",
+                    "description": "",
+                    "type": "Boolean"
+                },
+                {
+                    "name": "callback",
+                    "description": "(optional)  To be called after the enabled state is set.",
+                    "type": "Function()"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 97,
+            "description": "Retrieves the alarm message.\n\nThe property holds the message string which will be displayed when the alarm is triggered.\nThe default value is the localized \"Alarm\" text",
+            "itemtype": "method",
+            "name": "message",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function(String)"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 109,
+            "description": "Sets the alarm message.",
+            "itemtype": "method",
+            "name": "setMessage",
+            "params": [
+                {
+                    "name": "message",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "(optional)  To be called after the message is set.",
+                    "type": "Function()"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 120,
+            "description": "Retrieves the alarm sound.\n\nThe property holds the alarm's sound to be played when the alarm is triggered.\nAn empty url will mean to play the default sound.\n\nThe default value is an empty url.",
+            "itemtype": "method",
+            "name": "sound",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function(String)"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 134,
+            "description": "Sets the alarm sound.",
+            "itemtype": "method",
+            "name": "setSound",
+            "params": [
+                {
+                    "name": "sound",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "(optional)  To be called after the sound is set.",
+                    "type": "Function()"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 145,
+            "description": "Retrieves the alarm status.\n\nThe property holds the status of the last performed operation",
+            "itemtype": "method",
+            "name": "status",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function(String)"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 157,
+            "description": "Retrieves the alarm type.\n\nThe property holds the type of the alarm.\nThe default value is AlarmType.OneTime",
+            "itemtype": "method",
+            "name": "type",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function(AlarmType)"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 169,
+            "description": "Sets the alarm type.",
+            "itemtype": "method",
+            "name": "setType",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "",
+                    "type": "AlarmType"
+                },
+                {
+                    "name": "callback",
+                    "description": "(optional)  To be called after the type is set.",
+                    "type": "Function()"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 180,
+            "description": "Retrieves the alarm day of the week.\n\nThe property holds the days of the week the alarm is scheduled.\nThis property can have only one day set for one time alarms and multiple days for repeating alarms.",
+            "itemtype": "method",
+            "name": "daysOfWeek",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function(AlarmType)"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 192,
+            "description": "Sets the alarm day of the week.",
+            "itemtype": "method",
+            "name": "setDaysOfWeek",
+            "params": [
+                {
+                    "name": "daysOfWeek",
+                    "description": "",
+                    "type": "AlarmDayOfWeek"
+                },
+                {
+                    "name": "callback",
+                    "description": "(optional)  To be called after the day of the week is set.",
+                    "type": "Function()"
+                }
+            ],
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 206,
+            "description": "Cancels a given Alarm.",
+            "itemtype": "method",
+            "name": "cancel",
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 215,
+            "description": "Resets a given Alarm.",
+            "itemtype": "method",
+            "name": "reset",
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 224,
+            "description": "Saves the alarm as a system wide alarm with the parameters previously set.",
+            "itemtype": "method",
+            "name": "save",
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 235,
+            "description": "Destroys the remote object. This proxy object is not valid anymore.",
+            "itemtype": "method",
+            "name": "destroy",
+            "class": "Alarm",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 275,
+            "description": "Enumeration of the available types of Alarm.\n\n  Values:\n\n    OneTime: The alarm occurs only once\n\n    Repeating: The alarm is a repeating one,\n        either daily, weekly on a given day\n        or on selected days",
+            "static": 1,
+            "itemtype": "property",
+            "name": "AlarmType",
+            "type": "Object",
+            "example": [
+                "\n\n    var api = external.getUnityObject('1.0');\n    var alarmtype = api.AlarmApi.AlarmType;\n    // use alarmtype.OneTime or alarmtype.Repeating"
+            ],
+            "class": "AlarmApi",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 303,
+            "description": "Flags for the week days an Alarm should be triggered.\n\n  Values:\n\n    Monday: The alarm will kick on Mondays\n\n    Tuesday: The alarm will kick on Tuesdays\n\n    Wednesday: The alarm will kick on Wednesday\n\n    Thursday: The alarm will kick on Thursday\n\n    Friday: The alarm will kick on Friday\n\n    Saturday: The alarm will kick on Saturday\n\n    Sunday: The alarm will kick on Sunday\n\n    AutoDetect: The alarm day will be detected\n      from the alarm date.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "AlarmDayOfWeek",
+            "type": "Integer",
+            "example": [
+                "\n\n    var api = external.getUnityObject('1.0');\n    var dayofweek = api.AlarmApi.AlarmDayOfWeek;\n    // use dayofweek.Monday or/and dayofweek.Tuesday, etc."
+            ],
+            "class": "AlarmApi",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 360,
+            "description": "Error ids returned during AlarmApi calls.\n\n  Values:\n\n    NoError: Successful operation completion\n    \n    InvalidDate: The date specified for the alarm was invalid\n    \n    EarlyDate: The date specified for the alarm is an earlier\n        date than the current one\n\n    NbDaysOfWeek: The daysOfWeek parameter of the alarm was not specified\n    \n    OneTimeOnMoreDays: The one-time alarm was set to be kicked in several days\n    \n    InvalidEvent: The alarm event is invalid\n    \n    AdaptationError: The error occurred in alarm adaptation layer.\n        Adaptations may define additional behind this value",
+            "static": 1,
+            "itemtype": "property",
+            "name": "AlarmError",
+            "type": "Integer",
+            "example": [
+                "\n    var date = new Date();\n    <set a valid date in the future>\n\n    var api = external.getUnityObject('1.0');\n    api.AlarmApi.api.createAndSaveAlarmFor(\n      date,\n      api.AlarmApi.AlarmType.OneTime,\n      api.AlarmApi.AlarmDayOfWeek.AutoDetect,\n      \"alarm triggered\",\n      function(errorid) {\n        console.log(api.AlarmApi.api.errorToMessage(errorid));\n      });"
+            ],
+            "class": "AlarmApi",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 422,
+            "description": "Creates a Alarm object.",
+            "itemtype": "method",
+            "name": "createAlarm",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Function called with the created Alarm.",
+                    "type": "Function(Alarm)"
+                }
+            ],
+            "class": "AlarmApi",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 435,
+            "description": "Creates and saves a new alarm.",
+            "itemtype": "method",
+            "name": "api.createAndSaveAlarmFor",
+            "params": [
+                {
+                    "name": "date",
+                    "description": "date at which the alarm is to be triggered.",
+                    "type": "Date"
+                },
+                {
+                    "name": "type",
+                    "description": "type of the alarm.",
+                    "type": "AlarmType"
+                },
+                {
+                    "name": "daysOfWeek",
+                    "description": "days of the week the alarm is scheduled.",
+                    "type": "AlarmDayOfWeek"
+                },
+                {
+                    "name": "message",
+                    "description": "Message to be displayed when the alarm is triggered.",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "(optional)  Function to be called when the alarm has been saved.",
+                    "type": "Function(AlarmError)"
+                }
+            ],
+            "class": "AlarmApi",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 450,
+            "description": "Returns a message adapted to the given error id.",
+            "itemtype": "method",
+            "name": "api.errorToMessage",
+            "params": [
+                {
+                    "name": "error",
+                    "description": "error id.",
+                    "type": "AlarmError"
+                }
+            ],
+            "class": "AlarmApi",
+            "module": "AlarmApi"
+        },
+        {
+            "file": "alarm-api.js",
+            "line": 475,
+            "access": "private",
+            "tagname": "",
+            "class": "AlarmApi",
+            "module": "AlarmApi"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type",
+            "line": " alarm-api.js:475"
+        }
+    ]
+}
