@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+15.04.20150330-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Daniel Holbach ]
+  * Add ./update-docs script, which can needs to be run locally, as not all
+    dependencies of yuidocs are in the archive yet.
+    The API docs are added to unity-webapps-qml-doc, which will make it easier
+    for us to update developer.ubuntu.com/api.
+
+ -- Daniel Holbach <daniel.holbach@ubuntu.com>  Mon, 30 Mar 2015 18:29:40 +0200
+
 unity-webapps-qml (0.1+15.04.20150319-0ubuntu1) vivid; urgency=medium
 
   [ Alexandre Abreu ]
