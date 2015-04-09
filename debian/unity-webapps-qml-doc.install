@@ -1,1 +1,5 @@
 usr/share/unity-webapps-qml/doc
+src/Ubuntu/UnityWebApps/bindings/alarm-api/client/docsbuild/*		/usr/share/unity-webapps-qml/doc/api/alarm-api/
+src/Ubuntu/UnityWebApps/bindings/content-hub/client/docsbuild/*		/usr/share/unity-webapps-qml/doc/api/content-hub/
+src/Ubuntu/UnityWebApps/bindings/online-accounts/client/docsbuild/*	/usr/share/unity-webapps-qml/doc/api/online-accounts/
+src/Ubuntu/UnityWebApps/bindings/runtime-api/client/docsbuild/*		/usr/share/unity-webapps-qml/doc/api/runtime-api/

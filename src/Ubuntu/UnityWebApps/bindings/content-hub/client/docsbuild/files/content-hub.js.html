@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>content-hub.js - Content Hub JS API</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.8.0pr2/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <script src="http://yui.yahooapis.com/combo?3.8.0pr2/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            <h1><a href="../index.html"><img src="../assets/css/logo.png">Content Hub JS API: content-hub.js</a></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.1</em>
+        </div>
+    </div>
+    <div class="yui3-g">
+
+        <div id="sidebar" class="yui3-u">
+            <div id="modules" class="sidebox">
+                <div class="hd">
+                    <h2 class="no-toc">Modules</h2>
+                </div>
+                <div class="bd">
+                    <ul>
+                            <li><a href="../modules/ContentHub.html">ContentHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="classes" class="sidebox">
+                <div class="hd">
+                    <h2 class="no-toc">Classes</h2>
+                </div>
+                <div class="bd">
+                    <ul>
+                            <li><a href="../classes/ContentHub.html">ContentHub</a></li>
+                            <li><a href="../classes/ContentPeer.html">ContentPeer</a></li>
+                            <li><a href="../classes/ContentStore.html">ContentStore</a></li>
+                            <li><a href="../classes/ContentTransfer.html">ContentTransfer</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            
+            
+            
+            
+            <div id="fileTree" class="sidebox">
+                <div class="hd">
+                    <h2 class="no-toc">Files</h2>
+                </div>
+                <div class="bd">
+                    <ul><li>content-hub.js/<ul></ul></li></ul>
+                </div>
+            </div>
+            
+        </div>
+
+        <div id="main" class="yui3-u">
+            <div class="content"><h4>content-hub.js</h4>
+
+<pre class="code prettyprint linenums">
+/**
+ * ContentHub is the entry point to resource io transfer
+   from/to remote applications (peers).
+
+ * @module ContentHub
+ */
+
+function createContentHubApi(backendBridge) {
+    var PLUGIN_URI = &#x27;ContentHub&#x27;;
+
+/**
+ * ContentTransfer is an object created by the ContentHub to
+   and allows one to properly setup and manage a data
+   transfer between two peers.
+
+ * @class ContentTransfer
+ * @constructor
+ * @example
+
+       var api = external.getUnityObject(&#x27;1.0&#x27;);
+       var hub = api.ContentHub;
+
+       var pictureContentType = hub.ContentType.Pictures;
+
+       hub.defaultSourceForType(
+          pictureContentType
+          , function(peer) {
+            hub.importContentForPeer(
+              pictureContentType,
+              peer,
+              function(transfer) {
+                [setup the transfer options and store]
+                transfer.start(function(state) { [...] });
+              });
+           });
+ */
+    function ContentTransfer(objectid, content) {
+        this._proxy = backendBridge.createRemoteObject(
+            PLUGIN_URI, &#x27;ContentTransfer&#x27;, objectid);
+
+        this._store = content &amp;&amp; content.store
+             ? content.store : null;
+        this._state = content &amp;&amp; content.state
+             ? content.state : null;
+        this._selectionType = content &amp;&amp; content.selectionType
+             ? content.selectionType : null;
+        this._direction = content &amp;&amp; content.direction
+             ? content.direction : null;
+    };
+    ContentTransfer.prototype = {
+        // object methods
+        serialize: function() {
+            var self = this;
+            return {
+                type: &#x27;object-proxy&#x27;,
+                apiid: &#x27;ContentHub&#x27;,
+                objecttype: &#x27;ContentTransfer&#x27;,
+                objectid: self._proxy.id(),
+            }
+        },
+
+        // properties
+
+        /**
+         * Retrieves the current store.
+         *
+         * If the callback parameter is not set, the current &quot;local&quot; value is retrieved.
+         *
+         * @method store
+         * @param callback (optional) {Function(String)}
+         */
+        store: function(callback) {
+            if (callback &amp;&amp; typeof(callback) === &#x27;function&#x27;) {
+                this._proxy.call(&#x27;store&#x27;, [], callback);
+                return;
+            }
+            return this._store;
+        },
+        /**
+         * Sets the current store for the ContentTransfer.
+         *
+         * @method setStore
+         * @param store {ContentStore}
+         * @param callback (optional) {Function()} called when the store has been updated
+         */
+        setStore: function(store, callback) {
+            this._proxy.call(&#x27;setStore&#x27;, [store.serialize(), callback]);
+        },
+
+        /**
+         * Retrieves the current state.
+         *
+         * If the callback parameter is not set, the current &quot;local&quot; value is retrieved.
+         *
+         * @method state
+         * @param callback (optional) {Function(ContentTransfer.State)}
+         */
+        state: function(callback) {
+            if (callback &amp;&amp; typeof(callback) === &#x27;function&#x27;) {
+                this._proxy.call(&#x27;state&#x27;, [], callback);
+                return;
+            }
+            return this._state;
+        },
+        /**
+         * Sets the state of the transfer.
+         *
+         * @method setState
+         * @param state {ContentTransfer.State}
+         * @param callback {Function()} called when the state has been updated
+         */
+        setState: function(state, callback) {
+            this._proxy.call(&#x27;setState&#x27;, [state, callback]);
+        },
+        /**
+         * Notifies the listener when the state of the transfer changes.
+         *
+         * @method onStateChanged
+         * @param callback {Function(ContentTransfer.State)}
+         */
+        onStateChanged: function(callback) {
+            this._proxy.call(&#x27;onStateChanged&#x27;, [callback]);
+        },
+
+        /**
+         * Retrieves the current selection type.
+         *
+         * @method selectionType
+         * @param callback {Function(ContentTransfer.SelectionType)}
+         */
+        selectionType: function(callback) {
+            if (callback &amp;&amp; typeof(callback) === &#x27;function&#x27;) {
+                this._proxy.call(&#x27;selectionType&#x27;, [], callback);
+                return;
+            }
+            return this._selectionType;
+        },
+        /**
+         * Sets the selection type (single or multiple).
+         *
+         * @method setSelectionType
+         * @param selectionType {ContentTransfer.SelectionType}
+         * @param callback {Function()} called when the state has been updated
+         */
+        setSelectionType: function(selectionType, callback) {
+            this._selectionType = selectionType;
+            this._proxy.call(&#x27;setSelectionType&#x27;, [selectionType, callback]);
+        },
+
+        /**
+         * Retrieves the current transfer direction.
+         *
+         * If the callback parameter is not set, the current &quot;local&quot; value is retrieved.
+         *
+         * @method direction
+         * @param callback (optional) {Function(ContentTransfer.Direction)}
+         */
+        direction: function(callback) {
+            if (callback &amp;&amp; typeof(callback) === &#x27;function&#x27;) {
+                this._proxy.call(&#x27;direction&#x27;, [], callback);
+                return;
+            }
+            return this._direction;
+        },
+        /**
+         * Sets the transfer direction (import or export).
+         *
+         * @method setDirection
+         * @param direction {ContentTransfer.Direction}
+         * @param callback {Function()} called when the state has been updated
+         */
+        setDirection: function(direction, callback) {
+            this._direction = direction;
+            this._proxy.call(&#x27;setDirection&#x27;, [direction, callback]);
+        },
+
+        /**
+         * Retrieves the list of items associated with the ContentTransfer.
+         *
+         * @method items
+         * @param callback {Function( {Object{name: , url: }} )}
+         */
+        items: function(callback) {
+            this._proxy.call(&#x27;items&#x27;, [], callback);
+        },
+        /**
+         * Sets the list of items for the associated ContentTransfer (used when exporting).
+         *
+         * @method setItems
+         * @param items {Array of Object{name: String, url: String}}
+         * @param callback {Function()} called when the state has been updated
+         */
+        setItems: function(items, callback) {
+            this._proxy.call(&#x27;setItems&#x27;, [items, callback]);
+        },
+
+        // methods
+
+        /**
+         * Starts a transfer
+         * 
+         * @method start
+         * @param callback {Function(ContentTransfer.State)} 
+         */
+        start: function(callback) {
+            this._proxy.call(&#x27;start&#x27;, [callback]);
+        },
+
+        /**
+         * Sets State to ContentTransfer.Finalized and cleans up temporary files.
+         *
+         * @method finalize
+         */
+        finalize: function() {
+            this._proxy.call(&#x27;finalize&#x27;, []);
+        },
+
+        // extras
+
+        /**
+         * Destroys the remote object. This proxy object is not valid anymore.
+         *
+         * @method destroy
+         */
+        destroy: function() {
+            this._proxy.call(&#x27;destroy&#x27;, []);
+        },
+    };
+
+/**
+ * ContentPeer is an object returned by the ContentHub.
+   It represents a remote peer that can be used in a request
+   to import, export or share content.
+
+ * @class ContentPeer
+ * @module ContentHub
+ * @constructor
+ * @example
+
+       var api = external.getUnityObject(&#x27;1.0&#x27;);
+       var hub = api.ContentHub;
+
+       var pictureContentType = hub.ContentType.Pictures;
+
+       hub.defaultSourceForType(
+          pictureContentType
+          , function(peer) {
+             [do something with the peer]
+           });
+ */
+    function ContentPeer(objectid, content) {
+        this._proxy = backendBridge.createRemoteObject(
+            PLUGIN_URI, &#x27;ContentPeer&#x27;, objectid);
+
+        this._appId = content &amp;&amp; content.appId
+             ? content.appId : null;
+        this._name = content &amp;&amp; content.name
+             ? content.name : null;
+        this._handler = content &amp;&amp; content.handler
+             ? content.handler : null;
+        this._contentType = content &amp;&amp; content.contentType
+             ? content.contentType : null;
+        this._selectionType = content &amp;&amp; content.selectionType
+             ? content.selectionType : null;
+        this._isDefaultPeer = content &amp;&amp; content.isDefaultPeer;
+    };
+    ContentPeer.prototype = {
+        // object methods
+        serialize: function() {
+            var self = this;
+            return {
+                type: &#x27;object-proxy&#x27;,
+                apiid: &#x27;ContentHub&#x27;,
+                objecttype: &#x27;ContentPeer&#x27;,
+                objectid: self._proxy.id(),
+            }
+        },
+
+        // properties
+
+        /**
+         * Retrieves the app Id of the associated peer.
+         *
+         * If the callback parameter is not set, the current &quot;local&quot; value is retrieved.
+         *
+         * @method appId
+         * @return {String} Application Id for this peer
+         * @param callback (optional) {Function(String)}
+         */
+        appId: function(callback) {
+            if (callback &amp;&amp; typeof(callback) === &#x27;function&#x27;) {
+                this._proxy.call(&#x27;appId&#x27;, [], callback);
+                return;
+            }
+            return this._appId;
+        },
+        /**
+         * Sets the app Id of the associated peer.
+         *
+         * @method setAppId
+         * @param appId {String}
+         * @param callback {Function()} called when the appId has been updated
+         */
+        setAppId: function(appId, callback) {
+            this._proxy.call(&#x27;setAppId&#x27;, [appId, callback]);
+        },
+
+        /**
+         * Retrieves the specific ContentHandler for this peer.
+         *
+         * If the callback parameter is not set, the current &quot;local&quot; value is retrieved.
+         *
+         * @method handler
+         * @return {String} ContentHandler for this peer
+         * @param callback (optional) {Function(String)}
+         */
+        handler: function(callback) {
+            if (callback &amp;&amp; typeof(callback) === &#x27;function&#x27;) {
+                this._proxy.call(&#x27;handler&#x27;, [], callback);
+                return;
+            }
+            return this._handler;
+        },
+        /**
+         * Sets specific ContentHandler for this peer.
+         *
+         * @method setHandler
+         * @param handler {ContentHandler}
+         * @param callback {Function()} called when the appId has been updated
+         */
+        setHandler: function(handler, callback) {
+            this._proxy.call(&#x27;setHandler&#x27;, [handler, callback]);
+        },
+
+        /**
+         * Retrieves the specific ContentType for this peer.
+         *
+         * If the callback parameter is not set, the current &quot;local&quot; value is retrieved.
+         *
+         * @method contentType
+         * @return {String} ContentType for this peer
+         * @param callback (optional) {Function(String)}
+         */
+        contentType: function(callback) {
+            if (callback &amp;&amp; typeof(callback) === &#x27;function&#x27;) {
+                this._proxy.call(&#x27;contentType&#x27;, [], callback);
+                return;
+            }
+            return this._contentType;
+        },
+        /**
+         * Sets specific ContentType for this peer.
+         *
+         * @method setContentType
+         * @param contentType {ContentType}
+         * @param callback {Function()} called when the content type has been updated
+         */
+        setContentType: function(contentType, callback) {
+            this._proxy.call(&#x27;setContentType&#x27;, [contentType, callback]);
+        },
+
+        /**
+         * Retrieves the specific SelectionType for this peer.
+         *
+         * If the callback parameter is not set, the current &quot;local&quot; value is retrieved.
+         *
+         * @method selectionType
+         * @return {String} ContentTransfer.SelectionType for this peer
+         * @param callback (optional) {Function(String)}
+         */
+        selectionType: function(callback) {
+            if (callback &amp;&amp; typeof(callback) === &#x27;function&#x27;) {
+                this._proxy.call(&#x27;selectionType&#x27;, [], callback);
+                return;
+            }
+            return this._selectionType;
+        },
+        /**
+         * Sets specific SelectionType for this peer.
+         *
+         * @method setSelectionType
+         * @param selectionType {ContentTransfer.SelectionType}
+         * @param callback {Function()} called when the content type has been updated
+         */
+        setSelectionType: function(selectionType, callback) {
+            this._proxy.call(&#x27;setSelectionType&#x27;, [selectionType, callback]);
+        },
+
+        /**
+         * Retrieves the name of the associated peer.
+         *
+         * If the callback parameter is not set, the current &quot;local&quot; value is retrieved.
+         *
+         * @method name
+         * @param callback (optional) {Function(String)}
+         */
+        name: function(callback) {
+            if (callback &amp;&amp; typeof(callback) === &#x27;function&#x27;) {
+                this._proxy.call(&#x27;name&#x27;, [], callback);
+                return;
+            }
+            return this._name;
+        },
+
+        /**
+         * Returns true if the peer is a default one, false otherwise.
+         *
+         * If the callback parameter is not set, the current &quot;local&quot; value is retrieved.
+         *
+         * @method isDefaultPeer
+         * @param callback (optional) {Function(Bool)}
+         */
+        isDefaultPeer: function(callback) {
+            if (callback &amp;&amp; typeof(callback) === &#x27;function&#x27;) {
+                this._proxy.call(&#x27;isDefaultPeer&#x27;, [], callback);
+                return;
+            }
+            return this._isDefaultPeer;
+        },
+
+        // methods
+
+        /**
+         * Request to exchange content with this ContentPeer.
+         *
+         * @method request
+         * @param callback {Function(ContentTransfer)} Called with the resulting content transfer
+         */
+        request: function(callback) {
+            this._proxy.call(&#x27;request&#x27;, [], callback);
+        },
+
+        /**
+         * Request to import content from this ContentPeer and use a ContentStore for permanent storage.
+         *
+         * @method requestForStore
+         * @param store {ContentStore} Store used as a permanent storage
+         * @param callback {Function(ContentTransfer)} Called with the resulting content transfer
+         */
+        requestForStore: function(store, callback) {
+            this._proxy.call(&#x27;requestForStore&#x27;, [store.serialize()], callback);
+        },
+
+        // extras
+
+        /**
+         * Destroys the remote object. This proxy object is not valid anymore.
+         *
+         * @method destroy
+         */
+        destroy: function() {
+            this._proxy.call(&#x27;destroy&#x27;, []);
+        },
+    };
+
+/**
+ * ContentStore is an object returned by the ContentHub.
+
+   It represents a location where the resources imported or
+   exported from a peer during a transfer operation are to be
+   either saved or found.
+
+ * @class ContentStore
+ * @module ContentHub
+ * @constructor
+ * @example
+
+       var api = external.getUnityObject(&#x27;1.0&#x27;);
+       var hub = api.ContentHub;
+
+       var pictureContentType = hub.ContentType.Pictures;
+
+       hub.defaultStoreForType(pictureContentType, function(store) {
+         [do something with the store]
+         });
+ */
+    function ContentStore(objectid, content) {
+        this._proxy = backendBridge.createRemoteObject(
+            PLUGIN_URI, &#x27;ContentStore&#x27;, objectid);
+
+        this._uri = content &amp;&amp; content.uri
+             ? content.uri : null;
+        this._scope = content &amp;&amp; content.scope
+             ? content.scope : null;
+    };
+    ContentStore.prototype = {
+        // object methods
+        serialize: function() {
+            return {
+                type: &#x27;object-proxy&#x27;,
+                apiid: &#x27;ContentHub&#x27;,
+                objecttype: &#x27;ContentStore&#x27;,
+                objectid: this._proxy.id(),
+            }
+        },
+
+        // properties
+
+        //immutable
+
+        /**
+         * Retrieves the uri of the associated store.
+         *
+         * If the callback parameter is not set, the current &quot;local&quot; value is retrieved.
+         *
+         * @method uri
+         * @return {String} current uri
+         * @param callback (optional) {Function(String)}
+         */
+        uri: function(callback) {
+            if (callback &amp;&amp; typeof(callback) === &#x27;function&#x27;) {
+                this._proxy.call(&#x27;uri&#x27;, [], callback);
+                return;
+            }
+            return this._uri;
+        },
+
+        /**
+         * Retrieves the current scope.
+         *
+         * If the callback parameter is not set, the current &quot;local&quot; value is retrieved.
+         *
+         * @method scope
+         * @return {ContentScope} current scope
+         * @param callback (optional) {Function(ContentScope)}
+         */
+        scope: function(callback) {
+            if (callback &amp;&amp; typeof(callback) === &#x27;function&#x27;) {
+                this._proxy.call(&#x27;scope&#x27;, [], callback);
+                return;
+            }
+            return this._scope;
+        },
+        /**
+         * Sets the current scope.
+         *
+         * @method setScope
+         * @param scope {ContentScope}
+         * @param callback {Function()} called when the scope has been updated
+         */
+        setScope: function(scope, callback) {
+            this._proxy.call(&#x27;setScope&#x27;, [scope, callback]);
+        },
+
+        // extras
+
+        /**
+         * Destroys the remote object. This proxy object is not valid anymore.
+         *
+         * @method destroy
+         */
+        destroy: function() {
+            this._proxy.call(&#x27;destroy&#x27;, []);
+        },
+    };
+
+    function _constructorFromName(className) {
+        var constructorPerName = {
+            &quot;ContentPeer&quot;: ContentPeer,
+            &quot;ContentStore&quot;: ContentStore,
+            &quot;ContentTransfer&quot;: ContentTransfer,
+        };
+        return className in constructorPerName
+                ? constructorPerName[className]
+                : null;
+    };
+
+/**
+ * The ContentHub object.
+
+ * @class ContentHub
+ * @static
+ * @constructor
+ */
+    return {
+        /**
+         ContentType is an enumeration of well known content types.
+         
+           Values:
+
+             Pictures
+
+             Documents
+             
+             Music
+
+             Contacts
+
+             Videos
+
+             Links
+
+         @static
+         @property ContentType {String}
+         
+         @example
+
+          var api = external.getUnityObject(&#x27;1.0&#x27;);
+          var hub = api.ContentHub;
+         
+          var pictureContentType = hub.ContentType.Pictures;
+         */
+        ContentType: {
+            All: &quot;All&quot;,
+            Unknown: &quot;Unknown&quot;,
+            Pictures: &quot;Pictures&quot;,
+            Documents: &quot;Documents&quot;,
+            Music: &quot;Music&quot;,
+            Contacts: &quot;Contacts&quot;,
+            Videos: &quot;Videos&quot;,
+            Links: &quot;Links&quot;,
+        },
+
+        /**
+          ContentHandler is an enumeration of well known content handlers.
+
+           Values:
+
+             Source
+
+             Destination
+
+             Share
+
+           @static
+           @property ContentHandler {String}
+         */
+        ContentHandler: {
+            Source: &quot;Source&quot;,
+            Destination: &quot;Destination&quot;,
+            Share: &quot;Share&quot;,
+        },
+
+        /**
+          ContentScope is an enumeration of well known scope types.
+
+           Values:
+
+             System
+
+             User
+
+             App
+
+           @static
+           @property ContentScope {String}
+         */
+        ContentScope: {
+            System: &quot;System&quot;,
+            User: &quot;User&quot;,
+            App: &quot;App&quot;,
+        },
+
+        ContentTransfer: {
+
+        /**
+         ContentTransfer.State is an enumeration of the state of a given ongoing ContentTransfer.
+         
+           Values:
+
+            Created: Transfer created, waiting to be initiated.
+
+            Initiated: Transfer has been initiated.
+
+            InProgress: Transfer is in progress.
+
+            Charged: Transfer is charged with items and ready to be collected.
+
+            Collected: Items in the transfer have been collected.
+
+            Aborted: Transfer has been aborted.
+
+            Finalized: Transfer has been finished and cleaned up.
+
+            Downloaded: Download specified by downloadId has completed.
+
+            Downloading: Transfer is downloading item specified by downloadId.
+          
+         @static
+         @property ContentTransfer.State {String}
+         
+         @example
+
+          var api = external.getUnityObject(&#x27;1.0&#x27;);
+          var hub = api.ContentHub;
+         
+          var transferState = hub.ContentTransfer.State;
+          var pictureContentType = hub.ContentType.Pictures;
+
+          hub.importContentForPeer(
+            pictureContentType,
+            peer,
+            function(transfer) {
+                hub.defaultStoreForType(pictureContentType, function(store) {
+                    transfer.setStore(store, function() {
+                        transfer.start(function(state) {
+                            if (transferState.Aborted === state) {
+                              [...]
+                            }
+                            [...]
+                        });
+                    });
+                });
+          });
+
+         */
+            State: {
+                // Transfer created, waiting to be initiated.
+                Created: &quot;Created&quot;,
+
+                // Transfer has been initiated.
+                Initiated: &quot;Initiated&quot;,
+
+                // Transfer is in progress.
+                InProgress: &quot;InProgress&quot;,
+
+                // Transfer is charged with items and ready to be collected.
+                Charged: &quot;Charged&quot;,
+
+                // Items in the transfer have been collected.
+                Collected: &quot;Collected&quot;,
+
+                // Transfer has been aborted.
+                Aborted: &quot;Aborted&quot;,
+
+                // Transfer has been finished and cleaned up.
+                Finalized: &quot;Finalized&quot;,
+
+                // Transfer has finished downloading.
+                Downloaded: &quot;Downloaded&quot;,
+
+                // Transfer is downloading.
+                Downloading: &quot;Downloading&quot;,
+            },
+
+        /**
+         ContentTransfer.Direction is an enumeration of the directions of a given ContentTransfer.
+         
+           Values:
+
+            Import
+
+            Export
+
+            Share
+
+         @static
+         @property ContentTransfer.Direction {String}
+         */
+            Direction: {
+                // Transfer is a request to import content
+                Import: &quot;Import&quot;,
+
+                // Transfer is a request to export content
+                Export: &quot;Export&quot;,
+
+                // Transfer is a request to share content
+                Share: &quot;Share&quot;,
+            },
+
+        /**
+         ContentTransfer.SelectionType is an enumeration of the directions of a given ContentTransfer.
+         
+           Values:
+
+            Single: Transfer should contain a single item
+
+            Multiple: Transfer can contain multiple items
+
+         @static
+         @property ContentTransfer.SelectionType {String}
+         */
+            SelectionType: {
+                // Transfer should contain a single item
+                Single: &quot;Single&quot;,
+
+                // Transfer can contain multiple items
+                Multiple: &quot;Multiple&quot;,
+            },
+        },
+
+        /**
+         * Creates a ContentPeer object for the given source type.
+         *
+         * @method getPeers
+         * @param filters {Object} A dictionary of parameters to filter the result. The filtering keys are:
+         * - contentType: desired ContentType
+         * - handler: desired ContentHandler
+         *
+         * @param callback {Function(List of ContentPeer objects)} Callback that receives the result or null
+         */
+        getPeers: function(filter, callback) {
+            backendBridge.call(&#x27;ContentHub.getPeers&#x27;,
+                               [filter],
+                               callback);
+        },
+
+        /**
+         * Creates a ContentStore object for the given scope type.
+         *
+         * @method getStore
+         * @param scope {ContentScope} The content scope for the store
+         * @param callback {Function(ContentStore)} Callback that receives the result or null
+         */
+        getStore: function(scope, callback) {
+            backendBridge.call(&#x27;ContentHub.getStore&#x27;,
+                               [scope],
+                               callback);
+        },
+
+        /**
+         * Launches the content peer picker ui that allows the user to select a peer.
+         *
+         * @method launchContentPeerPicker
+         * @param filters {Object} A dictionary of parameters to filter the result. The filtering keys are:
+         * - contentType: desired ContentType
+         * - handler: desired ContentHandler
+         * - showTitle: boolean value indicating if the title should be visible
+         * @param onPeerSelected {Function(ContentPeer)} Called when the user has selected a peer
+         * @param onCancelPressed {Function()} Called when the user has pressed cancel
+         */
+        launchContentPeerPicker: function(filters, onPeerSelected, onCancelPressed) {
+            backendBridge.call(&#x27;ContentHub.launchContentPeerPicker&#x27;,
+                               [filters, onPeerSelected, onCancelPressed]);
+        },
+
+        /**
+         * Sets a handler that is to be called when the current application is the
+         * target of an export request.
+         *
+         * @method onExportRequested
+         * @param callback {Function(ContentTransfer)} Function when one requests a resource to be exported.
+         *                                                          The corresponding ContentTransfer is provided as a parameter.
+         * 
+         * @example
+         
+            var api = external.getUnityObject(1.0);
+            var hub = api.ContentHub;
+         
+            var transferState = hub.ContentTransfer.State;
+            
+            function _exportRequested(transfer) {
+              var url = window.location.href;
+              url = url.substr(0, url.lastIndexOf(&#x27;/&#x27;)+1) + &#x27;img/ubuntuone-music.png&#x27;;
+            
+              transfer.setItems([{name: &#x27;Ubuntu One&#x27;, url: url}],
+                function() {
+                  transfer.setState(hub.ContentTransfer.State.Charged);
+                });
+              };
+            
+            hub.onExportRequested(_exportRequested);
+         
+         */
+        onExportRequested: function(callback) {
+            backendBridge.call(&#x27;ContentHub.onExportRequested&#x27;,
+                               [callback]);
+        },
+
+        /**
+         * Sets a handler that is to be called when the current application is the
+         * target of an share request.
+         *
+         * @method onShareRequested
+         * @param callback {Function(ContentTransfer)} Function when one requests a resource to be shared.
+         *                                                          The corresponding ContentTransfer is provided as a parameter.
+         *
+         * @example
+
+            var api = external.getUnityObject(1.0);
+            var hub = api.ContentHub;
+
+            var transferState = hub.ContentTransfer.State;
+
+            function _shareRequested(transfer) {
+            };
+
+            hub.onShareRequested(_shareRequested);
+
+         */
+        onShareRequested: function(callback) {
+            backendBridge.call(&#x27;ContentHub.onShareRequested&#x27;,
+                               [callback]);
+        },
+
+        /**
+         * Sets a handler that is to be called when the current application is the
+         * target of an import request.
+         *
+         * @method onImportRequested
+         * @param callback {Function(ContentTransfer)} Function when one requests a resource to be imported.
+         *                                                          The corresponding ContentTransfer is provided as a parameter.
+         *
+         * @example
+
+            var api = external.getUnityObject(1.0);
+            var hub = api.ContentHub;
+
+            var transferState = hub.ContentTransfer.State;
+
+            function _importRequested(transfer) {
+            };
+
+            hub.onImportRequested(_importRequested);
+
+         */
+        onImportRequested: function(callback) {
+            backendBridge.call(&#x27;ContentHub.onImportRequested&#x27;,
+                               [callback]);
+        },
+
+        api: {
+
+            /**
+             * Creates a ContentStore object for the given ContentPeer.
+             *
+             * @method api.importContent
+             * @param type {ContentType} type of the content to import
+             * @param peer {ContentPeer} peer who&#x27;s content should be imported
+             * @param transferOptions {Object} a dictionary of transfer options. The options are the following:
+             * - multipleFiles {Bool}: specified if a transfer should involve multiple files or not
+             * - scope {ContentScope}: specifies the location where the transferred files should be copied to
+             * @param onError {Function(reason:)} called when the transfer has failed
+             * @param onSuccess {Function(Array of {ContentItem})} called when the transfer has been a success and items are available
+             */
+            importContent: function(type, peer, transferOptions, onSuccess, onError) {
+                backendBridge.call(&#x27;ContentHub.apiImportContent&#x27;,
+                                  [type, peer.serialize(), transferOptions, onSuccess, onError]);
+            }
+        },
+
+        // Internal
+
+        /**
+         * @private
+         *
+         */
+        createObjectWrapper: function(objectType, objectId, content) {
+            var Constructor = _constructorFromName(objectType);
+            return new Constructor(objectId, content);
+        },
+    };
+};
+
+</pre>
+
+</div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/js/tabs.js"></script>
+</body>
+</html>

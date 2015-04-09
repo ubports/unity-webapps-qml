@@ -1,0 +1,289 @@
+{
+    "project": {
+        "name": "Runtime JS API",
+        "description": "Ubuntu App Platform Runtime JavaScript API docs",
+        "version": "0.1"
+    },
+    "files": {
+        "runtime-api.js": {
+            "name": "runtime-api.js",
+            "modules": {
+                "RuntimeApi": 1
+            },
+            "classes": {
+                "RuntimeApi": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "RuntimeApi": {
+            "name": "RuntimeApi",
+            "submodules": {},
+            "classes": {
+                "RuntimeApi": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "runtime-api.js",
+            "line": 196,
+            "description": "RuntimeApi gives access to the application runtime information and management."
+        }
+    },
+    "classes": {
+        "RuntimeApi": {
+            "name": "RuntimeApi",
+            "shortname": "RuntimeApi",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "RuntimeApi",
+            "namespace": "",
+            "file": "runtime-api.js",
+            "line": 196,
+            "description": "The RuntimeApi object",
+            "is_constructor": 1,
+            "example": [
+                "\n\n      var api = external.getUnityObject('1.0');\n      api.RuntimeApi.getApplication(function(application) {\n        console.log('Application name: ' + application.getApplicationName());\n      });"
+            ]
+        }
+    },
+    "classitems": [
+        {
+            "file": "runtime-api.js",
+            "line": 42,
+            "description": "Internal",
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 53,
+            "description": "Retrieves the application name.",
+            "itemtype": "method",
+            "name": "getApplicationName",
+            "return": {
+                "description": "application name",
+                "type": "String"
+            },
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 63,
+            "description": "Sets up a callback that is to be called when the application's name changed.",
+            "itemtype": "method",
+            "name": "onApplicationNameChanged",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Function to be called when the application's name has changed.",
+                    "type": "Function(String)"
+                }
+            ],
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 75,
+            "description": "Retrieves the fileystem location where the application is allowed to write its data in.",
+            "itemtype": "method",
+            "name": "getApplicationWritableLocation",
+            "return": {
+                "description": "application writable location path",
+                "type": "String"
+            },
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 85,
+            "description": "Retrieves current platform information.",
+            "itemtype": "method",
+            "name": "getPlatformInfos",
+            "return": {
+                "description": "platform information as a dictionary with the following keys:\n - name: the platform name",
+                "type": "Object"
+            },
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 96,
+            "description": "Sets up a callback that is to be called when the application is about to quit.",
+            "itemtype": "method",
+            "name": "onAboutToQuit",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Function to be called when the application is about to quit.",
+                    "type": "Function()"
+                }
+            ],
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 107,
+            "description": "Sets up a callback that is to be called when the application has been deactivated (background).",
+            "itemtype": "method",
+            "name": "onDeactivated",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Function to be called when the application has been deactivated.",
+                    "type": "Function()"
+                }
+            ],
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 118,
+            "description": "Sets up a callback that is to be called when the application has been activated (from background).",
+            "itemtype": "method",
+            "name": "onActivated",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Function to be called when the application has been activated.",
+                    "type": "Function()"
+                }
+            ],
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 129,
+            "description": "Retrieves the current screen orientation.",
+            "itemtype": "method",
+            "name": "getScreenOrientation",
+            "return": {
+                "description": "current screen orientation.",
+                "type": "ScreenOrientation"
+            },
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 139,
+            "description": "Sets up a callback that is to be called when the application's screen has changed its orientation.",
+            "itemtype": "method",
+            "name": "onScreenOrientationChanged",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Function to be called when the application's screen orientation has changed.",
+                    "type": "Function(ScreenOrientation)"
+                }
+            ],
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 151,
+            "description": "Sets up a URI handler. The application can be sent URIs to open.",
+            "itemtype": "method",
+            "name": "setupUriHandler",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Function to be called with the current list of uris to open",
+                    "type": "Function([String])"
+                }
+            ],
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 162,
+            "description": "Retrieves the current input method's name. The name varies depending on the platform\ne.g. maliit can be part of the name for a maliit based Virtual Keyboard (possibly mangled\nwith e.g. 'phablet'), when a keyboard is there the name can be empty, ...",
+            "itemtype": "method",
+            "name": "getInputMethodName",
+            "return": {
+                "description": "current input method name",
+                "type": "String"
+            },
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 174,
+            "description": "Sets up a callback that is to be called when the On Screen Keyboard visibility has changed.",
+            "itemtype": "method",
+            "name": "onInputMethodVisibilityChanged",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Function to be called when the On Screen Keyboard visibility has changed (received the visibility as an arg).",
+                    "type": "Function(Bool)"
+                }
+            ],
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 209,
+            "description": "Enumeration of the available types of ScreenOrientation.\n\n  Values:\n\n    Landscape: The application screen is in landscape mode\n\n    InvertedLandscape: The application screen is in inverted landscape mode\n\n    Portrait: The application screen is in portrait mode\n\n    InvertedPortrait: The application screen is in inverted portrait mode\n\n    Unknown: The application screen is in an unknown mode",
+            "static": 1,
+            "itemtype": "property",
+            "name": "ScreenOrientation",
+            "type": "Object",
+            "example": [
+                "\n\n    var api = external.getUnityObject('1.0');\n    var orientation = api.RuntimeApi.ScreenOrientation;\n    // use orientation.Landscape or orientation.Portrait"
+            ],
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 245,
+            "description": "Creates an Application object.",
+            "itemtype": "method",
+            "name": "getApplication",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function (Application)"
+                }
+            ],
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        },
+        {
+            "file": "runtime-api.js",
+            "line": 257,
+            "access": "private",
+            "tagname": "",
+            "class": "RuntimeApi",
+            "module": "RuntimeApi"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type\nInternal",
+            "line": " runtime-api.js:42"
+        },
+        {
+            "message": "Missing item type",
+            "line": " runtime-api.js:257"
+        }
+    ]
+}

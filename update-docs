@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ ! $(which yuidoc) ]; then
+	echo "Please install yuidocjs: sudo apt-get install npm nodejs-legacy && sudo npm -g install yuidocjs"
+	exit 1
+fi
+
+cd ./src/Ubuntu/UnityWebApps/bindings && ./yuidoc-build.sh
