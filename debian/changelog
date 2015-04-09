@@ -1,4 +1,4 @@
-unity-webapps-qml (0.1+15.04.20150330-0ubuntu1) UNRELEASED; urgency=medium
+unity-webapps-qml (0.1+15.04.20150409-0ubuntu1) vivid; urgency=medium
 
   [ Daniel Holbach ]
   * Add ./update-docs script, which can needs to be run locally, as not all
@@ -6,7 +6,10 @@ unity-webapps-qml (0.1+15.04.20150330-0ubuntu1) UNRELEASED; urgency=medium
     The API docs are added to unity-webapps-qml-doc, which will make it easier
     for us to update developer.ubuntu.com/api.
 
- -- Daniel Holbach <daniel.holbach@ubuntu.com>  Mon, 30 Mar 2015 18:29:40 +0200
+  [ CI Train Bot ]
+  * New rebuild forced.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Thu, 09 Apr 2015 13:29:13 +0000
 
 unity-webapps-qml (0.1+15.04.20150319-0ubuntu1) vivid; urgency=medium
 
