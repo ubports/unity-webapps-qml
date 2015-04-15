@@ -44,6 +44,8 @@ function createContentHubApi(backendBridge) {
              ? content.state : null;
         this._selectionType = content && content.selectionType
              ? content.selectionType : null;
+        this._contentType = content && content.contentType
+             ? content.contentType : null;
         this._direction = content && content.direction
              ? content.direction : null;
     };
@@ -145,6 +147,31 @@ function createContentHubApi(backendBridge) {
         setSelectionType: function(selectionType, callback) {
             this._selectionType = selectionType;
             this._proxy.call('setSelectionType', [selectionType, callback]);
+        },
+
+        /**
+         * Retrieves the current content type.
+         *
+         * @method contentType
+         * @param callback {Function(ContentTransfer.ContentType)}
+         */
+        contentType: function(callback) {
+            if (callback && typeof(callback) === 'function') {
+                this._proxy.call('contentType', [], callback);
+                return;
+            }
+            return this._contentType;
+        },
+        /**
+         * Sets the content type.
+         *
+         * @method setContentType
+         * @param contentType {ContentTransfer.ContentType}
+         * @param callback {Function()} called when the state has been updated
+         */
+        setContentType: function(contentType, callback) {
+            this._contentType = contentType;
+            this._proxy.call('setContentType', [contentType, callback]);
         },
 
         /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Canonical Ltd.
+ * Copyright 2014-2015 Canonical Ltd.
  *
  * This file is part of unity-webapps-qml.
  *
@@ -239,7 +239,8 @@ function createContentHubApi(backendDelegate, parent) {
                     store: self._object.store,
                     state: self._object.state,
                     selectionType: self._object.selectionType,
-                    direction: self._object.direction,
+                    contentType: self._object.contentType,
+                    direction: self._object.direction
                 }
             }
         },
@@ -283,6 +284,17 @@ function createContentHubApi(backendDelegate, parent) {
             this._object.onStateChanged.connect(function() {
                 callback(_contentTransferStateToName(self._object.state));
             });
+        },
+
+        contentType: function(callback) {
+            this._validate();
+            callback(_contentTypeToName(this._object.contentType));
+        },
+        setContentType: function(contentType, callback) {
+            this._validate();
+            this._object.contentType = _nameToContentType(contentType);
+            if (callback && typeof(callback) === 'function')
+                callback();
         },
 
         selectionType: function(callback) {

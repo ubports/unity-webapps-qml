@@ -19,7 +19,10 @@ SOURCES += \
 
 OTHER_FILES += \
     $$system(ls *.qml) \
-    $$system(ls *.sh)
+    $$system(ls *.sh) \
+    tst_api_contenthub.qml \
+    tst_api_contenthub.html \
+    tst_api_contenthub.js
 
 
 # make check target

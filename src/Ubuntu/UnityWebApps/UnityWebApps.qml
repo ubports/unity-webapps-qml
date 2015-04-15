@@ -646,6 +646,14 @@ Item {
                             args[k] = params[k]
                         }
                     }
+
+                    // For backward compatibility
+                    if (params.hasOwnProperty("fileToShare") &&
+                            typeof(params.fileToShare) === 'object' &&
+                            params.fileToShare.hasOwnProperty("url")) {
+                        args.fileToShare = params.fileToShare.url
+                    }
+
                     args.visible = true
                     var uiobject = uicomponent.createObject(p, args);
                     if ( ! uiobject.onCompleted) {
