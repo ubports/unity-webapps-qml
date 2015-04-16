@@ -33,15 +33,22 @@ var UnityWebApps = (function () {
     /**
      * \param parentItem
      * \param bindeeProxies
-     * \param backends
-     * \param userscriptContent
+     * \param accessPolicy
+     * \param injected_api_path
+     * \param dispatched_callback
      */
-    function _UnityWebApps(parentItem, bindeeProxies, accessPolicy, injected_api_path) {
+    function _UnityWebApps(
+            parentItem,
+            bindeeProxies,
+            accessPolicy,
+            injected_api_path,
+            dispatched_callback) {
         this._injected_unity_api_path = injected_api_path;
         this._bindeeProxies = bindeeProxies;
         this._backends = null;
         this._accessPolicy = accessPolicy;
         this._callbackManager = UnityWebAppsUtils.makeCallbackManager();
+        this._dispatchedCallback = dispatched_callback
 
         this._bind();
     };
@@ -152,7 +159,13 @@ var UnityWebApps = (function () {
                     return;
                 }
 
+
                 this._log ('WebApps API message being dispatch: ' + apiCallName);
+
+                if (this._dispatchedCallback &&
+                        typeof(this._dispatchedCallback) === 'function') {
+                    this._dispatchedCallback({type: "dispatching", name: apiCallName})
+                }
 
                 this._dispatchApiCall (message.name, params);
 
@@ -214,6 +227,11 @@ var UnityWebApps = (function () {
                                 : prev[cur];
                 }, reducetarget);
                 t.apply (null, args);
+
+                if (this._dispatchedCallback &&
+                        typeof(this._dispatchedCallback) === 'function') {
+                    this._dispatchedCallback({type: "called", name: name})
+                }
 
             } catch (err) {
               this._log('Error while dispatching call to ' + names.join('.') + ': ' + err);

@@ -178,6 +178,12 @@ Item {
      */
     signal userScriptsInjected()
 
+    /*!
+     \qmlsignal UnityWebApps::apiCallDispatched()
+
+     This signal is emitted when an api call is being dispatched to the backend.
+     */
+    signal apiCallDispatched(string type, string name)
 
     Settings {
         id: settings
@@ -236,7 +242,10 @@ Item {
                     __getPolicyForContent(settings),
                     customClientApiFileUrl && customClientApiFileUrl.length !== 0
                       ? customClientApiFileUrl
-                      : 'unity-webapps-api.js');
+                      : 'unity-webapps-api.js',
+                    function(info) {
+                        apiCallDispatched(info.type, info.name)
+                    });
 
         internal.instance = instance;
 
@@ -644,7 +653,22 @@ Item {
 
                 var uicomponent;
                 function onCreated() {
-                    var uiobject = uicomponent.createObject(p, {"fileToShare": params.fileToShare.url, "visible": true});
+                    var args = {}
+                    for (var k in params) {
+                        if (params.hasOwnProperty(k)) {
+                            args[k] = params[k]
+                        }
+                    }
+console.log(' DDD')
+                    // For backward compatibility
+                    if (params.hasOwnProperty("fileToShare") &&
+                            typeof(params.fileToShare) === 'object' &&
+                            params.fileToShare.hasOwnProperty("url")) {
+                        args.fileToShare = params.fileToShare.url
+                    }
+
+                    args.visible = true
+                    var uiobject = uicomponent.createObject(p, args);
                     if ( ! uiobject.onCompleted) {
                         console.error("launchEmbeddedUI: The local UI component to be launched does not expose a mandatory 'completed' signal");
                         uiobject.destroy();
