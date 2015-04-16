@@ -18,19 +18,47 @@
 
 import QtQuick 2.0
 import QtTest 1.0
-import Ubuntu.Web 2.0
+import Ubuntu.Web 0.2
+import com.canonical.Oxide 1.0 as Oxide
 import Ubuntu.UnityWebApps 0.1
 
 
 TestCase {
+    id: testcase
+
     name: "ContentHubApiTest"
 
-    function setup() { }
+    SignalSpy {
+      id: spy
+      target: webapps
+      signalName: "apiCallDispatched"
+    }
 
+    SignalSpy {
+      id: spyMessageReceived
+      target: webview
+      signalName: "messageReceived"
+    }
+
+    function setup() {
+        callbacks = []
+        objects = {}
+        lastReceivedArgs = ""
+        webview.url = "empty.html"
+        spy.clear()
+        spyMessageReceived.clear()
+    }
+
+    property var callbacks: []
     property var objects: null
-    property var backends
+    property var backends: getContentHubBackend()
+    property string lastReceivedArgs
 
     function serializeContentTransferObject(id, content, selection, handlerFuncs) {
+        if (!objects) {
+            objects = {}
+        }
+
         objects[id] = {
             content: content,
             selection: selection,
@@ -56,38 +84,68 @@ TestCase {
         return  {
             ContentHub: {
                 onShareRequested: function(callback) {
-                    callback(serializeContentTransferObject("1", "", ""))
+                    callbacks.push(callback)
                 },
                 dispatchToObject: function(infos) {
                     var args = infos.args;
                     var callback = infos.callback;
                     var method_name = infos.method_name;
 
-                    verify(objects != null &&
-                           objects[infos.objectid] != null)
+                    verify(objects != null && objects[infos.objectid] != null)
 
                     verify(objects[infos.objectid].handlerFuncs[method_name] != null)
 
-                    var r = objects[infos.objectid].handlerFuncs[method_name](args)
+                    var r
+                    try {
+                        r = objects[infos.objectid].handlerFuncs[method_name].apply(objects[infos.objectid], args)
+                    } catch(e) {
+                        verify(0 && "Exception " + e.toString())
+                    }
+
                     if (callback) {
-                        callback(args)
+                        verify (typeof(callback) === 'function')
+                        callback(r)
                     }
                 }
             }
         }
     }
 
-    function test_contentHubShare() {
+    function test_call_shareRequested() {
         setup();
-
-        var transferObject = { contentType: function(callback) { callback("Pictures"); } }
-        var backend = getContentHubBackend()
-
-        webapps.customBackendProxies = backend;
 
         webview.url = "tst_api_contenthub.html"
 
-        compare(spy.count, 1, "This.Is.A.Backend backend called");
+        spy.wait()
+        compare(spy.count, 2, "Should have had 1 apiCallDispatched signal");
+        compare(callbacks.length, 1, "Should have had 1 callback object");
+    }
+
+    function test_invoke_shareRequestedCallback() {
+        setup();
+
+        var transferObject = { contentType: function() { return "Pictures"; } }
+
+        webview.url = "tst_api_contenthub.html"
+
+        spy.wait()
+        compare(spy.count, 2, "Should have had 2 apiCallDispatched signal");
+        compare(callbacks.length, 1, "Should have had 1 callback object");
+
+        evaluateCode("document.addEventListener('onsharerequest', function(e) { \
+oxide.sendMessage('share-request-received', { type: e.detail.type }); \
+})")
+
+        evaluateCode("document.addEventListener('received-object-value', function(e) { \
+oxide.sendMessage('share-request-received', { type: e.detail.type }); \
+})")
+
+        callbacks[0](
+            serializeContentTransferObject(
+                "1", "", "", transferObject))
+
+        spyMessageReceived.wait()
+        compare(spyMessageReceived.count, 2, "Should have had 1 messageReceived signal");
     }
 
     UnityWebApps {
@@ -98,11 +156,42 @@ TestCase {
         customBackendProxies: backends
     }
 
-    // 'mocks' the 'bindee'
+    function evaluateCode(code, wrap) {
+      webview.rootFrame.sendMessageNoReply(
+        "oxide://test-msg-handler/",
+        "evalcode",
+        { code: code,
+          wrap: wrap === undefined ? false : wrap });
+    }
+
     WebView {
         id: webview
 
         anchors.fill: parent
+
+        signal messageReceived()
+
+        messageHandlers: [
+            Oxide.ScriptMessageHandler {
+                msgId: "share-request-received"
+                contexts: [ "oxide://test-msg-handler/" ]
+                callback: function(msg) {
+                    testcase.lastReceivedArgs = msg.args;
+                    webview.messageReceived()
+                }
+            }
+        ]
+
+        context: WebContext {
+            userScripts: [
+              Oxide.UserScript {
+                context: "oxide://test-msg-handler/"
+                url: Qt.resolvedUrl("tst_api_contenthub.js")
+                incognitoEnabled: true
+                matchAllFrames: true
+              }
+            ]
+        }
 
         function getUnityWebappsProxies() {
             return UnityWebAppsUtils.makeProxiesForWebViewBindee(webview);

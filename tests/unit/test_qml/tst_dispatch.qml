@@ -130,6 +130,7 @@ TestCase {
         id: webapps
         name: ""
         bindee: null
+        injectExtraUbuntuApis: true
     }
 
     // 'mocks' the 'bindee'

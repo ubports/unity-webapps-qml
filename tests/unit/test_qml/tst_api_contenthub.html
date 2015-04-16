@@ -2,13 +2,20 @@
 
 <head>
 <script>
+
+var activeTransfer
+
 function _shareRequested(transfer) {
     activeTransfer = transfer;
 
-    transfer.contentType(function(type) {
-        var e = new CustomEvent("onsharerequest", { bubbles: true, detail: { type: type } });
+    var e = new CustomEvent("onsharerequest", { bubbles: true, detail: { } });
+    document.documentElement.dispatchEvent(e);
+
+    activeTransfer.contentType(function(type) {
+        var e = new CustomEvent("received-object-value",
+            { bubbles: true, detail: { value: type } });
         document.documentElement.dispatchEvent(e);
-    }
+    })
 }
 
 function setup() {

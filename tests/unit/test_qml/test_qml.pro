@@ -22,7 +22,12 @@ OTHER_FILES += \
     $$system(ls *.sh) \
     tst_api_contenthub.qml \
     tst_api_contenthub.html \
-    tst_api_contenthub.js
+    tst_api_contenthub.js \
+    tst_api_launchEmbeddedUI.qml \
+    tst_api_launchEmbeddedUI.html \
+    embeddedUI.qml \
+    tst_api_launchEmbeddedUI.js \
+    empty.html
 
 
 # make check target

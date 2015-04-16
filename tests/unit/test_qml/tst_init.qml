@@ -55,19 +55,6 @@ TestCase {
         compare(spy.count, 1, "Script has been injected");
     }
 
-    function test_initAndMessageHandlerAdded() {
-        setup();
-
-        spy.clear();
-        spy.target = mockedWebView;
-        spy.signalName = "loadingStartedConnected";
-
-        webapps.name = "test_initAndMessageHandlerAdded";
-        webapps.bindee = mockedWebView;
-
-        compare(spy.count, 1, "WebApp message connected on load started");
-    }
-
     function test_initWithNoName() {
         setup();
 
