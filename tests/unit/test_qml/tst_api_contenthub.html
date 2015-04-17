@@ -25,7 +25,7 @@ function setup() {
 }
 
 window.onload = function () {
-    if (external.getUnityObject) {
+    if (window.external && window.external.getUnityObject) {
         setup()
     } else {
         document.addEventListener('ubuntu-webapps-api-ready', function() {

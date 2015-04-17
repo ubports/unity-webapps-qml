@@ -28,31 +28,26 @@ TestCase {
 
     name: "ContentHubApiTest"
 
-    SignalSpy {
-      id: spy
-      target: webapps
-      signalName: "apiCallDispatched"
-    }
+    signal messageReceived()
 
     SignalSpy {
       id: spyMessageReceived
-      target: webview
+      target: testcase
       signalName: "messageReceived"
     }
 
     function setup() {
         callbacks = []
         objects = {}
-        lastReceivedArgs = ""
+        lastReceivedMethod = ""
         webview.url = "empty.html"
-        spy.clear()
         spyMessageReceived.clear()
     }
 
     property var callbacks: []
     property var objects: null
     property var backends: getContentHubBackend()
-    property string lastReceivedArgs
+    property string lastReceivedMethod
 
     function serializeContentTransferObject(id, content, selection, handlerFuncs) {
         if (!objects) {
@@ -85,6 +80,8 @@ TestCase {
             ContentHub: {
                 onShareRequested: function(callback) {
                     callbacks.push(callback)
+                    lastReceivedMethod = 'onShareRequested'
+                    testcase.messageReceived()
                 },
                 dispatchToObject: function(infos) {
                     var args = infos.args;
@@ -94,6 +91,7 @@ TestCase {
                     verify(objects != null && objects[infos.objectid] != null)
 
                     verify(objects[infos.objectid].handlerFuncs[method_name] != null)
+                    testcase.messageReceived()
 
                     var r
                     try {
@@ -116,8 +114,9 @@ TestCase {
 
         webview.url = "tst_api_contenthub.html"
 
-        spy.wait()
-        compare(spy.count, 2, "Should have had 1 apiCallDispatched signal");
+        spyMessageReceived.wait()
+        compare(spyMessageReceived.count, 1, "Should have had 1 apiCallDispatched signal");
+        compare(lastReceivedMethod, 'onShareRequested', "Should have had 2 apiCallDispatched signal");
         compare(callbacks.length, 1, "Should have had 1 callback object");
     }
 
@@ -128,8 +127,9 @@ TestCase {
 
         webview.url = "tst_api_contenthub.html"
 
-        spy.wait()
-        compare(spy.count, 2, "Should have had 2 apiCallDispatched signal");
+        spyMessageReceived.wait()
+        compare(spyMessageReceived.count, 1, "Should have had 2 apiCallDispatched signal");
+        compare(lastReceivedMethod, 'onShareRequested', "Should have had 2 apiCallDispatched signal");
         compare(callbacks.length, 1, "Should have had 1 callback object");
 
         evaluateCode("document.addEventListener('onsharerequest', function(e) { \
@@ -169,15 +169,13 @@ oxide.sendMessage('share-request-received', { type: e.detail.type }); \
 
         anchors.fill: parent
 
-        signal messageReceived()
-
         messageHandlers: [
             Oxide.ScriptMessageHandler {
                 msgId: "share-request-received"
                 contexts: [ "oxide://test-msg-handler/" ]
                 callback: function(msg) {
-                    testcase.lastReceivedArgs = msg.args;
-                    webview.messageReceived()
+                    testcase.lastReceivedMethod = msg.args;
+                    testcase.messageReceived()
                 }
             }
         ]
