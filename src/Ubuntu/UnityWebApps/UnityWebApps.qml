@@ -659,7 +659,7 @@ Item {
                             args[k] = params[k]
                         }
                     }
-console.log(' DDD')
+
                     // For backward compatibility
                     if (params.hasOwnProperty("fileToShare") &&
                             typeof(params.fileToShare) === 'object' &&
