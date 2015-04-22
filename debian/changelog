@@ -1,3 +1,13 @@
+unity-webapps-qml (0.1+15.04.20150422-0ubuntu1) vivid; urgency=medium
+
+  [ Alexandre Abreu ]
+  * Improve paramater passing to launchEmbedded UI (LP: #1417776)
+
+  [ CI Train Bot ]
+  * New rebuild forced.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Wed, 22 Apr 2015 14:37:14 +0000
+
 unity-webapps-qml (0.1+15.04.20150409-0ubuntu1) vivid; urgency=medium
 
   [ Daniel Holbach ]
