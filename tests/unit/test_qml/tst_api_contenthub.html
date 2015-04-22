@@ -1,0 +1,42 @@
+<html>
+
+<head>
+<script>
+
+var activeTransfer
+
+function _shareRequested(transfer) {
+    activeTransfer = transfer;
+
+    var e = new CustomEvent("onsharerequest", { bubbles: true, detail: { } });
+    document.documentElement.dispatchEvent(e);
+
+    activeTransfer.contentType(function(type) {
+        var e = new CustomEvent("received-object-value",
+            { bubbles: true, detail: { value: type } });
+        document.documentElement.dispatchEvent(e);
+    })
+}
+
+function setup() {
+    var api = external.getUnityObject('1.0');
+    var hub = api.ContentHub;
+    hub.onShareRequested(_shareRequested);
+}
+
+window.onload = function () {
+    if (window.external && window.external.getUnityObject) {
+        setup()
+    } else {
+        document.addEventListener('ubuntu-webapps-api-ready', function() {
+            setup()
+        });
+    }
+}
+</script>
+</head>
+
+<body>
+</body>
+
+</html>

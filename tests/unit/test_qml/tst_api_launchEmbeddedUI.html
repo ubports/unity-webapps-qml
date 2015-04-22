@@ -1,0 +1,21 @@
+<html>
+
+<head>
+<script>
+
+function callback() {}
+
+window.onload = function() {
+    document.addEventListener('launchEmbeddedUI', function(e) {
+        var api = external.getUnityObject('1.0');
+        api.launchEmbeddedUI('embeddedUI', callback, { fileToShare: "me", p: "you", q: "them" })
+    })
+}
+
+</script>
+</head>
+
+<body>
+</body>
+
+</html>
