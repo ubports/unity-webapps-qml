@@ -57,6 +57,7 @@ TestCase {
         objects[id] = {
             content: content,
             selection: selection,
+            items: {text: "blabla"},
             handlerFuncs: handlerFuncs
         };
         return {
@@ -123,7 +124,7 @@ TestCase {
     function test_invoke_shareRequestedCallback() {
         setup();
 
-        var transferObject = { contentType: function() { return "Pictures"; } }
+        var transferObject = { contentType: function() { return "Pictures"; }, items: function() { return [{ text: "blabla" }] } }
 
         webview.url = "tst_api_contenthub.html"
 
@@ -145,7 +146,7 @@ oxide.sendMessage('share-request-received', { type: e.detail.type }); \
                 "1", "", "", transferObject))
 
         spyMessageReceived.wait()
-        compare(spyMessageReceived.count, 2, "Should have had 1 messageReceived signal");
+        compare(spyMessageReceived.count, 3, "Should have had 1 messageReceived signal");
     }
 
     UnityWebApps {
@@ -175,6 +176,7 @@ oxide.sendMessage('share-request-received', { type: e.detail.type }); \
                 contexts: [ "oxide://test-msg-handler/" ]
                 callback: function(msg) {
                     testcase.lastReceivedMethod = msg.args;
+		    console.log("BLA " + JSON.stringify(msg.args))
                     testcase.messageReceived()
                 }
             }
