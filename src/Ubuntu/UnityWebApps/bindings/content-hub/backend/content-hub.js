@@ -56,7 +56,7 @@ function createContentHubApi(backendDelegate, parent) {
             "Videos": ContentHubBridge.ContentType.Videos,
             "Links": ContentHubBridge.ContentType.Links,
             "Text": ContentHubBridge.ContentType.Text,
-	    "EBooks": ContentHubBridge.ContentType.EBooks,
+            "EBooks": ContentHubBridge.ContentType.EBooks,
         };
         return name in contentTypePerName ?
                     contentTypePerName[name]

@@ -176,7 +176,6 @@ oxide.sendMessage('share-request-received', { type: e.detail.type }); \
                 contexts: [ "oxide://test-msg-handler/" ]
                 callback: function(msg) {
                     testcase.lastReceivedMethod = msg.args;
-		    console.log("BLA " + JSON.stringify(msg.args))
                     testcase.messageReceived()
                 }
             }
