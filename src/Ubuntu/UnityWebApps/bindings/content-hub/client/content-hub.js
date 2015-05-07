@@ -641,7 +641,7 @@ function createContentHubApi(backendBridge) {
             Videos: "Videos",
             Links: "Links",
             Text: "Text",
-	    EBooks: "EBooks",
+            EBooks: "EBooks",
         },
 
         /**
