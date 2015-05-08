@@ -617,6 +617,10 @@ function createContentHubApi(backendBridge) {
 
              Links
 
+             EBooks
+
+             Text
+
          @static
          @property ContentType {String}
          
@@ -636,6 +640,8 @@ function createContentHubApi(backendBridge) {
             Contacts: "Contacts",
             Videos: "Videos",
             Links: "Links",
+            Text: "Text",
+            EBooks: "EBooks",
         },
 
         /**

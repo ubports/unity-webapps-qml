@@ -13,7 +13,12 @@ function _shareRequested(transfer) {
 
     activeTransfer.contentType(function(type) {
         var e = new CustomEvent("received-object-value",
-            { bubbles: true, detail: { value: type } });
+            { bubbles: true, detail: { name: "type", value: type } });
+        document.documentElement.dispatchEvent(e);
+    })
+    activeTransfer.items(function(items) {
+        var e = new CustomEvent("received-object-value",
+            { bubbles: true, detail: { name: "text", value: items[0].text } });
         document.documentElement.dispatchEvent(e);
     })
 }

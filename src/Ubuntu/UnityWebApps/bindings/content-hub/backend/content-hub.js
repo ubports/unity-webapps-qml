@@ -55,6 +55,8 @@ function createContentHubApi(backendDelegate, parent) {
             "Contacts": ContentHubBridge.ContentType.Contacts,
             "Videos": ContentHubBridge.ContentType.Videos,
             "Links": ContentHubBridge.ContentType.Links,
+            "Text": ContentHubBridge.ContentType.Text,
+            "EBooks": ContentHubBridge.ContentType.EBooks,
         };
         return name in contentTypePerName ?
                     contentTypePerName[name]
@@ -77,6 +79,10 @@ function createContentHubApi(backendDelegate, parent) {
             return "Videos";
         else if (state === ContentHubBridge.ContentType.Links)
             return "Links";
+        else if (state === ContentHubBridge.ContentType.Text)
+            return "Text";
+        else if (state === ContentHubBridge.ContentType.EBooks)
+            return "EBooks";
         return "Unknown";
     };
 
@@ -338,6 +344,9 @@ function createContentHubApi(backendDelegate, parent) {
 
                 item.object.name = items[i].name;
                 item.object.url = items[i].url;
+                if (items[i].text) {
+		    item.object.text = items[i].text;
+		}
 
                 contentItems.push(item.object);
             }
@@ -374,8 +383,11 @@ function createContentHubApi(backendDelegate, parent) {
             serializeItems: function(self) {
                 var items = [];
                 for (var i = 0; i < self.items.length; ++i) {
-                    items.push({name: self.items[i].name.toString(),
-                                   url: self.items[i].url.toString()});
+                    items.push({
+			name: self.items[i].name.toString(),
+                        url: self.items[i].url.toString(),
+                        text: self.items[i].text.toString()
+		    });
                 }
                 return items;
             }
