@@ -126,13 +126,6 @@ UnityBindingBridge.prototype = {
                     console.log('Error while dispatching callback call: ' + e)
                 }
             }
-            else {
-                try {
-                    console.log('Unknown message received: '
-                                + JSON.stringify(message));
-                }
-                catch(e) {}
-            }
         });
     },
 

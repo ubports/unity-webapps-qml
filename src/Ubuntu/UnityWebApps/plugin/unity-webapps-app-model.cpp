@@ -127,7 +127,6 @@ void UnityWebappsAppModel::setSearchPath(const QString& path)
 
     if (path.isEmpty())
     {
-        qDebug() << "Empty path in webapps model search path update request";
         return;
     }
 
@@ -141,10 +140,6 @@ void UnityWebappsAppModel::setSearchPath(const QString& path)
     }
 
     _searchPath = doCorrectSearchPath(searchDir.path());
-
-    qDebug() << "Using '"
-             << _searchPath
-             << "' as the default search path for installed webapps";
 
     Q_EMIT searchPathChanged(_searchPath);
 }
@@ -261,7 +256,6 @@ void UnityWebappsAppModel::load()
 
     if (!isValidInstall(installationSearchPath))
     {
-        qDebug() << "Invalid webapps installation";
         return;
     }
 
@@ -289,8 +283,6 @@ void UnityWebappsAppModel::load()
                 parser.parse (QFileInfo (webappInfos.value().manifestFilename));
         if (!manifest.isvalid())
         {
-            qDebug() << "Invalid webapps manifest found in: "
-                     << candidateWebappFolder.absoluteFilePath();
             continue;
         }
 

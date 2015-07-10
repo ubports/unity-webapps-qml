@@ -395,8 +395,6 @@ Item {
         if (model) {
             if (model.providesSingleInlineWebapp() && webapps.name.length === 0) {
                 webapps.name = model.getSingleInlineWebappName();
-
-                console.log('Webapp name updated to ' + webapps.name)
             }
             __setupNamedWebappEnvironment();
         }
