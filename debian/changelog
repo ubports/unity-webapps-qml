@@ -1,3 +1,9 @@
+unity-webapps-qml (0.1+16.04.20160114-0ubuntu1) xenial; urgency=medium
+
+  * Clean up very verbose and non informative logs (LP: #1473488)
+
+ -- Alexandre Abreu <alexandre.abreu@canonical.com>  Thu, 14 Jan 2016 15:42:27 +0000
+
 unity-webapps-qml (0.1+15.04.20150508-0ubuntu1) vivid; urgency=medium
 
   [ Alexandre Abreu ]
