@@ -121,8 +121,6 @@ void UnityWebapps::init(const QString& name,
         desktopId = QString("%1.desktop").arg(QString(qgetenv("APP_ID")));
     }
 
-    qDebug() << "UnityWebapps initialized with desktop id: " << desktopId;
-
     bool success = initInternal(name,
                                 displayName,
                                 domain,
@@ -174,7 +172,6 @@ void UnityWebapps::buildAppInfos(const QString & name,
 {
     if (_appInfos != NULL)
     {
-        qDebug() << "WARNING: Found existing application info for app " << name;
         return;
     }
 
@@ -225,14 +222,12 @@ bool UnityWebapps::isValidInitForWebappAndModel (const QString & domain,
 
     if ( ! _model->exists(displayName))
     {
-        qDebug() << "Initializing a non-local webapp (not found installed locally)";
         return true;
     }
 
     QString modelAppDomain = _model->getDomainFor(displayName);
     if (modelAppDomain.isEmpty())
     {
-        qDebug() << "Validation a weird webapps install: domain name empty for " << displayName;
         return true;
     }
 
@@ -246,7 +241,6 @@ QString UnityWebapps::getUserSharePath()
             QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
     if (userhomeList.isEmpty())
     {
-        qDebug() << "Error cannot find current '~'";
         return QString();
     }
 
@@ -442,8 +436,6 @@ QString UnityWebapps::extractFromGlobalDesktopFile(const QString & desktopFilena
     if (qgetenv("UNITY_WEBAPPS_QML_GLOBAL_DESKTOP_FILE_LOCATION").data() != NULL)
     {
         DESKTOP_FILE_LOCATION = QString(qgetenv("UNITY_WEBAPPS_QML_GLOBAL_DESKTOP_FILE_LOCATION"));
-
-        qDebug() << "Using " << DESKTOP_FILE_LOCATION << " as a global desktop file location search path";
     }
 
     QFileInfo fileInfo(QString("%1/%2")
@@ -570,7 +562,6 @@ void UnityWebapps::ensureLocalApplicationsPathExists()
     QString shareDirPath (getUserSharePath());
     if (shareDirPath.isEmpty())
     {
-        qDebug() << "Error while trying to get current session home directory";
         return;
     }
 

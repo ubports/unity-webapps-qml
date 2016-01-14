@@ -79,7 +79,6 @@ OxideWebviewAdapter.prototype = {
             var script = userScriptUrls[i];
             if (this._injectedUserScripts.some(
                         function(e) { return e === script; })) {
-                console.log('Skipping already injected script: ' + script)
                 continue;
             }
 
