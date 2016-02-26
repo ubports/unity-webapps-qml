@@ -203,7 +203,13 @@ UbuntuBindingBackendDelegate.prototype = {
     },
 
     parentView: function() {
-        return this._parent ? this._parent.bindee : null;
+        if (! this._parent) {
+            return null
+        }
+        if (this._parent.embeddedUiComponentParent) {
+            return this._parent.embeddedUiComponentParent
+        }
+        return this._parent.bindee
     },
 
     isObjectProxyInfo: function(info) {

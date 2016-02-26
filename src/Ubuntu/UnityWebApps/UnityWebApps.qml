@@ -152,6 +152,15 @@ Item {
     property var customBackendProxies: null
 
     /*!
+      \qmlproperty string [optional] UnityWebApps::embeddedUiComponentParent
+
+      Specifies a parent view for potential embedded ui components being created
+      by using api.launchEmbeddedUI
+
+     */
+    property var embeddedUiComponentParent: null
+
+    /*!
       \qmlproperty string UnityWebApps::_opt_clientApiFileUrl
 
       Used only for testing.
@@ -651,6 +660,11 @@ Item {
 
                 var uicomponent;
                 function onCreated() {
+                    if (uicomponent.status == Component.Error) {
+                        console.log("Error loading embedded ui component:", uicomponent.errorString())
+                        return
+                    }
+
                     var args = {}
                     for (var k in params) {
                         if (params.hasOwnProperty(k)) {
@@ -680,8 +694,8 @@ Item {
                     uiobject.onCompleted.connect(_onCompleted);
                 };
 
-                var uicomponent = Qt.createComponent(path + "/" + name + ".qml");
-                if (uicomponent.status === Component.Ready)
+                uicomponent = Qt.createComponent(path + "/" + name + ".qml");
+                if (uicomponent.status == Component.Ready)
                     onCreated()
                 else
                     uicomponent.statusChanged.connect(onCreated)
