@@ -99,9 +99,9 @@ function createContentHubApi(backendDelegate, parent) {
 
         _runHandlers: function(handlers, transfer) {
             for (var i = 0;
-                 i < this.handlers.length;
+                 i < handlers.length;
                  ++i) {
-                this.handlers[i](transfer)
+                handlers[i](transfer)
             }
         },
 
