@@ -44,6 +44,97 @@ function createContentHubApi(backendDelegate, parent) {
 
     var _contenthub = ContentHubBridge.ContentHub;
 
+    function ContentHubEventHandler() {
+        this._contentHub = _contenthub;
+
+        this._shareRequestedCallbacks = []
+        this._importRequestedCallbacks = []
+        this._exportRequestedCallbacks = []
+
+        this._currentShareTransfer = null
+        this._currentImportTranfer = null
+        this._currentExportTransfer = null
+
+        this.setup()
+    }
+    ContentHubEventHandler.prototype = {
+        setup: function() {
+            this._contentHub.exportRequested.connect(
+                     this._exportRequested.bind(this))
+            this._contentHub.importRequested.connect(
+                     this._importRequested.bind(this))
+            this._contentHub.shareRequested.connect(
+                     this._shareRequested.bind(this))
+        },
+        _exportRequested: function(transfer) {
+            if (this._exportRequestedCallbacks.length === 0) {
+                if (this._currentExportTransfer) {
+                    this._currentExportTransfer.state = ContentTransfer.Aborted
+                }
+                this._currentExportTransfer = transfer
+            } else {
+                this._runHandlers(this._exportRequestedCallbacks, transfer)
+            }
+        },
+        _importRequested: function(transfer) {
+            if (this._importRequestedCallbacks.length === 0) {
+                if (this._currentImportTransfer) {
+                    this._currentImportTransfer.state = ContentTransfer.Aborted
+                }
+                this._currentImportTransfer = transfer
+            } else {
+                this._runHandlers(this._importRequestedCallbacks, transfer)
+            }
+        },
+        _shareRequested: function(transfer) {
+            if (this._shareRequestedCallbacks.length === 0) {
+                if (this._currentShareTransfer) {
+                    this._currentShareTransfer.state = ContentTransfer.Aborted
+                }
+                this._currentShareTransfer = transfer
+            } else {
+                this._runHandlers(this._shareRequestedCallbacks, transfer)
+            }
+        },
+
+        _runHandlers: function(handlers, transfer) {
+            for (var i = 0;
+                 i < this.handlers.length;
+                 ++i) {
+                this.handlers[i](transfer)
+            }
+        },
+
+        onExportRequested: function(callback) {
+            this._exportRequestedCallbacks.push(callback)
+            if (this._currentExportTransfer
+                    && this._currentExportTransfer.state !== ContentTransfer.Aborted
+                    && this._currentExportTransfer.state !== ContentTransfer.Finalized) {
+                this._exportRequested(this._currentExportTransfer)
+                this._currentExportTransfer = null
+            }
+        },
+        onImportRequested: function(callback) {
+            this._importRequestedCallbacks.push(callback)
+            if (this._currentImportTransfer
+                    && this._currentImportTransfer.state !== ContentTransfer.Aborted
+                    && this._currentImportTransfer.state !== ContentTransfer.Finalized) {
+                this._importRequested(this._currentImportTransfer)
+                this._currentImportTransfer = null
+            }
+        },
+        onShareRequested: function(callback) {
+            this._shareRequestedCallbacks.push(callback)
+            if (this._currentShareTransfer
+                    && this._currentShareTransfer.state !== ContentTransfer.Aborted
+                    && this._currentShareTransfer.state !== ContentTransfer.Finalized) {
+                this._shareRequested(this._currentShareTransfer)
+                this._currentShareTransfer = null
+            }
+        },
+    };
+    var contentHubHandler = new ContentHubEventHandler();
+
     // TODO find a better way
     function _nameToContentType(name) {
         var contentTypePerName = {
@@ -345,8 +436,8 @@ function createContentHubApi(backendDelegate, parent) {
                 item.object.name = items[i].name;
                 item.object.url = items[i].url;
                 if (items[i].text) {
-		    item.object.text = items[i].text;
-		}
+                    item.object.text = items[i].text;
+                }
 
                 contentItems.push(item.object);
             }
@@ -384,10 +475,10 @@ function createContentHubApi(backendDelegate, parent) {
                 var items = [];
                 for (var i = 0; i < self.items.length; ++i) {
                     items.push({
-			name: self.items[i].name.toString(),
+                        name: self.items[i].name.toString(),
                         url: self.items[i].url.toString(),
                         text: self.items[i].text.toString()
-		    });
+                    });
                 }
                 return items;
             }
@@ -807,21 +898,21 @@ function createContentHubApi(backendDelegate, parent) {
         },
 
         onExportRequested: function(callback) {
-            _contenthub.exportRequested.connect(function(exportTransfer) {
+            contentHubHandler.onExportRequested(function(exportTransfer) {
                 var wrapped = new ContentTransfer(exportTransfer);
                 callback(wrapped.serialize());
             });
         },
 
         onImportRequested: function(callback) {
-            _contenthub.onImportRequested.connect(function(importTransfer) {
+            contentHubHandler.onImportRequested(function(importTransfer) {
                 var wrapped = new ContentTransfer(importTransfer);
                 callback(wrapped.serialize());
             });
         },
 
         onShareRequested: function(callback) {
-            _contenthub.shareRequested.connect(function(shareTransfer) {
+            contentHubHandler.onShareRequested(function(shareTransfer) {
                 var wrapped = new ContentTransfer(shareTransfer);
                 callback(wrapped.serialize());
             });
