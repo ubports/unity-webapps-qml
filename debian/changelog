@@ -1,3 +1,12 @@
+unity-webapps-qml (0.1+16.04.20160429.1-0ubuntu1) xenial; urgency=medium
+
+  * Allow one to specify a parent for embedded uis being launched by
+    webapps (LP: #1550397)
+  * Handle delayed creation of content hub share/import/export handler
+    that could miss transfer requests (LP: #1564770)
+
+ -- Alexandre Abreu <alexandre.abreu@canonical.com>  Fri, 29 Apr 2016 20:17:25 +0000
+
 unity-webapps-qml (0.1+16.04.20160114-0ubuntu1) xenial; urgency=medium
 
   * Clean up very verbose and non informative logs (LP: #1473488)
