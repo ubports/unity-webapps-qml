@@ -1,3 +1,10 @@
+unity-webapps-qml (0.1+16.10.20160713-0ubuntu1) yakkety; urgency=medium
+
+  [ Florian Boucault ]
+  * Fixes for crossbuilding.
+
+ -- Alexandre Abreu <alexandre.abreu@canonical.com>  Wed, 13 Jul 2016 16:23:10 +0000
+
 unity-webapps-qml (0.1+16.04.20160429.1-0ubuntu1) xenial; urgency=medium
 
   * Allow one to specify a parent for embedded uis being launched by
