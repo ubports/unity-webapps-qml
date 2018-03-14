@@ -53,15 +53,15 @@ Depends: qtdeclarative5-window-plugin,
 Description: Example usage of Unity Webapps QML component
  Some examples demonstrating the webapps QML component.
 
-Package: unity-webapps-qml-doc
-Section: doc
-Architecture: all
-Depends: ${misc:Depends}, ${shlibs:Depends},
-Suggests: unity-webapps-qml-examples,
-Description: Documentation for Unity Webapps QML - documentation
- Unity Webapps QML component
- .
- This package contains developer documentation.
+#Package: unity-webapps-qml-doc
+#Section: doc
+#Architecture: all
+#Depends: ${misc:Depends}, ${shlibs:Depends},
+#Suggests: unity-webapps-qml-examples,
+#Description: Documentation for Unity Webapps QML - documentation
+# Unity Webapps QML component
+# .
+# This package contains developer documentation.
 
 Package: unity-webapps-qml-autopilot
 Architecture: all
