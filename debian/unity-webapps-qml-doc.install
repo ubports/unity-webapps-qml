@@ -3,4 +3,3 @@ src/Ubuntu/UnityWebApps/bindings/content-hub/client/docsbuild/*		/usr/share/unit
 src/Ubuntu/UnityWebApps/bindings/online-accounts/client/docsbuild/*	/usr/share/unity-webapps-qml/doc/api/online-accounts/
 src/Ubuntu/UnityWebApps/bindings/runtime-api/client/docsbuild/*		/usr/share/unity-webapps-qml/doc/api/runtime-api/
 usr/share/unity-webapps-qml/doc
-usr/share/unity-webapps-qml/doc/*
