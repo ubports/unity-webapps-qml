@@ -1,4 +1,4 @@
-tests/autopilot/html/* usr/share/unity-webapps-qml/autopilot-tests/html/
 tests/autopilot/data/* usr/share/unity-webapps-qml/autopilot-tests/data/
+tests/autopilot/html/* usr/share/unity-webapps-qml/autopilot-tests/html/
 tests/autopilot/qml/* usr/share/unity-webapps-qml/autopilot-tests/qml/
 usr/lib/python*
